@@ -1,0 +1,100 @@
+import type { Problem, Difficulty } from '../../types/math';
+import { randomInt, pickOne } from '../mathHelpers';
+
+export function generateRatioProblem(difficulty: Difficulty): Problem {
+  const type = pickOne(['percentage', 'proportion_equation', 'proportional_distribution']);
+  const id = `rat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+
+  if (type === 'percentage') {
+    const total = pickOne([20, 25, 40, 50, 100]);
+    const part = randomInt(3, total - 2);
+    const percent = Math.round((part / total) * 100);
+
+    return {
+      id,
+      topicId: 'ratios',
+      subtopic: '백분율 (%)',
+      difficulty,
+      question: `전체 ${total}명 중 안경을 쓴 학생이 ${part}명입니다. 안경을 쓴 학생의 비율을 백분율(%)로 나타내면 몇 %인가요?`,
+      hint: `백분율은 (비교하는 양 ÷ 기준량) × 100 이에요!`,
+      answerType: 'number',
+      correctAnswer: percent,
+      explanations: [
+        {
+          title: '1단계: 비율 구하기',
+          content: `기준량은 ${total}, 비교하는 양은 ${part}이므로 비율은 ${part}/${total} 입니다.`,
+        },
+        {
+          title: '2단계: 백분율로 환산 (× 100)',
+          content: `(${part} / ${total}) × 100 = ${percent}% 입니다.`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'proportion_equation') {
+    // a : b = c : x (x = b * c / a)
+    const a = randomInt(2, 6);
+    const b = randomInt(3, 8);
+    const multiplier = randomInt(2, 6);
+    const c = a * multiplier;
+    const x = b * multiplier;
+
+    return {
+      id,
+      topicId: 'ratios',
+      subtopic: '비례식의 성질',
+      difficulty,
+      question: `다음 비례식에서 빈칸 □에 들어갈 알맞은 수를 구하세요:  ${a} : ${b} = ${c} : □`,
+      hint: `비례식에서는 '외항의 곱 = 내항의 곱'이 성립해요! 또는 앞의 비의 전항(${a})이 몇 배 커졌는지(${multiplier}배) 살펴보세요.`,
+      answerType: 'number',
+      correctAnswer: x,
+      explanations: [
+        {
+          title: '방법 1: 전항과 후항의 배수 관계',
+          content: `${a}가 ${multiplier}배 되어 ${c}이 되었으므로, ${b}도 똑같이 ${multiplier}배 되어야 합니다: ${b} × ${multiplier} = ${x}`,
+        },
+        {
+          title: '방법 2: 외항의 곱 = 내항의 곱',
+          content: `${a} × □ = ${b} × ${c} (${b * c})  ➡️  □ = ${b * c} ÷ ${a} = ${x}`,
+        },
+      ],
+    };
+  }
+
+  // Proportional distribution
+  const r1 = randomInt(1, 4);
+  const r2 = randomInt(2, 5);
+  const unit = randomInt(3, 10);
+  const total = (r1 + r2) * unit;
+  const person = pickOne(['민수', '지우', '태호', '서연']);
+  const isFirst = Math.random() > 0.5;
+  const targetName = isFirst ? `${person}` : '친구';
+  const targetAns = isFirst ? r1 * unit : r2 * unit;
+
+  return {
+    id,
+    topicId: 'ratios',
+    subtopic: '비례배분',
+    difficulty,
+    context: '스티커 나누기',
+    question: `스티커 ${total}장을 ${person}와 친구가 ${r1} : ${r2}의 비로 나누어 가지려고 합니다. ${targetName}가 갖게 될 스티커는 몇 장일까요?`,
+    hint: `전체를 총 (${r1} + ${r2} = ${r1 + r2})조각으로 나눈 다음, 그 중 ${isFirst ? r1 : r2}조각의 양을 구하면 돼요!`,
+    answerType: 'number',
+    correctAnswer: targetAns,
+    explanations: [
+      {
+        title: '1단계: 비의 합 구하기',
+        content: `전체 비의 합 = ${r1} + ${r2} = ${r1 + r2} 묶음`,
+      },
+      {
+        title: '2단계: 1묶음의 크기 구하기',
+        content: `${total} ÷ ${r1 + r2} = 1묶음당 ${unit}장`,
+      },
+      {
+        title: '3단계: 배분하기',
+        content: `${targetName}의 몫 = ${unit} × ${isFirst ? r1 : r2} = ${targetAns}장`,
+      },
+    ],
+  };
+}
