@@ -36,39 +36,40 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         {/* Brand */}
-        <div
+        <button
+          type="button"
           onClick={() => {
             sound.playPop();
             onTabChange('roadmap');
           }}
-          className="flex items-center gap-2 cursor-pointer select-none group"
+          className="flex items-center gap-2 cursor-pointer select-none group text-left"
         >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white text-xl shadow-md group-hover:scale-105 transition-transform">
+          <span className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white text-xl shadow-md group-hover:scale-105 transition-transform">
             📐
-          </div>
-          <div>
-            <div className="font-black text-slate-800 text-sm sm:text-lg leading-tight tracking-tight">
+          </span>
+          <span className="block">
+            <span className="block font-black text-slate-800 text-sm sm:text-lg leading-tight tracking-tight">
               준영이의 수학공부
-            </div>
-            <div className="hidden text-sm font-bold text-indigo-600 tracking-wide sm:block">
+            </span>
+            <span className="hidden text-sm font-bold text-indigo-600 tracking-wide sm:block">
               초등 5·6학년 생각하는 수학
-            </div>
-            <div className="text-[10px] leading-tight text-slate-500">
+            </span>
+            <span className="block text-[10px] leading-tight text-slate-500">
               빌드 날짜 {BUILD_DATE.replaceAll('-', '.')}
-            </div>
-          </div>
-        </div>
+            </span>
+          </span>
+        </button>
 
         {/* Navigation Tabs */}
-        <nav className="hidden md:flex items-center bg-slate-100 p-1 rounded-xl gap-1">
+        <nav className="hidden md:flex items-center bg-slate-100 p-1 rounded-2xl gap-1">
           <button
             onClick={() => {
               sound.playPop();
               onTabChange('roadmap');
             }}
-            className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
+            className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all ${
               currentTab === 'roadmap'
-                ? 'bg-white text-indigo-600 shadow-sm'
+                ? 'bg-white text-indigo-700 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -79,9 +80,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               sound.playPop();
               onTabChange('lab');
             }}
-            className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
+            className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all ${
               currentTab === 'lab'
-                ? 'bg-white text-indigo-600 shadow-sm'
+                ? 'bg-white text-indigo-700 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -92,9 +93,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               sound.playPop();
               onTabChange('quiz');
             }}
-            className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
+            className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all ${
               currentTab === 'quiz'
-                ? 'bg-white text-indigo-600 shadow-sm'
+                ? 'bg-white text-indigo-700 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -105,15 +106,15 @@ export const Navbar: React.FC<NavbarProps> = ({
               sound.playPop();
               onTabChange('review');
             }}
-            className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all relative ${
+            className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all relative ${
               currentTab === 'review'
-                ? 'bg-white text-rose-600 shadow-sm'
+                ? 'bg-white text-rose-700 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             📝 오답 노트
             {wrongCount > 0 && (
-              <span className="ml-1 px-1.5 py-0.2 bg-rose-600 text-white rounded-full text-xs font-bold">
+              <span className="ml-1 px-1.5 py-0.5 bg-rose-600 text-white rounded-full text-xs font-bold">
                 {wrongCount}
               </span>
             )}
@@ -130,9 +131,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 sound.playPop();
                 onTabChange(tab);
               }}
-              className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
+              className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all ${
                 currentTab === tab
-                  ? 'bg-white text-indigo-600 shadow-sm'
+                  ? 'bg-white text-indigo-700 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -166,7 +167,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
 
           {/* Level and Stars Badge */}
-          <div className="hidden items-center gap-2 bg-amber-50 px-3 py-1 rounded-xl border border-amber-200 text-amber-900 sm:flex">
+          <div className="hidden items-center gap-2 bg-amber-50 px-3 py-1 rounded-full border border-amber-200 text-amber-900 sm:flex">
             <span className="text-xs font-extrabold">Lv.{stats.level}</span>
             <span className="w-px h-3 bg-amber-200" />
             <div className="flex items-center gap-0.5 text-xs font-black text-amber-700">
@@ -195,9 +196,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               sound.playPop();
               onTabChange(tab);
             }}
-            className={`flex flex-col items-center gap-0.5 rounded-lg px-0.5 py-1 leading-tight whitespace-nowrap ${
+            className={`flex flex-col items-center gap-0.5 rounded-xl px-0.5 py-1 leading-tight whitespace-nowrap ${
               currentTab === tab
-                ? `${tab === 'review' ? 'text-rose-600' : 'text-indigo-600'} bg-white shadow-2xs`
+                ? `${tab === 'review' ? 'text-rose-700' : 'text-indigo-700'} bg-white shadow-2xs`
                 : 'text-slate-500'
             }`}
           >

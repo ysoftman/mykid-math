@@ -28,7 +28,7 @@ export const DailyMission: React.FC<{ stats: UserStats }> = ({ stats }) => {
           <span>🎯</span> 오늘의 미션: 도전 퀴즈 {DAILY_MISSION_GOAL}문제 풀기
         </h3>
         {streak > 0 && (
-          <span className="text-xs font-bold text-orange-700 bg-orange-50 border border-orange-200 px-2.5 py-1 rounded-full">
+          <span className="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
             🔥 {streak}일 연속
           </span>
         )}
@@ -41,7 +41,7 @@ export const DailyMission: React.FC<{ stats: UserStats }> = ({ stats }) => {
               🎉 미션 완료! 출석 도장과 별 {DAILY_MISSION_BONUS}개를 받았어요
             </span>
           ) : (
-            <span className="text-slate-500">
+            <span className="text-slate-700">
               {DAILY_MISSION_GOAL - solvedToday}문제만 더 풀면 출석 도장과 별 {DAILY_MISSION_BONUS}
               개!
             </span>
@@ -50,7 +50,14 @@ export const DailyMission: React.FC<{ stats: UserStats }> = ({ stats }) => {
             {Math.min(solvedToday, DAILY_MISSION_GOAL)} / {DAILY_MISSION_GOAL}
           </span>
         </div>
-        <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+        <div
+          role="progressbar"
+          aria-label="오늘의 미션"
+          aria-valuemin={0}
+          aria-valuemax={DAILY_MISSION_GOAL}
+          aria-valuenow={Math.min(solvedToday, DAILY_MISSION_GOAL)}
+          className="w-full bg-slate-100 h-3 rounded-full overflow-hidden"
+        >
           <div
             className={`h-full rounded-full transition-all duration-500 ${done ? 'bg-emerald-500' : 'bg-amber-400'}`}
             style={{ width: `${percent}%` }}
@@ -59,7 +66,7 @@ export const DailyMission: React.FC<{ stats: UserStats }> = ({ stats }) => {
       </div>
 
       <div>
-        <div className="text-xs font-bold text-slate-500">출석 도장 (최근 2주)</div>
+        <div className="text-xs font-bold text-slate-700">출석 도장 (최근 2주)</div>
         <p className="text-xs text-slate-500 mt-0.5 mb-2">
           도장 받는 법: 🎯 도전 퀴즈에서 하루 {DAILY_MISSION_GOAL}문제 풀기 (틀려도 괜찮아요).
           게임과 오답 노트 문제는 세지 않아요.
@@ -72,13 +79,21 @@ export const DailyMission: React.FC<{ stats: UserStats }> = ({ stats }) => {
             return (
               <div
                 key={key}
+                role="img"
+                aria-label={`${d.getMonth() + 1}월 ${d.getDate()}일${isToday ? ' (오늘)' : ''} ${stamped ? '도장 받음' : '도장 없음'}`}
                 title={`${d.getMonth() + 1}월 ${d.getDate()}일`}
                 className={`flex flex-col items-center justify-center rounded-xl border py-1.5 ${
                   stamped ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200'
                 } ${isToday ? 'ring-2 ring-indigo-500' : ''}`}
               >
                 <span
-                  className={`text-[11px] whitespace-nowrap ${isToday ? 'font-black text-indigo-700' : 'text-slate-500'}`}
+                  className={`text-[11px] font-semibold whitespace-nowrap ${
+                    isToday
+                      ? 'font-black text-indigo-700'
+                      : stamped
+                        ? 'text-emerald-900'
+                        : 'text-slate-700'
+                  }`}
                 >
                   {d.getMonth() + 1}/{d.getDate()}
                 </span>

@@ -97,6 +97,7 @@ export const App: React.FC = () => {
             onOpenWrongNotes={() => setCurrentTab('review')}
             onOpenShop={() => setCurrentTab('shop')}
             onOpenGames={() => setCurrentTab('games')}
+            onStartQuiz={() => setCurrentTab('quiz')}
             onDataImported={refreshStats}
           />
         )}

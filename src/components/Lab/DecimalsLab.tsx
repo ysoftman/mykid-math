@@ -31,13 +31,14 @@ export const DecimalsLab: React.FC = () => {
         <div className="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100">
           <div className="flex justify-between items-center mb-1">
             <span className="text-xs font-bold text-emerald-800">가로 길이: {valA.toFixed(1)}</span>
-            <span className="text-xs text-emerald-600 font-semibold">{cellsA}칸 / 10칸</span>
+            <span className="text-xs text-emerald-800 font-semibold">{cellsA}칸 / 10칸</span>
           </div>
           <input
             type="range"
             min="1"
             max="10"
             value={cellsA}
+            aria-label="가로 길이"
             onChange={(e) => {
               setValA(Number(e.target.value) / 10);
               sound.playPop();
@@ -49,13 +50,14 @@ export const DecimalsLab: React.FC = () => {
         <div className="bg-teal-50/50 p-4 rounded-xl border border-teal-100">
           <div className="flex justify-between items-center mb-1">
             <span className="text-xs font-bold text-teal-800">세로 길이: {valB.toFixed(1)}</span>
-            <span className="text-xs text-teal-600 font-semibold">{cellsB}칸 / 10칸</span>
+            <span className="text-xs text-teal-800 font-semibold">{cellsB}칸 / 10칸</span>
           </div>
           <input
             type="range"
             min="1"
             max="10"
             value={cellsB}
+            aria-label="세로 길이"
             onChange={(e) => {
               setValB(Number(e.target.value) / 10);
               sound.playPop();
@@ -79,7 +81,7 @@ export const DecimalsLab: React.FC = () => {
               return (
                 <div
                   key={`${r}-${c}`}
-                  className={`w-5 h-5 sm:w-8 sm:h-8 rounded-sm transition-all duration-200 border flex items-center justify-center ${
+                  className={`w-5 h-5 sm:w-8 sm:h-8 rounded transition-all duration-200 border flex items-center justify-center ${
                     isOverlap
                       ? 'bg-emerald-400 border-emerald-300 text-emerald-950 font-bold shadow'
                       : inCol

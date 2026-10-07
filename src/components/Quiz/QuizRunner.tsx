@@ -1,9 +1,9 @@
-import confetti from 'canvas-confetti';
 import type React from 'react';
 import { useState } from 'react';
 import type { Difficulty, Problem, TopicId } from '../../types/math';
 import { checkAnswer, formatAnswer } from '../../utils/answer';
 import { sound } from '../../utils/audio';
+import confetti from '../../utils/confetti';
 import { generateProblem } from '../../utils/problemGenerators';
 import {
   addWrongNote,
@@ -156,7 +156,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
               sound.playPop();
               onOpenScratchPad();
             }}
-            className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors border border-indigo-200"
+            className="flex items-center gap-1.5 text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-xl transition-colors border border-indigo-200"
           >
             <span>✏️</span>
             <span>연습장 열기</span>
@@ -166,7 +166,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
           <div
             role="group"
             aria-label="난이도 선택"
-            className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg text-xs font-semibold"
+            className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-semibold"
           >
             <span className="px-1 text-slate-700">난이도</span>
             {(['easy', 'medium', 'hard'] as Difficulty[]).map((d) => (
@@ -175,10 +175,10 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
                 onClick={() => handleDifficultyChange(d)}
                 aria-pressed={difficulty === d}
                 aria-label={`${DIFFICULTY_LABELS[d]} 난이도`}
-                className={`min-w-10 rounded-md px-2 py-1 transition-all ${
+                className={`min-w-10 rounded-lg px-2 py-1 transition-all ${
                   difficulty === d
-                    ? 'bg-white text-indigo-600 shadow-sm font-bold'
-                    : 'text-slate-500 hover:text-slate-800'
+                    ? 'bg-white text-indigo-700 shadow-sm font-bold'
+                    : 'text-slate-600 hover:text-slate-800'
                 }`}
               >
                 {DIFFICULTY_LABELS[d]}
@@ -191,7 +191,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
       {/* Problem Content */}
       <div className="space-y-4">
         {problem.context && (
-          <div className="inline-block bg-amber-50 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-md border border-amber-200">
+          <div className="inline-block bg-amber-50 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-lg border border-amber-200">
             📖 {problem.context}
           </div>
         )}
@@ -201,7 +201,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
         </h3>
 
         {combo >= 2 && (
-          <div className="inline-block bg-orange-100 text-orange-700 text-sm font-extrabold px-3 py-1 rounded-full border border-orange-200 animate-in fade-in">
+          <div className="inline-block bg-amber-50 text-amber-800 text-sm font-extrabold px-3 py-1 rounded-full border border-amber-200 animate-in fade-in">
             🔥 {combo}연속!
           </div>
         )}
@@ -249,7 +249,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
           {!isAnswered ? (
             <button
               onClick={handleCheckAnswer}
-              className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold rounded-xl shadow-md hover:brightness-105 active:scale-95 transition-all text-base"
+              className="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm active:scale-95 transition-all text-base"
             >
               정답 확인하기! 🎯
             </button>
@@ -259,7 +259,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
                 sound.playPop();
                 loadNewProblem();
               }}
-              className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold rounded-xl shadow-md hover:brightness-105 active:scale-95 transition-all text-base flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm active:scale-95 transition-all text-base flex items-center justify-center gap-2"
             >
               <span>다음 문제 풀기</span>
               <span>➡️</span>
@@ -286,7 +286,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
                   : '아쉬워요! 풀이를 보고 다시 원리를 익혀볼까요?'}
               </div>
               {comboBonus && (
-                <div className="text-sm font-bold text-orange-600 mt-0.5">🔥 +1 콤보 보너스 ⭐</div>
+                <div className="text-sm font-bold text-amber-800 mt-0.5">🔥 +1 콤보 보너스 ⭐</div>
               )}
               <div className="text-xs mt-0.5 opacity-90">
                 정답: <strong>{formatAnswer(problem)}</strong>
@@ -299,7 +299,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
               sound.playPop();
               setShowSolution(!showSolution);
             }}
-            className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-colors ${
+            className={`text-xs font-bold px-3 py-1.5 rounded-xl border transition-colors ${
               isCorrect
                 ? 'bg-emerald-100 border-emerald-300 text-emerald-800 hover:bg-emerald-200'
                 : 'bg-rose-100 border-rose-300 text-rose-800 hover:bg-rose-200'
@@ -318,7 +318,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
               sound.playPop();
               setShowHint(!showHint);
             }}
-            className="text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors"
+            className="text-xs font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors"
           >
             <span>💡</span>
             <span>{showHint ? '힌트 숨기기' : '어려운가요? 힌트 보기'}</span>

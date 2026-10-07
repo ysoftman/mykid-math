@@ -51,16 +51,16 @@ export const FactorsLab: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex flex-wrap bg-amber-50 p-1 rounded-xl">
+        <div className="flex flex-wrap bg-slate-100 p-1 rounded-2xl gap-1">
           <button
             onClick={() => {
               sound.playPop();
               setTab('rect');
             }}
-            className={`px-4 py-1.5 text-sm font-semibold rounded-lg transition-all ${
+            className={`px-4 py-1.5 text-sm font-bold rounded-xl transition-all ${
               tab === 'rect'
-                ? 'bg-amber-500 text-white shadow-sm'
-                : 'text-amber-800 hover:bg-amber-100'
+                ? 'bg-white text-indigo-700 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             🧱 직사각형 타일 약수 탐색
@@ -70,10 +70,10 @@ export const FactorsLab: React.FC = () => {
               sound.playPop();
               setTab('gcd_lcm');
             }}
-            className={`px-4 py-1.5 text-sm font-semibold rounded-lg transition-all ${
+            className={`px-4 py-1.5 text-sm font-bold rounded-xl transition-all ${
               tab === 'gcd_lcm'
-                ? 'bg-amber-500 text-white shadow-sm'
-                : 'text-amber-800 hover:bg-amber-100'
+                ? 'bg-white text-indigo-700 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             🤝 최대공약수 & 최소공배수
@@ -93,17 +93,18 @@ export const FactorsLab: React.FC = () => {
                 min="4"
                 max="36"
                 value={targetNum}
+                aria-label="살펴볼 수"
                 onChange={(e) => handleNumChange(Number(e.target.value))}
                 className="w-40 sm:w-60 accent-amber-500 cursor-pointer"
               />
-              <span className="text-2xl font-black text-amber-600 bg-white px-3 py-1 rounded-lg border border-amber-200">
+              <span className="text-2xl font-black text-amber-700 bg-white px-3 py-1 rounded-lg border border-amber-200">
                 {targetNum}
               </span>
             </div>
 
             <div className="text-sm text-amber-900">
               <span className="font-semibold">{targetNum}의 약수: </span>
-              <span className="font-mono bg-white px-2 py-0.5 rounded border border-amber-200 font-bold text-amber-600">
+              <span className="font-mono bg-white px-2 py-0.5 rounded-lg border border-amber-200 font-bold text-amber-700">
                 {factors.join(', ')}
               </span>
               <span className="ml-1 text-xs text-amber-700">({factors.length}개)</span>
@@ -126,7 +127,7 @@ export const FactorsLab: React.FC = () => {
                     }}
                     className={`px-3 py-2 rounded-xl text-sm font-bold border transition-all ${
                       isSelected
-                        ? 'bg-amber-500 border-amber-600 text-white shadow-md scale-105'
+                        ? 'bg-amber-100 border-amber-400 text-amber-900 shadow-sm scale-105'
                         : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-amber-50'
                     }`}
                   >
@@ -152,7 +153,7 @@ export const FactorsLab: React.FC = () => {
                 {Array.from({ length: targetNum }).map((_, idx) => (
                   <div
                     key={idx}
-                    className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-amber-400 to-amber-500 rounded flex items-center justify-center text-xs font-bold text-amber-950 shadow-sm"
+                    className="w-6 h-6 sm:w-7 sm:h-7 bg-amber-400 rounded flex items-center justify-center text-xs font-bold text-amber-950 shadow-sm"
                   >
                     {idx + 1}
                   </div>
@@ -178,7 +179,7 @@ export const FactorsLab: React.FC = () => {
             <div className="bg-amber-50/50 p-4 rounded-xl space-y-2">
               <label className="text-sm font-bold text-amber-900 flex justify-between">
                 <span>첫 번째 수 (A): {numA}</span>
-                <span className="text-xs text-amber-600 font-normal">
+                <span className="text-xs text-amber-800 font-normal">
                   약수: {factorsA.join(', ')}
                 </span>
               </label>
@@ -187,6 +188,7 @@ export const FactorsLab: React.FC = () => {
                 min="6"
                 max="36"
                 value={numA}
+                aria-label="첫 번째 수 (A)"
                 onChange={(e) => {
                   sound.playPop();
                   setNumA(Number(e.target.value));
@@ -198,7 +200,7 @@ export const FactorsLab: React.FC = () => {
             <div className="bg-blue-50/50 p-4 rounded-xl space-y-2">
               <label className="text-sm font-bold text-blue-900 flex justify-between">
                 <span>두 번째 수 (B): {numB}</span>
-                <span className="text-xs text-blue-600 font-normal">
+                <span className="text-xs text-blue-800 font-normal">
                   약수: {factorsB.join(', ')}
                 </span>
               </label>
@@ -207,6 +209,7 @@ export const FactorsLab: React.FC = () => {
                 min="6"
                 max="36"
                 value={numB}
+                aria-label="두 번째 수 (B)"
                 onChange={(e) => {
                   sound.playPop();
                   setNumB(Number(e.target.value));
@@ -217,24 +220,24 @@ export const FactorsLab: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-5">
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5">
               <div className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">
                 공통인 약수 중 가장 큰 수
               </div>
               <div className="text-xl font-bold text-slate-800">최대공약수 (GCD)</div>
-              <div className="text-4xl font-black text-amber-600 my-2">{calculatedGCD}</div>
+              <div className="text-4xl font-black text-amber-700 my-2">{calculatedGCD}</div>
               <div className="text-xs text-slate-600">
                 공약수 목록: <strong className="text-amber-700">{commonFactors.join(', ')}</strong>{' '}
                 중 가장 큰 수는 <strong>{calculatedGCD}</strong>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-5">
+            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-5">
               <div className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-1">
                 공통인 배수 중 가장 작은 수
               </div>
               <div className="text-xl font-bold text-slate-800">최소공배수 (LCM)</div>
-              <div className="text-4xl font-black text-blue-600 my-2">{calculatedLCM}</div>
+              <div className="text-4xl font-black text-blue-700 my-2">{calculatedLCM}</div>
               <div className="text-xs text-slate-600">
                 두 수가 처음으로 함께 만나는 배수는 <strong>{calculatedLCM}</strong>입니다!
               </div>

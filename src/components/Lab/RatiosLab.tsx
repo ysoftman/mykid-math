@@ -31,7 +31,7 @@ export const RatiosLab: React.FC = () => {
         <div className="bg-rose-50/50 p-4 rounded-xl border border-rose-100">
           <div className="flex justify-between items-center mb-1">
             <span className="text-xs font-bold text-rose-800">🍓 딸기 시럽 (비교하는 양)</span>
-            <span className="text-xs font-black text-rose-600 bg-white px-2 py-0.5 rounded border border-rose-200">
+            <span className="text-xs font-black text-rose-700 bg-white px-2 py-0.5 rounded-full border border-rose-200">
               {syrup} 컵
             </span>
           </div>
@@ -40,6 +40,7 @@ export const RatiosLab: React.FC = () => {
             min="1"
             max="6"
             value={syrup}
+            aria-label="딸기 시럽 컵 수"
             onChange={(e) => {
               sound.playPop();
               setSyrup(Number(e.target.value));
@@ -51,7 +52,7 @@ export const RatiosLab: React.FC = () => {
         <div className="bg-sky-50/50 p-4 rounded-xl border border-sky-100">
           <div className="flex justify-between items-center mb-1">
             <span className="text-xs font-bold text-sky-800">💧 탄산수 (물)</span>
-            <span className="text-xs font-black text-sky-600 bg-white px-2 py-0.5 rounded border border-sky-200">
+            <span className="text-xs font-black text-sky-700 bg-white px-2 py-0.5 rounded-full border border-sky-200">
               {water} 컵
             </span>
           </div>
@@ -60,6 +61,7 @@ export const RatiosLab: React.FC = () => {
             min="1"
             max="8"
             value={water}
+            aria-label="탄산수 컵 수"
             onChange={(e) => {
               sound.playPop();
               setWater(Number(e.target.value));
@@ -72,16 +74,16 @@ export const RatiosLab: React.FC = () => {
       <div className="bg-slate-900 rounded-2xl p-6 flex flex-col md:flex-row items-center justify-around gap-6 text-white">
         {/* Juice Glass Visualizer */}
         <div className="flex flex-col items-center">
-          <div className="relative w-28 h-44 border-4 border-slate-400 border-t-0 rounded-b-3xl bg-slate-800/80 overflow-hidden flex flex-col justify-end p-1 shadow-inner">
+          <div className="relative w-28 h-44 border-4 border-slate-400 border-t-0 rounded-b-2xl bg-slate-800/80 overflow-hidden flex flex-col justify-end p-1 shadow-inner">
             <div
-              className="w-full rounded-b-2xl transition-all duration-300 relative flex items-center justify-center font-bold text-xs"
+              className="w-full rounded-b-xl transition-all duration-300 relative flex items-center justify-center font-bold text-xs"
               style={{
                 height: `${Math.min(95, (total / 12) * 100)}%`,
                 backgroundColor: `rgba(244, 63, 94, ${juiceOpacity})`,
                 boxShadow: '0 -4px 12px rgba(244, 63, 94, 0.4)',
               }}
             >
-              <span className="bg-black/40 px-2 py-0.5 rounded text-xs text-white">
+              <span className="bg-black/40 px-2 py-0.5 rounded-full text-xs text-white">
                 농도 {ratioVal}%
               </span>
             </div>
@@ -108,7 +110,7 @@ export const RatiosLab: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-gradient-to-r from-rose-600 to-pink-600 p-4 rounded-xl text-white shadow-md">
+          <div className="bg-rose-600 p-4 rounded-xl text-white shadow-md">
             <div className="text-xs font-semibold text-rose-100">백분율 (퍼센트 %)</div>
             <div className="text-3xl font-black mt-1">{ratioVal}%</div>
             <div className="text-xs text-rose-100 mt-1">

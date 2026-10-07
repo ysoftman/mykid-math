@@ -1,15 +1,23 @@
-import confetti from 'canvas-confetti';
 import type React from 'react';
 import { useState } from 'react';
 import type { WrongNoteItem } from '../../types/math';
 import { checkAnswer, formatAnswer } from '../../utils/answer';
 import { sound } from '../../utils/audio';
+import confetti from '../../utils/confetti';
 import {
   getWrongNotes,
   type RewardResult,
   recordWrongConquered,
   removeWrongNote,
 } from '../../utils/storage';
+
+type FeedbackTone = 'correct' | 'wrong' | 'notice';
+
+const FEEDBACK_STYLES: Record<FeedbackTone, string> = {
+  correct: 'bg-emerald-50 border-emerald-200 text-emerald-900',
+  wrong: 'bg-rose-50 border-rose-200 text-rose-900',
+  notice: 'bg-amber-50 border-amber-200 text-amber-900',
+};
 
 interface ReviewNoteProps {
   onClose: () => void;
@@ -22,6 +30,7 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
   const [retryId, setRetryId] = useState<string | null>(null);
   const [retryInput, setRetryInput] = useState<string>('');
   const [retryFeedback, setRetryFeedback] = useState<string | null>(null);
+  const [feedbackTone, setFeedbackTone] = useState<FeedbackTone>('notice');
   const [expandedExplanationId, setExpandedExplanationId] = useState<string | null>(null);
   const [isConquering, setIsConquering] = useState<boolean>(false);
 
@@ -30,10 +39,12 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
     const p = item.problem;
     const result = checkAnswer(p, retryInput);
     if (result === 'empty') {
+      setFeedbackTone('notice');
       setRetryFeedback('답을 먼저 입력해 주세요!');
       return;
     }
     if (result === 'unreduced') {
+      setFeedbackTone('notice');
       setRetryFeedback('값은 맞았어요! 기약분수로 약분해 보세요.');
       return;
     }
@@ -43,6 +54,7 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
       confetti({ particleCount: 60, spread: 50 });
       setIsConquering(true);
       const reward = recordWrongConquered();
+      setFeedbackTone('correct');
       setRetryFeedback('🎉 완벽해요! 오답을 완전히 정복했습니다! +1⭐');
       setTimeout(() => {
         removeWrongNote(p.id);
@@ -57,6 +69,7 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
       }, 1200);
     } else {
       sound.playWrong();
+      setFeedbackTone('wrong');
       setRetryFeedback('아직 정답이 아니에요. 아래 풀이를 다시 읽어보세요!');
     }
   };
@@ -104,7 +117,7 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
       ) : (
         <div className="space-y-4">
           <div className="text-xs font-semibold text-slate-500">
-            총 <strong className="text-rose-600">{notes.length}개</strong>의 복습할 문제가 있습니다.
+            총 <strong className="text-rose-700">{notes.length}개</strong>의 복습할 문제가 있습니다.
           </div>
 
           {notes.map((item) => {
@@ -118,7 +131,7 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center gap-2">
-                    <span className="bg-rose-100 text-rose-700 text-xs font-bold px-2 py-0.5 rounded">
+                    <span className="bg-rose-100 text-rose-700 text-xs font-bold px-2 py-0.5 rounded-lg">
                       {item.problem.subtopic}
                     </span>
                     <span className="text-xs text-slate-500">{item.solvedAt} 풀이</span>
@@ -126,7 +139,7 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
 
                   <button
                     onClick={() => handleDeleteItem(item.problem.id)}
-                    className="text-slate-500 hover:text-rose-600 text-xs transition-colors"
+                    className="text-slate-600 hover:text-rose-700 text-xs transition-colors"
                     title="오답 노트에서 삭제"
                   >
                     삭제 ✕
@@ -140,7 +153,7 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
                 <div className="flex flex-wrap items-center gap-4 text-xs bg-white p-3 rounded-xl border border-slate-200">
                   <div>
                     <span className="text-slate-600">내가 적은 오답: </span>
-                    <strong className="text-rose-600 font-mono">
+                    <strong className="text-rose-700 font-mono">
                       {item.userAnswer || '미입력'}
                     </strong>
                   </div>
@@ -159,7 +172,7 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
                       sound.playPop();
                       setExpandedExplanationId(isExpanded ? null : item.id);
                     }}
-                    className="text-xs font-bold text-indigo-600 hover:underline"
+                    className="text-xs font-bold text-indigo-700 hover:underline"
                   >
                     {isExpanded ? '접기 ▲' : '해설 다시보기 ▼'}
                   </button>
@@ -188,17 +201,17 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') handleRetrySubmit(item);
                         }}
-                        className="w-28 px-2 py-1 text-xs border border-indigo-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-indigo-500 font-bold"
+                        className="w-28 px-2 py-1 text-xs border border-indigo-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-indigo-500 font-bold"
                       />
                       <button
                         onClick={() => handleRetrySubmit(item)}
-                        className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold"
+                        className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold"
                       >
                         확인
                       </button>
                       <button
                         onClick={() => setRetryId(null)}
-                        className="px-2 py-1 text-slate-500 hover:text-slate-700 text-xs"
+                        className="px-2 py-1 text-slate-600 hover:text-slate-800 text-xs rounded-xl"
                       >
                         취소
                       </button>
@@ -207,7 +220,9 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
                 </div>
 
                 {isRetrying && retryFeedback && (
-                  <div className="text-xs font-bold p-2 bg-indigo-50 text-indigo-900 rounded-lg">
+                  <div
+                    className={`text-xs font-bold p-2 border rounded-xl ${FEEDBACK_STYLES[feedbackTone]}`}
+                  >
                     {retryFeedback}
                   </div>
                 )}
@@ -218,7 +233,7 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
                     {item.problem.explanations.map((exp, idx) => (
                       <div
                         key={idx}
-                        className="bg-white p-3 rounded-lg border border-slate-200 text-xs space-y-0.5"
+                        className="bg-white p-3 rounded-xl border border-slate-200 text-xs space-y-0.5"
                       >
                         <div className="font-bold text-indigo-600">{exp.title}</div>
                         <div className="text-slate-700">{exp.content}</div>

@@ -1,9 +1,9 @@
-import confetti from 'canvas-confetti';
 import type React from 'react';
 import { useEffect, useState } from 'react';
 import type { Difficulty, Problem } from '../../types/math';
 import { formatAnswer } from '../../utils/answer';
 import { sound } from '../../utils/audio';
+import confetti from '../../utils/confetti';
 import { generateProblem, TOPICS } from '../../utils/problemGenerators';
 import { type RewardResult, recordTimeAttack } from '../../utils/storage';
 import { GameProblem } from './GameProblem';
@@ -87,14 +87,14 @@ export const TimeAttack: React.FC<TimeAttackProps> = ({ best, onReward }) => {
           <br />
           맞힌 문제 하나마다 ⭐ 1개를 받아요.
         </p>
-        <div className="inline-block bg-amber-50 border border-amber-200 text-amber-800 font-bold px-4 py-2 rounded-xl">
+        <div className="inline-block bg-amber-50 border border-amber-200 text-amber-800 font-bold px-4 py-2 rounded-full">
           🏆 최고 기록: {best}문제
         </div>
         <div>
           <button
             type="button"
             onClick={start}
-            className="px-8 py-3 bg-gradient-to-r from-rose-500 to-orange-500 text-white font-black text-lg rounded-xl shadow-md hover:brightness-105 active:scale-95 transition-all"
+            className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-lg rounded-xl shadow-sm active:scale-95 transition-all"
           >
             시작하기! 🚀
           </button>
@@ -109,7 +109,7 @@ export const TimeAttack: React.FC<TimeAttackProps> = ({ best, onReward }) => {
         <div className="text-6xl">{result?.isNewBest && correctCount > 0 ? '🏆' : '⏰'}</div>
         <h3 className="text-2xl font-black text-slate-800">시간 끝!</h3>
         {result?.isNewBest && correctCount > 0 && (
-          <div className="text-xl font-black text-rose-600">🎉 신기록!</div>
+          <div className="text-xl font-black text-rose-700">🎉 신기록!</div>
         )}
         <p className="text-lg text-slate-700">
           {solvedCount}문제 중 <strong className="text-indigo-600">{correctCount}문제</strong>{' '}
@@ -122,7 +122,7 @@ export const TimeAttack: React.FC<TimeAttackProps> = ({ best, onReward }) => {
         <button
           type="button"
           onClick={start}
-          className="px-8 py-3 bg-gradient-to-r from-rose-500 to-orange-500 text-white font-black text-lg rounded-xl shadow-md hover:brightness-105 active:scale-95 transition-all"
+          className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-lg rounded-xl shadow-sm active:scale-95 transition-all"
         >
           다시 하기 🔄
         </button>
@@ -143,7 +143,7 @@ export const TimeAttack: React.FC<TimeAttackProps> = ({ best, onReward }) => {
         <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
           <div
             className={`h-full rounded-full transition-[width] duration-100 ${
-              timeLeft <= 10 ? 'bg-rose-500' : 'bg-gradient-to-r from-emerald-500 to-teal-500'
+              timeLeft <= 10 ? 'bg-rose-500' : 'bg-emerald-500'
             }`}
             style={{ width: `${percent}%` }}
           />
@@ -152,10 +152,10 @@ export const TimeAttack: React.FC<TimeAttackProps> = ({ best, onReward }) => {
 
       {feedback && (
         <div
-          className={`text-sm font-bold px-3 py-2 rounded-xl ${
+          className={`text-sm font-bold px-3 py-2 rounded-2xl ${
             feedback.correct
-              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-              : 'bg-rose-50 text-rose-800 border border-rose-200'
+              ? 'bg-emerald-50 text-emerald-900 border border-emerald-200'
+              : 'bg-rose-50 text-rose-900 border border-rose-200'
           }`}
         >
           {feedback.correct ? '⭕ 정답!' : `❌ 아쉬워요! 정답은 ${feedback.answer}`}

@@ -23,7 +23,7 @@ export const FractionInput: React.FC<FractionInputProps> = ({
         placeholder="분자"
         disabled={disabled}
         onChange={(e) => onChangeNumerator(e.target.value)}
-        className="w-20 text-center text-lg font-bold py-1 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100"
+        className="w-20 text-center text-lg font-bold py-1 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-100"
       />
       <div className="w-16 h-0.5 bg-slate-400 my-1 rounded-full" />
       <input
@@ -32,7 +32,7 @@ export const FractionInput: React.FC<FractionInputProps> = ({
         placeholder="분모"
         disabled={disabled}
         onChange={(e) => onChangeDenominator(e.target.value)}
-        className="w-20 text-center text-lg font-bold py-1 bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-slate-100"
+        className="w-20 text-center text-lg font-bold py-1 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-100"
       />
     </div>
   );

@@ -2,7 +2,13 @@ import type React from 'react';
 import type { TopicId, UserStats } from '../types/math';
 import { sound } from '../utils/audio';
 import { TOPICS } from '../utils/problemGenerators';
-import { BADGE_DEFINITIONS, exportData, importData, SHOP_ITEMS } from '../utils/storage';
+import {
+  BADGE_DEFINITIONS,
+  exportData,
+  getAttendanceStreak,
+  importData,
+  SHOP_ITEMS,
+} from '../utils/storage';
 import { DailyMission } from './DailyMission';
 
 interface RoadmapProps {
@@ -12,6 +18,41 @@ interface RoadmapProps {
   onDataImported: () => void;
   onOpenShop: () => void;
   onOpenGames: () => void;
+  onStartQuiz: () => void;
+}
+
+// [current, goal] per badge, mirroring the unlock conditions in storage.ts
+function badgeProgress(id: string, s: UserStats): [number, number] | null {
+  switch (id) {
+    case 'first_step':
+      return [s.totalCorrect, 1];
+    case 'factor_pro':
+      return [s.topicProgress.factors.correctCount, 5];
+    case 'fraction_master':
+      return [s.topicProgress.fractions.correctCount, 5];
+    case 'decimal_wiz':
+      return [s.topicProgress.decimals.correctCount, 5];
+    case 'geometry_architect':
+      return [s.topicProgress.geometry.correctCount, 5];
+    case 'ratio_master':
+      return [s.topicProgress.ratios.correctCount, 5];
+    case 'star_collector':
+      return [s.stars, 20];
+    case 'math_hero':
+      return [s.level, 5];
+    case 'combo_5':
+      return [s.bestCombo, 5];
+    case 'wrong_conqueror':
+      return [s.wrongConquered, 5];
+    case 'attendance_7':
+      return [getAttendanceStreak(s), 7];
+    case 'time_attack_10':
+      return [s.timeAttackBest, 10];
+    case 'boss_slayer':
+      return [s.bossCleared.length, 1];
+    default:
+      return null;
+  }
 }
 
 export const Roadmap: React.FC<RoadmapProps> = ({
@@ -21,6 +62,7 @@ export const Roadmap: React.FC<RoadmapProps> = ({
   onDataImported,
   onOpenShop,
   onOpenGames,
+  onStartQuiz,
 }) => {
   const currentLevel = stats.level;
   const currentStars = stats.stars;
@@ -62,11 +104,11 @@ export const Roadmap: React.FC<RoadmapProps> = ({
     <div className="space-y-6">
       {/* User Progress Banner */}
       <div
-        className={`bg-gradient-to-r ${bannerGradient} rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden`}
+        className={`bg-gradient-to-r ${bannerGradient} rounded-2xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden`}
       >
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold tracking-wide">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-xs font-bold tracking-wide">
               <span>🚀</span> 초등 5~6학년 수학 마스터 로드맵
             </div>
             <h2 className="text-2xl sm:text-3xl font-black flex items-center gap-2">
@@ -78,25 +120,42 @@ export const Roadmap: React.FC<RoadmapProps> = ({
                 </span>
               )}
             </h2>
-            <p className="text-indigo-100 text-xs sm:text-sm max-w-md">
-              문제를 맞히면 별(⭐)을 모으고 레벨업할 수 있어요! 단원별 실험실에서 원리를 먼저
-              살펴보고 도전해보세요.
+            <p className="text-white/90 text-xs sm:text-sm max-w-md">
+              문제를 맞히면 별(⭐)을 모아 레벨업해요!
             </p>
+            {/* Inverted primary: an indigo-600 button would disappear on the indigo banner */}
+            <button
+              type="button"
+              onClick={() => {
+                sound.playPop();
+                onStartQuiz();
+              }}
+              className="px-6 py-3 rounded-xl bg-white hover:bg-indigo-50 text-indigo-700 text-base font-black shadow-md transition-colors"
+            >
+              오늘의 퀴즈 풀기 ▶
+            </button>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 flex flex-col items-center min-w-[200px]">
+          <div className="bg-white/10 p-4 rounded-2xl border border-white/20 flex flex-col items-center min-w-[200px]">
             <div className="flex items-center gap-2">
               <span className="text-3xl">⭐</span>
               <span className="text-3xl font-black">{currentStars}</span>
               <span className="text-xs text-white/90">별 보유</span>
             </div>
-            <div className="w-full bg-black/20 h-2.5 rounded-full mt-3 overflow-hidden">
+            <div
+              role="progressbar"
+              aria-label="다음 레벨까지"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(progressPercent)}
+              className="w-full bg-black/20 h-2.5 rounded-full mt-3 overflow-hidden"
+            >
               <div
-                className="bg-yellow-400 h-full rounded-full transition-all duration-500"
+                className="bg-amber-400 h-full rounded-full transition-all duration-500"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <div className="text-xs text-indigo-100 mt-1 font-semibold">
+            <div className="text-xs text-white/90 mt-1 font-semibold">
               다음 레벨까지 별 {Math.max(0, nextLevelStars - currentStars)}개 남음
             </div>
           </div>
@@ -128,6 +187,7 @@ export const Roadmap: React.FC<RoadmapProps> = ({
       {/* Shop & Games */}
       <div className="grid grid-cols-2 gap-3">
         <button
+          type="button"
           onClick={() => {
             sound.playPop();
             onOpenShop();
@@ -143,16 +203,17 @@ export const Roadmap: React.FC<RoadmapProps> = ({
           </span>
         </button>
         <button
+          type="button"
           onClick={() => {
             sound.playPop();
             onOpenGames();
           }}
-          className="bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-2xl p-4 text-left transition-colors flex items-center gap-3"
+          className="bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-2xl p-4 text-left transition-colors flex items-center gap-3"
         >
           <span className="text-3xl">🎮</span>
           <span>
-            <span className="block text-sm font-black text-emerald-900">수학 게임</span>
-            <span className="block text-xs text-emerald-800">타임어택 · 보스전 · 가족 대결</span>
+            <span className="block text-sm font-black text-indigo-900">수학 게임</span>
+            <span className="block text-xs text-indigo-700">타임어택 · 보스전 · 가족 대결</span>
           </span>
         </button>
       </div>
@@ -162,22 +223,39 @@ export const Roadmap: React.FC<RoadmapProps> = ({
         <h3 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
           <span>🏆</span> 획득한 업적 뱃지 ({stats.badges.length}/{BADGE_DEFINITIONS.length})
         </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 min-[420px]:grid-cols-2 lg:grid-cols-4 gap-3">
           {BADGE_DEFINITIONS.map((badge) => {
             const unlocked = stats.badges.includes(badge.id);
+            const progress = unlocked ? null : badgeProgress(badge.id, stats);
+            const current = progress ? Math.min(progress[0], progress[1]) : 0;
             return (
               <div
                 key={badge.id}
-                className={`p-3 rounded-xl border flex items-center gap-3 transition-all ${
+                className={`p-3 rounded-xl border flex items-start gap-3 ${
                   unlocked
-                    ? 'bg-amber-50/70 border-amber-200 text-amber-950 shadow-2xs'
-                    : 'bg-slate-50 border-slate-200 text-slate-500'
+                    ? 'bg-amber-50 border-amber-200 text-amber-900'
+                    : 'bg-slate-50 border-slate-200 text-slate-700'
                 }`}
               >
                 <span className="text-2xl">{unlocked ? badge.icon : '🔒'}</span>
-                <div>
+                <div className="flex-1 min-w-0">
                   <div className="text-xs font-bold">{badge.name}</div>
-                  <div className="text-xs line-clamp-1">{badge.desc}</div>
+                  <div className={`text-xs ${unlocked ? 'text-amber-800' : 'text-slate-500'}`}>
+                    {badge.desc}
+                  </div>
+                  {progress && (
+                    <div className="mt-1.5 flex items-center gap-2">
+                      <div className="flex-1 bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                        <div
+                          className="bg-indigo-500 h-full rounded-full"
+                          style={{ width: `${(current / progress[1]) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-bold text-slate-700">
+                        {current}/{progress[1]}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -190,11 +268,12 @@ export const Roadmap: React.FC<RoadmapProps> = ({
         <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="text-lg font-bold text-slate-800">단원별 학습 코스</h3>
           <button
+            type="button"
             onClick={() => {
               sound.playPop();
               onOpenWrongNotes();
             }}
-            className="self-start text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 sm:self-auto"
+            className="self-start text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1.5 sm:self-auto"
           >
             <span>📝</span>
             <span>오답 노트 보러가기</span>
@@ -210,15 +289,16 @@ export const Roadmap: React.FC<RoadmapProps> = ({
             };
 
             return (
-              <div
+              <button
+                type="button"
                 key={topic.id}
                 onClick={() => {
                   sound.playPop();
                   onSelectTopic(topic.id);
                 }}
-                className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-indigo-400 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+                className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-indigo-400 hover:shadow-md transition-all text-left group flex flex-col justify-between"
               >
-                <div className="space-y-3">
+                <div className="space-y-3 w-full">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
@@ -228,13 +308,13 @@ export const Roadmap: React.FC<RoadmapProps> = ({
                         <span className="text-xs font-bold text-slate-500">
                           단원 {index + 1} · {topic.grade}
                         </span>
-                        <h4 className="font-extrabold text-slate-800 text-base group-hover:text-indigo-600 transition-colors">
+                        <h4 className="font-extrabold text-slate-800 text-base group-hover:text-indigo-700 transition-colors">
                           {topic.title}
                         </h4>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1 bg-amber-50 px-2 py-1 rounded-lg border border-amber-200 text-amber-700 text-xs font-bold">
+                    <div className="flex items-center gap-1 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200 text-amber-700 text-xs font-bold">
                       <span>⭐</span>
                       <span>{progress.stars}</span>
                     </div>
@@ -243,16 +323,16 @@ export const Roadmap: React.FC<RoadmapProps> = ({
                   <p className="text-xs text-slate-500 leading-relaxed">{topic.description}</p>
                 </div>
 
-                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                <div className="mt-4 pt-3 border-t border-slate-100 w-full flex items-center justify-between text-xs">
                   <span className="text-slate-500">
                     푼 문제: <strong className="text-slate-700">{progress.solvedCount}개</strong>{' '}
                     (정답 {progress.correctCount}개)
                   </span>
-                  <span className="font-bold text-indigo-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                  <span className="font-bold text-indigo-700 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                     학습 시작 ➔
                   </span>
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>
@@ -262,18 +342,19 @@ export const Roadmap: React.FC<RoadmapProps> = ({
       <div className="flex flex-wrap items-center justify-end gap-2 text-xs font-bold">
         <span className="text-slate-500 mr-auto">기록 백업 (다른 기기로 옮기기)</span>
         <button
+          type="button"
           onClick={handleExport}
-          className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700"
+          className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700"
         >
           💾 내보내기
         </button>
-        <label className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 cursor-pointer">
+        <label className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 cursor-pointer focus-within:ring-2 focus-within:ring-indigo-500">
           📂 불러오기
           <input
             type="file"
             accept="application/json,.json"
             onChange={handleImport}
-            className="hidden"
+            className="sr-only"
           />
         </label>
       </div>

@@ -1,7 +1,7 @@
-import confetti from 'canvas-confetti';
 import type React from 'react';
 import type { UserStats } from '../types/math';
 import { sound } from '../utils/audio';
+import confetti from '../utils/confetti';
 import { KID_CALL } from '../utils/profile';
 import { buyItem, equipItem, SHOP_ITEMS, type ShopSlot } from '../utils/storage';
 
@@ -38,7 +38,7 @@ export const Shop: React.FC<ShopProps> = ({ stats, onStatsChanged }) => {
   return (
     <div className="space-y-6">
       {/* Avatar preview + wallet */}
-      <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center gap-6">
+      <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center gap-6">
         <div className="relative w-28 h-28 shrink-0 rounded-full bg-indigo-50 border-2 border-indigo-200 flex items-center justify-center">
           <span className="text-6xl">🧒</span>
           {hat && <span className="absolute -top-5 text-5xl">{hat}</span>}
@@ -52,8 +52,8 @@ export const Shop: React.FC<ShopProps> = ({ stats, onStatsChanged }) => {
           </p>
         </div>
         <div className="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-3 text-center">
-          <div className="text-xs font-bold text-amber-700">쓸 수 있는 별</div>
-          <div className="text-3xl font-black text-amber-900">⭐ {spendable}</div>
+          <div className="text-xs font-bold text-amber-800">쓸 수 있는 별</div>
+          <div className="text-3xl font-black text-amber-700">⭐ {spendable}</div>
         </div>
       </div>
 
@@ -91,26 +91,37 @@ export const Shop: React.FC<ShopProps> = ({ stats, onStatsChanged }) => {
                     <>
                       <span className="text-xs font-bold text-indigo-700">✨ 착용 중</span>
                       <button
+                        type="button"
                         onClick={() => handleEquip(null, slot)}
-                        className="w-full text-xs font-bold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700"
+                        className="w-full text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700"
                       >
                         {slot === 'theme' ? '기본으로' : '벗기'}
                       </button>
                     </>
                   ) : owned ? (
                     <button
+                      type="button"
                       onClick={() => handleEquip(item.id, slot)}
-                      className="w-full text-xs font-bold px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white"
+                      className="w-full text-xs font-bold px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200"
                     >
                       착용하기
                     </button>
                   ) : (
                     <>
-                      <span className="text-xs font-bold text-amber-700">⭐ {item.price}</span>
+                      <span
+                        className={`text-xs font-bold ${lacking > 0 ? 'text-slate-500' : 'text-amber-700'}`}
+                      >
+                        ⭐ {item.price}
+                      </span>
                       <button
+                        type="button"
                         onClick={() => handleBuy(item.id)}
                         disabled={lacking > 0}
-                        className="w-full text-xs font-bold px-3 py-1.5 rounded-lg bg-amber-400 hover:bg-amber-500 text-amber-950 disabled:bg-slate-100 disabled:text-slate-500 disabled:cursor-not-allowed"
+                        className={`w-full text-xs font-bold px-3 py-1.5 rounded-xl border ${
+                          lacking > 0
+                            ? 'bg-slate-50 border-slate-200 text-slate-500 cursor-not-allowed'
+                            : 'bg-amber-100 hover:bg-amber-200 border-amber-300 text-amber-900'
+                        }`}
                       >
                         {lacking > 0 ? `별 ${lacking}개 더 모아요` : '사기'}
                       </button>

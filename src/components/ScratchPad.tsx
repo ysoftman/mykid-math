@@ -98,7 +98,7 @@ export const ScratchPad: React.FC<ScratchPadProps> = ({ isOpen, onClose }) => {
         <div className="flex items-center gap-2">
           <button
             onClick={clearCanvas}
-            className="text-xs bg-indigo-700 hover:bg-indigo-800 text-indigo-100 px-2.5 py-1 rounded-lg transition-colors"
+            className="text-xs bg-indigo-700 hover:bg-indigo-800 text-white px-3 py-1.5 rounded-xl transition-colors"
           >
             모두 지우기
           </button>
@@ -107,7 +107,8 @@ export const ScratchPad: React.FC<ScratchPadProps> = ({ isOpen, onClose }) => {
               sound.playPop();
               onClose();
             }}
-            className="w-7 h-7 rounded-lg bg-indigo-700 hover:bg-indigo-800 flex items-center justify-center font-bold text-sm"
+            aria-label="연습장 닫기"
+            className="w-8 h-8 rounded-xl bg-indigo-700 hover:bg-indigo-800 flex items-center justify-center font-bold text-sm"
           >
             ✕
           </button>
@@ -126,6 +127,8 @@ export const ScratchPad: React.FC<ScratchPadProps> = ({ isOpen, onClose }) => {
                 setIsEraser(false);
                 sound.playPop();
               }}
+              aria-label={`펜 색 ${c}`}
+              aria-pressed={!isEraser && color === c}
               style={{ backgroundColor: c }}
               className={`w-6 h-6 rounded-full border-2 transition-transform ${
                 !isEraser && color === c
@@ -143,7 +146,7 @@ export const ScratchPad: React.FC<ScratchPadProps> = ({ isOpen, onClose }) => {
               setLineWidth(lineWidth === 3 ? 6 : 3);
               sound.playPop();
             }}
-            className="px-2 py-1 rounded-lg text-slate-700 bg-white border font-bold"
+            className="px-2.5 py-1 rounded-xl text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 font-bold"
             title="선 굵기 전환"
           >
             {lineWidth === 3 ? '굵기: 보통' : '굵기: 두껍게'}
@@ -153,8 +156,11 @@ export const ScratchPad: React.FC<ScratchPadProps> = ({ isOpen, onClose }) => {
               setIsEraser(false);
               sound.playPop();
             }}
-            className={`px-2.5 py-1 rounded-lg font-bold ${
-              !isEraser ? 'bg-indigo-600 text-white' : 'bg-white text-slate-700 border'
+            aria-pressed={!isEraser}
+            className={`px-2.5 py-1 rounded-xl font-bold ${
+              !isEraser
+                ? 'bg-indigo-600 text-white'
+                : 'bg-white text-slate-700 border border-slate-200'
             }`}
           >
             펜
@@ -164,8 +170,11 @@ export const ScratchPad: React.FC<ScratchPadProps> = ({ isOpen, onClose }) => {
               setIsEraser(true);
               sound.playPop();
             }}
-            className={`px-2.5 py-1 rounded-lg font-bold ${
-              isEraser ? 'bg-indigo-600 text-white' : 'bg-white text-slate-700 border'
+            aria-pressed={isEraser}
+            className={`px-2.5 py-1 rounded-xl font-bold ${
+              isEraser
+                ? 'bg-indigo-600 text-white'
+                : 'bg-white text-slate-700 border border-slate-200'
             }`}
           >
             지우개

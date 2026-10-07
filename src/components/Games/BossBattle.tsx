@@ -1,9 +1,9 @@
-import confetti from 'canvas-confetti';
 import type React from 'react';
 import { useState } from 'react';
 import type { Problem, TopicId } from '../../types/math';
 import { formatAnswer } from '../../utils/answer';
 import { sound } from '../../utils/audio';
+import confetti from '../../utils/confetti';
 import { generateProblem, TOPICS } from '../../utils/problemGenerators';
 import { BOSS_CLEAR_STARS, type RewardResult, recordBossClear } from '../../utils/storage';
 import { GameProblem } from './GameProblem';
@@ -140,14 +140,14 @@ export const BossBattle: React.FC<BossBattleProps> = ({ bossCleared, onReward })
         <p className="text-sm text-slate-600">
           어려운 문제 {BOSS_HP}개를 모두 맞혀 보스를 물리쳤어요!
         </p>
-        <p className="text-lg font-bold text-amber-600">+{BOSS_CLEAR_STARS} ⭐ 획득!</p>
+        <p className="text-lg font-bold text-amber-700">+{BOSS_CLEAR_STARS} ⭐ 획득!</p>
         <button
           type="button"
           onClick={() => {
             sound.playPop();
             setPhase('select');
           }}
-          className="px-8 py-3 bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-black rounded-xl shadow-md hover:brightness-105 active:scale-95 transition-all"
+          className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl shadow-sm active:scale-95 transition-all"
         >
           다른 보스 도전하기
         </button>
@@ -168,7 +168,7 @@ export const BossBattle: React.FC<BossBattleProps> = ({ bossCleared, onReward })
           <button
             type="button"
             onClick={() => startBattle(topicId)}
-            className="px-6 py-3 bg-gradient-to-r from-rose-500 to-orange-500 text-white font-black rounded-xl shadow-md hover:brightness-105 active:scale-95 transition-all"
+            className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl shadow-sm active:scale-95 transition-all"
           >
             다시 도전 🔥
           </button>
@@ -190,7 +190,7 @@ export const BossBattle: React.FC<BossBattleProps> = ({ bossCleared, onReward })
   const hpPercent = ((BOSS_HP - hits) / BOSS_HP) * 100;
   return (
     <div className="bg-white rounded-2xl p-5 sm:p-8 shadow-sm border border-slate-200 space-y-5">
-      <div className="bg-gradient-to-br from-slate-800 to-violet-900 rounded-2xl p-4 text-white space-y-3">
+      <div className="bg-slate-800 rounded-2xl p-4 text-white space-y-3">
         <div className="flex items-center justify-between gap-2">
           <span className="font-extrabold">{boss.name}</span>
           <span className="text-lg" aria-label={`남은 하트 ${hearts}개`}>
@@ -218,7 +218,7 @@ export const BossBattle: React.FC<BossBattleProps> = ({ bossCleared, onReward })
           </div>
           <div className="h-3 bg-white/20 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-rose-500 to-red-500 rounded-full transition-all duration-500"
+              className="h-full bg-rose-500 rounded-full transition-all duration-500"
               style={{ width: `${hpPercent}%` }}
             />
           </div>
@@ -231,7 +231,7 @@ export const BossBattle: React.FC<BossBattleProps> = ({ bossCleared, onReward })
           <button
             type="button"
             onClick={nextAfterMiss}
-            className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold rounded-xl shadow-md hover:brightness-105 active:scale-95 transition-all"
+            className="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm active:scale-95 transition-all"
           >
             다음 문제로 공격! ➡️
           </button>

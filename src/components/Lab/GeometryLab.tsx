@@ -38,16 +38,16 @@ export const GeometryLab: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex flex-wrap bg-purple-50 p-1 rounded-xl gap-1">
+        <div className="flex flex-wrap bg-slate-100 p-1 rounded-2xl gap-1">
           <button
             onClick={() => {
               sound.playPop();
               setShape('triangle');
             }}
-            className={`px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
+            className={`px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all ${
               shape === 'triangle'
-                ? 'bg-purple-600 text-white shadow-sm'
-                : 'text-purple-800 hover:bg-purple-100'
+                ? 'bg-white text-indigo-700 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             🔺 삼각형
@@ -57,10 +57,10 @@ export const GeometryLab: React.FC = () => {
               sound.playPop();
               setShape('trapezoid');
             }}
-            className={`px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
+            className={`px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all ${
               shape === 'trapezoid'
-                ? 'bg-purple-600 text-white shadow-sm'
-                : 'text-purple-800 hover:bg-purple-100'
+                ? 'bg-white text-indigo-700 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             ⏢ 사다리꼴
@@ -70,10 +70,10 @@ export const GeometryLab: React.FC = () => {
               sound.playPop();
               setShape('circle');
             }}
-            className={`px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
+            className={`px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all ${
               shape === 'circle'
-                ? 'bg-purple-600 text-white shadow-sm'
-                : 'text-purple-800 hover:bg-purple-100'
+                ? 'bg-white text-indigo-700 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             ⭕ 원의 변형
@@ -95,6 +95,7 @@ export const GeometryLab: React.FC = () => {
                 min="4"
                 max="12"
                 value={base}
+                aria-label="밑변"
                 onChange={(e) => {
                   sound.playPop();
                   setBase(Number(e.target.value));
@@ -111,6 +112,7 @@ export const GeometryLab: React.FC = () => {
                 min="3"
                 max="10"
                 value={height}
+                aria-label="높이"
                 onChange={(e) => {
                   sound.playPop();
                   setHeight(Number(e.target.value));
@@ -188,7 +190,7 @@ export const GeometryLab: React.FC = () => {
                   sound.playPop();
                   setShowTriTwin(!showTriTwin);
                 }}
-                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl text-xs sm:text-sm font-bold shadow hover:brightness-110 transition-all"
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all"
               >
                 {showTriTwin
                   ? '↩️ 원래 삼각형만 보기'
@@ -222,6 +224,7 @@ export const GeometryLab: React.FC = () => {
                 min="2"
                 max="8"
                 value={topBase}
+                aria-label="윗변"
                 onChange={(e) => {
                   sound.playPop();
                   setTopBase(Number(e.target.value));
@@ -238,6 +241,7 @@ export const GeometryLab: React.FC = () => {
                 min="5"
                 max="12"
                 value={bottomBase}
+                aria-label="아랫변"
                 onChange={(e) => {
                   sound.playPop();
                   setBottomBase(Number(e.target.value));
@@ -254,6 +258,7 @@ export const GeometryLab: React.FC = () => {
                 min="3"
                 max="8"
                 value={trapHeight}
+                aria-label="높이"
                 onChange={(e) => {
                   sound.playPop();
                   setTrapHeight(Number(e.target.value));
@@ -319,7 +324,7 @@ export const GeometryLab: React.FC = () => {
                   sound.playPop();
                   setShowTrapTwin(!showTrapTwin);
                 }}
-                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl text-xs sm:text-sm font-bold shadow hover:brightness-110 transition-all"
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all"
               >
                 {showTrapTwin ? '↩️ 원래 사다리꼴만 보기' : '✨ 똑같은 사다리꼴 거꾸로 이어붙이기!'}
               </button>
@@ -351,6 +356,7 @@ export const GeometryLab: React.FC = () => {
                 min="2"
                 max="6"
                 value={radius}
+                aria-label="반지름"
                 onChange={(e) => {
                   sound.playPop();
                   setRadius(Number(e.target.value));
@@ -370,8 +376,10 @@ export const GeometryLab: React.FC = () => {
                       sound.playPop();
                       setSlices(s);
                     }}
-                    className={`flex-1 py-1 rounded text-xs font-bold ${
-                      slices === s ? 'bg-purple-600 text-white' : 'bg-white border text-slate-700'
+                    className={`flex-1 py-1.5 rounded-xl text-xs font-bold ${
+                      slices === s
+                        ? 'bg-purple-600 border border-purple-600 text-white'
+                        : 'bg-white border border-slate-200 text-slate-700'
                     }`}
                   >
                     {s}등분
@@ -439,7 +447,7 @@ export const GeometryLab: React.FC = () => {
                     {Array.from({ length: slices }).map((_, i) => (
                       <div
                         key={i}
-                        className={`w-2 h-full rounded-t-sm transition-all duration-300 ${
+                        className={`w-2 h-full rounded-t transition-all duration-300 ${
                           i % 2 === 0 ? 'bg-purple-500' : 'bg-pink-500 transform rotate-180'
                         }`}
                       />

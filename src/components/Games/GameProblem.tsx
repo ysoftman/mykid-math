@@ -52,7 +52,7 @@ export const GameProblem: React.FC<GameProblemProps> = ({
   return (
     <div className={compact ? 'space-y-3' : 'space-y-4'}>
       {problem.context && (
-        <div className="inline-block bg-amber-50 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-md border border-amber-200">
+        <div className="inline-block bg-amber-50 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-lg border border-amber-200">
           📖 {problem.context}
         </div>
       )}
@@ -92,7 +92,7 @@ export const GameProblem: React.FC<GameProblemProps> = ({
           type="button"
           onClick={handleSubmit}
           disabled={disabled}
-          className="px-5 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold rounded-xl shadow-md hover:brightness-105 active:scale-95 transition-all disabled:opacity-50"
+          className="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm active:scale-95 transition-all disabled:opacity-50"
         >
           확인 🎯
         </button>

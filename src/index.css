@@ -22,6 +22,8 @@
   --color-slate-100: #eee6d6;
   --color-slate-200: #e2d8c5;
   --color-slate-300: #d1c5ae;
+  /* Darker than Tailwind's default so secondary text keeps 4.5:1 contrast on the warm background */
+  --color-slate-500: #556377;
   --color-slate-800: #36332e;
   --color-slate-900: #2a2824;
 }
@@ -49,6 +51,34 @@
   input[type="range"] {
     min-height: 2.75rem;
     touch-action: pan-y;
+  }
+}
+
+/* Entrance animation used as `animate-in fade-in` / `animate-in fade-in zoom-in-95` */
+@utility animate-in {
+  animation: enter 0.25s ease-out both;
+}
+@utility fade-in {
+  --enter-opacity: 0;
+}
+@utility zoom-in-95 {
+  --enter-scale: 0.95;
+}
+@keyframes enter {
+  from {
+    opacity: var(--enter-opacity, 1);
+    transform: scale(var(--enter-scale, 1));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Unlayered, so it wins over Tailwind's layered utilities without !important */
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    transition-duration: 0.01ms;
   }
 }
 

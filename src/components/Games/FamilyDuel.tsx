@@ -1,9 +1,9 @@
-import confetti from 'canvas-confetti';
 import type React from 'react';
 import { useState } from 'react';
 import type { Difficulty, Problem, TopicId } from '../../types/math';
 import { formatAnswer } from '../../utils/answer';
 import { sound } from '../../utils/audio';
+import confetti from '../../utils/confetti';
 import { generateProblem, TOPICS } from '../../utils/problemGenerators';
 import { KID_NAME } from '../../utils/profile';
 import { GameProblem } from './GameProblem';
@@ -159,7 +159,7 @@ export const FamilyDuel: React.FC = () => {
         <button
           type="button"
           onClick={start}
-          className="w-full px-6 py-3 bg-gradient-to-r from-sky-500 to-pink-500 text-white font-black text-lg rounded-xl shadow-md hover:brightness-105 active:scale-95 transition-all"
+          className="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-lg rounded-xl shadow-sm active:scale-95 transition-all"
         >
           대결 시작! ⚔️
         </button>
@@ -182,7 +182,7 @@ export const FamilyDuel: React.FC = () => {
             sound.playPop();
             setPhase('setup');
           }}
-          className="px-8 py-3 bg-gradient-to-r from-sky-500 to-pink-500 text-white font-black rounded-xl shadow-md hover:brightness-105 active:scale-95 transition-all"
+          className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl shadow-sm active:scale-95 transition-all"
         >
           한 판 더! 🔄
         </button>
@@ -198,7 +198,7 @@ export const FamilyDuel: React.FC = () => {
         <div className="text-xs font-bold text-slate-500">
           {turn + 1} / {TOTAL_TURNS} 턴
         </div>
-        <div className={`inline-block px-5 py-2 rounded-2xl border-2 ${PLAYER_STYLES[player]}`}>
+        <div className={`inline-block px-5 py-2 rounded-full border-2 ${PLAYER_STYLES[player]}`}>
           <span className="text-2xl sm:text-3xl font-black">{displayName(player)} 차례!</span>
         </div>
       </div>
@@ -226,7 +226,7 @@ export const FamilyDuel: React.FC = () => {
           <button
             type="button"
             onClick={nextTurn}
-            className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold rounded-xl shadow-md hover:brightness-105 active:scale-95 transition-all"
+            className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm active:scale-95 transition-all"
           >
             {turn + 1 >= TOTAL_TURNS ? '결과 보기 🏁' : `${displayName(nextPlayer)} 차례로 ➡️`}
           </button>

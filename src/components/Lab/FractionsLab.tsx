@@ -44,16 +44,16 @@ export const FractionsLab: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex flex-wrap bg-blue-50 p-1 rounded-xl">
+        <div className="flex flex-wrap bg-slate-100 p-1 rounded-2xl gap-1">
           <button
             onClick={() => {
               sound.playPop();
               setMode('addition');
             }}
-            className={`px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
+            className={`px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all ${
               mode === 'addition'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-blue-800 hover:bg-blue-100'
+                ? 'bg-white text-indigo-700 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
             ➕ 통분과 덧셈
@@ -63,13 +63,13 @@ export const FractionsLab: React.FC = () => {
               sound.playPop();
               setMode('multiplication');
             }}
-            className={`px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
+            className={`px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all ${
               mode === 'multiplication'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-blue-800 hover:bg-blue-100'
+                ? 'bg-white text-indigo-700 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            ✖️ 곱셈 (면적 모델)
+            <span className="font-black">×</span> 곱셈 (면적 모델)
           </button>
         </div>
       </div>
@@ -92,6 +92,7 @@ export const FractionsLab: React.FC = () => {
                     min="2"
                     max="6"
                     value={den1}
+                    aria-label="첫 번째 분수의 분모"
                     onChange={(e) => {
                       const d = Number(e.target.value);
                       setDen1(d);
@@ -109,6 +110,7 @@ export const FractionsLab: React.FC = () => {
                     min="1"
                     max={den1 - 1}
                     value={num1}
+                    aria-label="첫 번째 분수의 분자"
                     onChange={(e) => {
                       setNum1(Number(e.target.value));
                       setIsUnified(false);
@@ -133,6 +135,7 @@ export const FractionsLab: React.FC = () => {
                     min="2"
                     max="6"
                     value={den2}
+                    aria-label="두 번째 분수의 분모"
                     onChange={(e) => {
                       const d = Number(e.target.value);
                       setDen2(d);
@@ -150,6 +153,7 @@ export const FractionsLab: React.FC = () => {
                     min="1"
                     max={den2 - 1}
                     value={num2}
+                    aria-label="두 번째 분수의 분자"
                     onChange={(e) => {
                       setNum2(Number(e.target.value));
                       setIsUnified(false);
@@ -177,7 +181,7 @@ export const FractionsLab: React.FC = () => {
                     <div
                       key={idx}
                       className={`flex-1 border-r border-slate-300 last:border-r-0 flex items-center justify-center text-xs font-bold transition-all duration-300 ${
-                        isFilled ? 'bg-blue-500 text-white shadow-inner' : 'bg-white text-slate-500'
+                        isFilled ? 'bg-blue-700 text-white shadow-inner' : 'bg-white text-slate-500'
                       }`}
                     >
                       1/{isUnified ? commonDen : den1}
@@ -201,7 +205,7 @@ export const FractionsLab: React.FC = () => {
                       key={idx}
                       className={`flex-1 border-r border-slate-300 last:border-r-0 flex items-center justify-center text-xs font-bold transition-all duration-300 ${
                         isFilled
-                          ? 'bg-indigo-500 text-white shadow-inner'
+                          ? 'bg-indigo-600 text-white shadow-inner'
                           : 'bg-white text-slate-500'
                       }`}
                     >
@@ -218,17 +222,17 @@ export const FractionsLab: React.FC = () => {
                   sound.playPop();
                   setIsUnified(!isUnified);
                 }}
-                className="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-sm font-bold shadow hover:brightness-105 active:scale-95 transition-all"
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-sm active:scale-95 transition-all"
               >
                 {isUnified ? '↩️ 원래 분수로 보기' : `✨ 공통분모 ${commonDen}으로 통분하기!`}
               </button>
 
               <div className="text-sm font-bold text-slate-800 bg-white px-4 py-2 rounded-xl border border-slate-200">
                 합계:{' '}
-                <span className="text-blue-600">
+                <span className="text-blue-700">
                   {num1}/{den1} + {num2}/{den2} ={' '}
                 </span>
-                <span className="text-indigo-600 font-extrabold text-base">
+                <span className="text-indigo-700 font-extrabold text-base">
                   {simplifiedSum.num}/{simplifiedSum.den}
                 </span>
                 {simplifiedSum.num >= simplifiedSum.den && (
@@ -260,6 +264,7 @@ export const FractionsLab: React.FC = () => {
                     min="2"
                     max="5"
                     value={mDen1}
+                    aria-label="가로 분수의 분모"
                     onChange={(e) => {
                       const d = Number(e.target.value);
                       setMDen1(d);
@@ -276,6 +281,7 @@ export const FractionsLab: React.FC = () => {
                     min="1"
                     max={mDen1 - 1}
                     value={mNum1}
+                    aria-label="가로 분수의 분자"
                     onChange={(e) => {
                       setMNum1(Number(e.target.value));
                       sound.playPop();
@@ -298,6 +304,7 @@ export const FractionsLab: React.FC = () => {
                     min="2"
                     max="5"
                     value={mDen2}
+                    aria-label="세로 분수의 분모"
                     onChange={(e) => {
                       const d = Number(e.target.value);
                       setMDen2(d);
@@ -314,6 +321,7 @@ export const FractionsLab: React.FC = () => {
                     min="1"
                     max={mDen2 - 1}
                     value={mNum2}
+                    aria-label="세로 분수의 분자"
                     onChange={(e) => {
                       setMNum2(Number(e.target.value));
                       sound.playPop();

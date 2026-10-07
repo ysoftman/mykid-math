@@ -9,27 +9,27 @@ import { TimeAttack } from './TimeAttack';
 
 type GameId = 'time' | 'boss' | 'duel';
 
-const GAMES: { id: GameId; icon: string; title: string; description: string; color: string }[] = [
+const GAMES: { id: GameId; icon: string; title: string; description: string; tint: string }[] = [
   {
     id: 'time',
     icon: '⏱️',
     title: '60초 타임어택',
     description: '60초 안에 최대한 많이! 맞힐 때마다 ⭐ 1개',
-    color: 'from-rose-500 to-orange-500',
+    tint: 'bg-rose-50 border-rose-200 text-rose-900',
   },
   {
     id: 'boss',
     icon: '⚔️',
     title: '단원 보스전',
     description: '어려운 문제로 보스를 물리치고 👑 왕관을!',
-    color: 'from-violet-600 to-indigo-600',
+    tint: 'bg-violet-50 border-violet-200 text-violet-900',
   },
   {
     id: 'duel',
     icon: '👨‍👩‍👧',
     title: '가족 대결',
     description: '번갈아 풀며 누가 더 많이 맞히나 겨뤄요',
-    color: 'from-sky-500 to-pink-500',
+    tint: 'bg-sky-50 border-sky-200 text-sky-900',
   },
 ];
 
@@ -60,7 +60,7 @@ export const GameHub: React.FC<GameHubProps> = ({ onReward, onStatsChanged }) =>
             sound.playPop();
             setGame(null);
           }}
-          className="text-sm font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-xl border border-indigo-200 transition-colors"
+          className="text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-xl border border-indigo-200 transition-colors"
         >
           ⬅️ 게임 목록으로
         </button>
@@ -86,20 +86,20 @@ export const GameHub: React.FC<GameHubProps> = ({ onReward, onStatsChanged }) =>
               sound.playPop();
               setGame(g.id);
             }}
-            className={`bg-gradient-to-br ${g.color} rounded-2xl p-5 text-left text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all`}
+            className={`${g.tint} flex flex-col items-start justify-start rounded-2xl border p-5 text-left shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all`}
           >
-            <div className="text-5xl">{g.icon}</div>
-            <div className="mt-3 text-xl font-black">{g.title}</div>
-            <div className="mt-1 text-sm text-white/90">{g.description}</div>
+            <span className="block text-5xl">{g.icon}</span>
+            <span className="block mt-3 text-xl font-black">{g.title}</span>
+            <span className="block mt-1 text-sm text-slate-700">{g.description}</span>
             {g.id === 'time' && (
-              <div className="mt-3 inline-block bg-white/20 px-2.5 py-1 rounded-full text-xs font-bold">
+              <span className="mt-3 inline-block bg-white/80 px-2.5 py-1 rounded-full text-xs font-bold">
                 🏆 최고 {stats.timeAttackBest}문제
-              </div>
+              </span>
             )}
             {g.id === 'boss' && (
-              <div className="mt-3 inline-block bg-white/20 px-2.5 py-1 rounded-full text-xs font-bold">
+              <span className="mt-3 inline-block bg-white/80 px-2.5 py-1 rounded-full text-xs font-bold">
                 👑 {stats.bossCleared.length} / {TOPICS.length} 단원 격파
-              </div>
+              </span>
             )}
           </button>
         ))}

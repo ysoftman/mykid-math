@@ -1,7 +1,7 @@
-import confetti from 'canvas-confetti';
 import type React from 'react';
 import { useEffect } from 'react';
 import { sound } from '../utils/audio';
+import confetti from '../utils/confetti';
 import { BADGE_DEFINITIONS, DAILY_MISSION_BONUS, type RewardResult } from '../utils/storage';
 
 interface RewardModalProps {
@@ -40,7 +40,7 @@ export const RewardModal: React.FC<RewardModalProps> = ({ reward, onClose }) => 
         role="dialog"
         aria-modal="true"
         aria-label="축하해요"
-        className="w-full max-w-sm space-y-5 rounded-3xl border-4 border-amber-300 bg-white p-6 text-center shadow-2xl animate-in fade-in"
+        className="w-full max-w-sm space-y-5 rounded-2xl border-4 border-amber-300 bg-white p-6 text-center shadow-2xl animate-in fade-in"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="text-6xl">🎊</div>
@@ -81,7 +81,7 @@ export const RewardModal: React.FC<RewardModalProps> = ({ reward, onClose }) => 
         <button
           type="button"
           onClick={close}
-          className="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 py-3 text-base font-bold text-white shadow-md transition-all hover:brightness-105 active:scale-95"
+          className="w-full rounded-xl bg-indigo-600 py-3 text-base font-bold text-white shadow-sm transition-all hover:bg-indigo-700 active:scale-95"
         >
           좋아요! 🙌
         </button>

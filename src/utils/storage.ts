@@ -41,7 +41,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     icon: '🌲',
     slot: 'theme',
     price: 12,
-    gradient: 'from-emerald-600 to-teal-700',
+    gradient: 'from-emerald-700 to-teal-800',
   },
   {
     id: 'theme_ocean',
@@ -49,7 +49,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     icon: '🌊',
     slot: 'theme',
     price: 12,
-    gradient: 'from-sky-600 to-blue-700',
+    gradient: 'from-sky-700 to-blue-800',
   },
   {
     id: 'theme_sunset',
@@ -57,7 +57,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     icon: '🌅',
     slot: 'theme',
     price: 25,
-    gradient: 'from-orange-500 via-rose-500 to-fuchsia-600',
+    gradient: 'from-orange-700 via-rose-700 to-fuchsia-800',
   },
 ];
 
