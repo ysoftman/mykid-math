@@ -2,14 +2,26 @@ import type { Difficulty, Problem } from '../../types/math';
 import { lcm, pickOne, randomInt, simplifyFraction } from '../mathHelpers';
 
 export function generateFractionProblem(difficulty: Difficulty): Problem {
-  const type = pickOne(['addition', 'subtraction', 'multiplication', 'division']);
+  const type = pickOne([
+    'addition',
+    'subtraction',
+    'multiplication',
+    'division',
+    'fraction_of_number',
+  ]);
   const id = `frac_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+  const unlikeDenominators =
+    difficulty === 'easy'
+      ? [2, 3, 4, 5]
+      : difficulty === 'medium'
+        ? [2, 3, 4, 5, 6, 8]
+        : [5, 6, 7, 8, 9, 10, 12];
 
   if (type === 'addition') {
     // Unlike denominator addition
-    const den1 = pickOne([2, 3, 4, 5, 6]);
-    let den2 = pickOne([2, 3, 4, 5, 6, 8, 10]);
-    while (den1 === den2) den2 = pickOne([3, 4, 5, 6, 8, 10]);
+    const den1 = pickOne(unlikeDenominators);
+    let den2 = pickOne(unlikeDenominators);
+    while (den1 === den2) den2 = pickOne(unlikeDenominators);
 
     const num1 = randomInt(1, den1 - 1);
     const num2 = randomInt(1, den2 - 1);
@@ -53,9 +65,10 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
 
   if (type === 'subtraction') {
     // Make sure frac1 > frac2
-    let den1 = pickOne([2, 3, 4, 5, 6]);
-    let den2 = pickOne([3, 4, 5, 6, 8]);
-    while (den1 === den2) den2 = pickOne([3, 4, 5, 6, 8]);
+    const subtractionDenominators = unlikeDenominators.filter((den) => den > 2);
+    let den1 = pickOne(unlikeDenominators);
+    let den2 = pickOne(subtractionDenominators);
+    while (den1 === den2) den2 = pickOne(subtractionDenominators);
 
     let num1 = randomInt(1, den1 - 1);
     let num2 = randomInt(1, den2 - 1);
@@ -109,9 +122,15 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
   }
 
   if (type === 'multiplication') {
-    const den1 = pickOne([2, 3, 4, 5]);
+    const multiplicationDenominators =
+      difficulty === 'easy'
+        ? [2, 3, 4, 5]
+        : difficulty === 'medium'
+          ? [3, 4, 5, 6, 7]
+          : [5, 6, 7, 8, 9];
+    const den1 = pickOne(multiplicationDenominators);
     const num1 = randomInt(1, den1 - 1);
-    const den2 = pickOne([3, 4, 5, 6, 7]);
+    const den2 = pickOne(multiplicationDenominators);
     const num2 = randomInt(1, den2 - 1);
 
     const multNum = num1 * num2;
@@ -140,10 +159,55 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
     };
   }
 
+  if (type === 'fraction_of_number') {
+    const den =
+      difficulty === 'easy'
+        ? randomInt(2, 4)
+        : difficulty === 'medium'
+          ? randomInt(3, 7)
+          : randomInt(5, 10);
+    const num = randomInt(1, den - 1);
+    const unit =
+      difficulty === 'easy'
+        ? randomInt(2, 8)
+        : difficulty === 'medium'
+          ? randomInt(4, 12)
+          : randomInt(8, 20);
+    const whole = den * unit;
+    const answer = num * unit;
+
+    return {
+      id,
+      topicId: 'fractions',
+      subtopic: '어떤 수의 분수만큼 구하기',
+      difficulty,
+      question: `쿠키 ${whole}개 중에서 ${num}/${den}만큼은 몇 개인가요?`,
+      hint: `전체를 분모 ${den}만큼 똑같이 나눈 다음, 그중 분자 ${num}만큼을 구해요.`,
+      answerType: 'number',
+      correctAnswer: answer,
+      explanations: [
+        {
+          title: '1단계: 전체를 똑같이 나누기',
+          content: `${whole} ÷ ${den} = ${unit}, 한 묶음에 ${unit}개입니다.`,
+        },
+        {
+          title: '2단계: 필요한 묶음만큼 구하기',
+          content: `${unit} × ${num} = ${answer}, 따라서 ${num}/${den}만큼은 ${answer}개입니다.`,
+        },
+      ],
+    };
+  }
+
   // Division
-  const den1 = pickOne([3, 4, 5, 6]);
+  const divisionDenominators =
+    difficulty === 'easy'
+      ? [3, 4, 5]
+      : difficulty === 'medium'
+        ? [3, 4, 5, 6, 8]
+        : [5, 6, 8, 9, 10];
+  const den1 = pickOne(divisionDenominators);
   const num1 = randomInt(2, den1 - 1);
-  const den2 = pickOne([2, 3, 4, 5]);
+  const den2 = pickOne(divisionDenominators.filter((den) => den > 2));
   const num2 = randomInt(1, den2 - 1);
 
   // num1/den1 ÷ num2/den2 = num1/den1 × den2/num2

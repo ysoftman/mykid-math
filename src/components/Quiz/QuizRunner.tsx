@@ -7,6 +7,18 @@ import { generateProblem } from '../../utils/problemGenerators';
 import { addWrongNote, recordProblemResult } from '../../utils/storage';
 import { FractionInput } from './FractionInput';
 
+const DIFFICULTY_LABELS: Record<Difficulty, string> = {
+  easy: '하',
+  medium: '중',
+  hard: '상',
+};
+
+const DIFFICULTY_BADGE_STYLES: Record<Difficulty, string> = {
+  easy: 'bg-emerald-100 text-emerald-800',
+  medium: 'bg-amber-100 text-amber-800',
+  hard: 'bg-rose-100 text-rose-800',
+};
+
 interface QuizRunnerProps {
   topicId: TopicId;
   onStatsUpdated: () => void;
@@ -126,7 +138,12 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
           <span className="bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-lg">
             {problem.subtopic}
           </span>
-          <span className="text-xs text-slate-400">무한 생성 문제</span>
+          <span
+            className={`rounded-lg px-2.5 py-1 text-xs font-bold ${DIFFICULTY_BADGE_STYLES[difficulty]}`}
+          >
+            난이도 {DIFFICULTY_LABELS[difficulty]}
+          </span>
+          <span className="text-xs text-slate-500">무한 생성 문제</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -142,18 +159,25 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
           </button>
 
           {/* Difficulty selector */}
-          <div className="flex bg-slate-100 p-0.5 rounded-lg text-xs font-semibold">
+          <div
+            role="group"
+            aria-label="난이도 선택"
+            className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg text-xs font-semibold"
+          >
+            <span className="px-1 text-slate-700">난이도</span>
             {(['easy', 'medium', 'hard'] as Difficulty[]).map((d) => (
               <button
                 key={d}
                 onClick={() => handleDifficultyChange(d)}
-                className={`px-2 py-1 rounded-md transition-all ${
+                aria-pressed={difficulty === d}
+                aria-label={`${DIFFICULTY_LABELS[d]} 난이도`}
+                className={`min-w-10 rounded-md px-2 py-1 transition-all ${
                   difficulty === d
                     ? 'bg-white text-indigo-600 shadow-sm font-bold'
                     : 'text-slate-500 hover:text-slate-800'
                 }`}
               >
-                {d === 'easy' ? '기본' : d === 'medium' ? '보통' : '도전'}
+                {DIFFICULTY_LABELS[d]}
               </button>
             ))}
           </div>

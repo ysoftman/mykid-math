@@ -1,4 +1,4 @@
-// Web Audio API based sound synthesizer for Kid Math Lab
+// Web Audio API based sound synthesizer
 class SoundManager {
   private ctx: AudioContext | null = null;
   private soundEnabled: boolean = true;

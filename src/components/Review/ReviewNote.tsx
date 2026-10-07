@@ -114,12 +114,12 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats 
                     <span className="bg-rose-100 text-rose-700 text-xs font-bold px-2 py-0.5 rounded">
                       {item.problem.subtopic}
                     </span>
-                    <span className="text-[11px] text-slate-400">{item.solvedAt} 풀이</span>
+                    <span className="text-xs text-slate-500">{item.solvedAt} 풀이</span>
                   </div>
 
                   <button
                     onClick={() => handleDeleteItem(item.problem.id)}
-                    className="text-slate-400 hover:text-rose-500 text-xs transition-colors"
+                    className="text-slate-500 hover:text-rose-600 text-xs transition-colors"
                     title="오답 노트에서 삭제"
                   >
                     삭제 ✕
@@ -132,13 +132,13 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats 
 
                 <div className="flex flex-wrap items-center gap-4 text-xs bg-white p-3 rounded-xl border border-slate-200">
                   <div>
-                    <span className="text-slate-400">내가 적은 오답: </span>
+                    <span className="text-slate-600">내가 적은 오답: </span>
                     <strong className="text-rose-600 font-mono">
                       {item.userAnswer || '미입력'}
                     </strong>
                   </div>
                   <div>
-                    <span className="text-slate-400">정답: </span>
+                    <span className="text-slate-600">정답: </span>
                     <strong className="text-indigo-600 font-mono">
                       {typeof item.problem.correctAnswer === 'object'
                         ? `${(item.problem.correctAnswer as any).num}/${(item.problem.correctAnswer as any).den}`
@@ -193,7 +193,7 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats 
                       </button>
                       <button
                         onClick={() => setRetryId(null)}
-                        className="px-2 py-1 text-slate-400 hover:text-slate-600 text-xs"
+                        className="px-2 py-1 text-slate-500 hover:text-slate-700 text-xs"
                       >
                         취소
                       </button>

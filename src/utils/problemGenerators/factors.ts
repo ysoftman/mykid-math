@@ -2,7 +2,7 @@ import type { Difficulty, Problem } from '../../types/math';
 import { gcd, getFactors, lcm, pickOne, randomInt } from '../mathHelpers';
 
 export function generateFactorProblem(difficulty: Difficulty): Problem {
-  const type = pickOne(['factors_count', 'gcd', 'lcm', 'word_problem']);
+  const type = pickOne(['factors_count', 'gcd', 'lcm', 'common_factors_count', 'word_problem']);
   const id = `fac_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
   if (type === 'factors_count') {
@@ -43,11 +43,17 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
   }
 
   if (type === 'gcd') {
-    const g = difficulty === 'easy' ? randomInt(2, 6) : randomInt(4, 12);
-    const m1 = randomInt(2, 5);
-    let m2 = randomInt(2, 6);
-    while (m1 === m2 || gcd(m1, m2) !== 1) {
-      m2 = randomInt(2, 7);
+    const g =
+      difficulty === 'easy'
+        ? randomInt(2, 6)
+        : difficulty === 'medium'
+          ? randomInt(5, 15)
+          : randomInt(10, 30);
+    const maxMultiplier = difficulty === 'easy' ? 4 : difficulty === 'medium' ? 6 : 9;
+    const m1 = randomInt(2, maxMultiplier);
+    let m2 = randomInt(2, maxMultiplier);
+    while (gcd(m1, m2) !== 1) {
+      m2 = randomInt(2, maxMultiplier);
     }
     const a = g * m1;
     const b = g * m2;
@@ -76,12 +82,14 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
   }
 
   if (type === 'lcm') {
-    const g = randomInt(2, 5);
-    const m1 = randomInt(2, 4);
-    let m2 = randomInt(2, 5);
-    while (m1 === m2 || gcd(m1, m2) !== 1) {
-      m2 = randomInt(2, 6);
-    }
+    const g =
+      difficulty === 'easy'
+        ? randomInt(2, 5)
+        : difficulty === 'medium'
+          ? randomInt(3, 8)
+          : randomInt(6, 12);
+    const m1 = pickOne([2, 3, 4]);
+    const m2 = m1 === 2 ? pickOne([3, 5]) : m1 === 3 ? pickOne([2, 4, 5]) : pickOne([3, 5]);
     const a = g * m1;
     const b = g * m2;
     const ans = lcm(a, b);
@@ -108,10 +116,51 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
     };
   }
 
+  if (type === 'common_factors_count') {
+    const common =
+      difficulty === 'easy'
+        ? randomInt(2, 8)
+        : difficulty === 'medium'
+          ? randomInt(6, 18)
+          : randomInt(12, 30);
+    const a = common * 2;
+    const b = common * 3;
+    const commonFactors = getFactors(gcd(a, b));
+
+    return {
+      id,
+      topicId: 'factors',
+      subtopic: '공약수 찾기',
+      difficulty,
+      question: `두 수 ${a}와 ${b}의 공약수는 모두 몇 개인가요?`,
+      hint: `먼저 두 수를 모두 나누어떨어지게 하는 수를 찾고, 중복 없이 개수를 세어 보세요.`,
+      answerType: 'number',
+      correctAnswer: commonFactors.length,
+      explanations: [
+        {
+          title: '1단계: 공약수 찾기',
+          content: `${a}와 ${b}를 모두 나누어떨어지게 하는 수를 찾습니다.`,
+        },
+        {
+          title: '2단계: 공약수 세기',
+          content: `공약수는 ${commonFactors.join(', ')}이고, 모두 ${commonFactors.length}개입니다.`,
+        },
+      ],
+    };
+  }
+
   // Word Problem
-  const g = randomInt(3, 8);
-  const m1 = randomInt(2, 4);
-  const m2 = randomInt(3, 5);
+  const g =
+    difficulty === 'easy'
+      ? randomInt(2, 6)
+      : difficulty === 'medium'
+        ? randomInt(4, 10)
+        : randomInt(8, 18);
+  const m1 = randomInt(2, difficulty === 'hard' ? 7 : 4);
+  let m2 = randomInt(3, difficulty === 'hard' ? 8 : 5);
+  while (gcd(m1, m2) !== 1) {
+    m2 = randomInt(3, difficulty === 'hard' ? 8 : 5);
+  }
   const candies = g * m1;
   const chocolates = g * m2;
   return {

@@ -2,7 +2,7 @@ import type { Difficulty, Problem } from '../../types/math';
 import { pickOne, randomInt } from '../mathHelpers';
 
 export function generateDecimalProblem(difficulty: Difficulty): Problem {
-  const type = pickOne(['multiplication', 'division', 'word_problem']);
+  const type = pickOne(['multiplication', 'division', 'addition_subtraction', 'word_problem']);
   const id = `dec_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
   if (type === 'multiplication') {
@@ -34,28 +34,30 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
         ],
       };
     } else {
-      // Decimal x Decimal
-      const a = randomInt(2, 9) / 10;
-      const b = randomInt(3, 8) / 10;
-      const ans = Math.round(a * b * 100) / 100;
+      // Multiply decimals, using hundredths for the hardest level.
+      const aPlaces = difficulty === 'hard' ? 2 : 1;
+      const aScale = 10 ** aPlaces;
+      const a = randomInt(aScale + 1, 9 * aScale) / aScale;
+      const b = randomInt(2, 9) / 10;
+      const ans = Math.round(a * b * 10 ** (aPlaces + 1)) / 10 ** (aPlaces + 1);
 
       return {
         id,
         topicId: 'decimals',
         subtopic: '소수 × 소수',
         difficulty,
-        question: `다음 식을 계산하세요:  ${a.toFixed(1)} × ${b.toFixed(1)}`,
+        question: `다음 식을 계산하세요:  ${a.toFixed(aPlaces)} × ${b.toFixed(1)}`,
         hint: `두 소수의 소수점 아래 자릿수를 합치면 총 몇 자리인가요? 자연수 곱셈 결과에서 그만큼 왼쪽으로 점을 옮겨요!`,
         answerType: 'number',
         correctAnswer: ans,
         explanations: [
           {
             title: '1단계: 자연수의 곱 구하기',
-            content: `${Math.round(a * 10)} × ${Math.round(b * 10)} = ${Math.round(a * 10) * Math.round(b * 10)}`,
+            content: `${Math.round(a * aScale)} × ${Math.round(b * 10)} = ${Math.round(a * aScale) * Math.round(b * 10)}`,
           },
           {
             title: '2단계: 소수점 자릿수 합산',
-            content: `0.1 × 0.1 = 0.01이므로, 소수 둘째 자리가 되도록 점을 찍어 ${ans}가 됩니다.`,
+            content: `소수점 아래 자릿수를 합쳐 결과에 점을 찍으면 ${ans}가 됩니다.`,
           },
         ],
       };
@@ -64,36 +66,90 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
 
   if (type === 'division') {
     // Division: Choose clean quotient
-    const quotient = randomInt(2, 8);
-    const divisor = randomInt(2, 6) / 10;
-    const dividend = Math.round(divisor * quotient * 10) / 10;
+    const quotient =
+      difficulty === 'easy'
+        ? randomInt(2, 8)
+        : difficulty === 'medium'
+          ? randomInt(3, 12)
+          : randomInt(5, 20);
+    const places = difficulty === 'hard' ? 2 : 1;
+    const scale = 10 ** places;
+    const maxDivisor = places === 2 ? 55 : difficulty === 'easy' ? 6 : 8;
+    const divisor = randomInt(places === 2 ? 12 : 2, maxDivisor) / scale;
+    const dividend = Math.round(divisor * quotient * scale) / scale;
 
     return {
       id,
       topicId: 'decimals',
       subtopic: '소수의 나눗셈',
       difficulty,
-      question: `다음 나눗셈을 계산하세요:  ${dividend.toFixed(1)} ÷ ${divisor.toFixed(1)}`,
+      question: `다음 나눗셈을 계산하세요:  ${dividend.toFixed(places)} ÷ ${divisor.toFixed(places)}`,
       hint: `나누는 수와 나누어지는 수에 똑같이 10을 곱해서 자연수의 나눗셈으로 바꾸어 풀어보세요!`,
       answerType: 'number',
       correctAnswer: quotient,
       explanations: [
         {
           title: '1단계: 소수점 이동하기 (10배)',
-          content: `나누는 수와 나누어지는 수를 똑같이 10배 합니다: ${Math.round(dividend * 10)} ÷ ${Math.round(divisor * 10)}`,
+          content: `나누는 수와 나누어지는 수에 똑같이 ${scale}을 곱합니다: ${Math.round(dividend * scale)} ÷ ${Math.round(divisor * scale)}`,
         },
         {
           title: '2단계: 자연수의 나눗셈 계산',
-          content: `${Math.round(dividend * 10)} ÷ ${Math.round(divisor * 10)} = ${quotient}`,
+          content: `${Math.round(dividend * scale)} ÷ ${Math.round(divisor * scale)} = ${quotient}`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'addition_subtraction') {
+    const places = difficulty === 'hard' ? 2 : 1;
+    const scale = 10 ** places;
+    const maxValue = difficulty === 'easy' ? 5 : difficulty === 'medium' ? 20 : 100;
+    let a = randomInt(scale, maxValue * scale);
+    let b = randomInt(scale, maxValue * scale);
+    const operation = pickOne(['+', '-']);
+
+    if (operation === '-' && a < b) [a, b] = [b, a];
+
+    const answerScaled = operation === '+' ? a + b : a - b;
+    const answer = answerScaled / scale;
+    const first = (a / scale).toFixed(places);
+    const second = (b / scale).toFixed(places);
+
+    return {
+      id,
+      topicId: 'decimals',
+      subtopic: operation === '+' ? '소수의 덧셈' : '소수의 뺄셈',
+      difficulty,
+      question: `다음 소수의 ${operation === '+' ? '덧셈' : '뺄셈'}을 계산하세요: ${first} ${operation} ${second}`,
+      hint: `소수점을 세로로 맞추어 쓰고, 같은 자리끼리 계산해 보세요.`,
+      answerType: 'number',
+      correctAnswer: answer,
+      explanations: [
+        {
+          title: '1단계: 소수점 자리 맞추기',
+          content: `${first}와 ${second}의 소수점을 같은 위치에 맞춥니다.`,
+        },
+        {
+          title: '2단계: 같은 자리끼리 계산하기',
+          content: `${first} ${operation} ${second} = ${answer.toFixed(places)}`,
         },
       ],
     };
   }
 
   // Word Problem
-  const length = (randomInt(12, 25) / 10).toFixed(1);
-  const count = randomInt(3, 5);
-  const total = Math.round(parseFloat(length) * count * 10) / 10;
+  const lengthPlaces = difficulty === 'hard' ? 2 : 1;
+  const lengthScale = 10 ** lengthPlaces;
+  const maxLength = difficulty === 'easy' ? 25 : difficulty === 'medium' ? 40 : 250;
+  const minLength = difficulty === 'hard' ? 101 : 12;
+  const length = (randomInt(minLength, maxLength) / lengthScale).toFixed(lengthPlaces);
+  const count =
+    difficulty === 'easy'
+      ? randomInt(2, 4)
+      : difficulty === 'medium'
+        ? randomInt(3, 6)
+        : randomInt(4, 8);
+  const total = Math.round(parseFloat(length) * count * lengthScale) / lengthScale;
 
   return {
     id,

@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import { sound } from '../../utils/audio';
+import { LabGuide } from './LabGuide';
 
 export const DecimalsLab: React.FC = () => {
   const [valA, setValA] = useState<number>(0.6);
@@ -23,6 +24,8 @@ export const DecimalsLab: React.FC = () => {
           </p>
         </div>
       </div>
+
+      <LabGuide />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100">
@@ -64,7 +67,7 @@ export const DecimalsLab: React.FC = () => {
 
       {/* 10x10 Grid View */}
       <div className="bg-slate-900 rounded-2xl p-6 flex flex-col items-center justify-center text-white">
-        <div className="text-xs text-slate-300 mb-4">전체 1개 큰 정사각형 = 100칸 (1칸 = 0.01)</div>
+        <div className="text-xs text-slate-200 mb-4">전체 1개 큰 정사각형 = 100칸 (1칸 = 0.01)</div>
 
         <div className="grid grid-cols-10 gap-0.5 sm:gap-1 bg-slate-800 p-2 sm:p-3 rounded-xl border border-slate-700">
           {Array.from({ length: 10 }).map((_, r) =>
@@ -76,7 +79,7 @@ export const DecimalsLab: React.FC = () => {
               return (
                 <div
                   key={`${r}-${c}`}
-                  className={`w-6 h-6 sm:w-8 sm:h-8 rounded-sm transition-all duration-200 border flex items-center justify-center text-[10px] ${
+                  className={`w-5 h-5 sm:w-8 sm:h-8 rounded-sm transition-all duration-200 border flex items-center justify-center ${
                     isOverlap
                       ? 'bg-emerald-400 border-emerald-300 text-emerald-950 font-bold shadow'
                       : inCol
@@ -97,7 +100,7 @@ export const DecimalsLab: React.FC = () => {
           <div className="text-xl sm:text-2xl font-black text-emerald-400">
             {valA.toFixed(1)} × {valB.toFixed(1)} = {product.toFixed(2)}
           </div>
-          <p className="text-sm text-slate-300">
+          <p className="text-sm text-slate-200">
             100칸 중 <strong className="text-white">{overlapCount}칸</strong>이 겹치므로{' '}
             <strong className="text-emerald-300">
               {overlapCount} / 100 = {product.toFixed(2)}

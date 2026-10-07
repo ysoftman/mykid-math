@@ -2,13 +2,27 @@ import type { Difficulty, Problem } from '../../types/math';
 import { pickOne, randomInt } from '../mathHelpers';
 
 export function generateGeometryProblem(difficulty: Difficulty): Problem {
-  const shape = pickOne(['triangle', 'parallelogram', 'trapezoid', 'rhombus', 'circle']);
+  const shape = pickOne([
+    'triangle',
+    'parallelogram',
+    'trapezoid',
+    'rhombus',
+    'missing_height',
+    'circle',
+  ]);
   const id = `geo_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
   if (shape === 'triangle') {
-    const base = randomInt(4, 14);
+    const base =
+      difficulty === 'easy'
+        ? randomInt(3, 8)
+        : difficulty === 'medium'
+          ? randomInt(5, 14)
+          : randomInt(10, 24);
     // Make either base or height even so area is integer
-    const height = base % 2 === 0 ? randomInt(3, 12) : randomInt(2, 6) * 2;
+    const heightMax = difficulty === 'easy' ? 8 : difficulty === 'medium' ? 12 : 20;
+    const height =
+      base % 2 === 0 ? randomInt(3, heightMax) : randomInt(2, Math.floor(heightMax / 2)) * 2;
     const area = (base * height) / 2;
 
     return {
@@ -36,8 +50,18 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
   }
 
   if (shape === 'parallelogram') {
-    const base = randomInt(4, 15);
-    const height = randomInt(3, 12);
+    const base =
+      difficulty === 'easy'
+        ? randomInt(3, 8)
+        : difficulty === 'medium'
+          ? randomInt(5, 15)
+          : randomInt(10, 24);
+    const height =
+      difficulty === 'easy'
+        ? randomInt(2, 8)
+        : difficulty === 'medium'
+          ? randomInt(3, 12)
+          : randomInt(8, 20);
     const area = base * height;
 
     return {
@@ -65,11 +89,23 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
   }
 
   if (shape === 'trapezoid') {
-    const top = randomInt(3, 8);
-    const bottom = randomInt(5, 12);
+    const top =
+      difficulty === 'easy'
+        ? randomInt(2, 6)
+        : difficulty === 'medium'
+          ? randomInt(3, 8)
+          : randomInt(6, 14);
+    const bottom =
+      difficulty === 'easy'
+        ? randomInt(top + 1, 9)
+        : difficulty === 'medium'
+          ? randomInt(top + 1, 12)
+          : randomInt(top + 1, 20);
     // Make sum or height even
     const sum = top + bottom;
-    const height = sum % 2 === 0 ? randomInt(4, 10) : randomInt(2, 5) * 2;
+    const heightMax = difficulty === 'easy' ? 8 : difficulty === 'medium' ? 10 : 18;
+    const height =
+      sum % 2 === 0 ? randomInt(2, heightMax) : randomInt(1, Math.floor(heightMax / 2)) * 2;
     const area = (sum * height) / 2;
 
     return {
@@ -97,8 +133,9 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
   }
 
   if (shape === 'rhombus') {
-    const d1 = randomInt(4, 12);
-    const d2 = d1 % 2 === 0 ? randomInt(3, 10) : randomInt(2, 5) * 2;
+    const dMax = difficulty === 'easy' ? 8 : difficulty === 'medium' ? 12 : 24;
+    const d1 = randomInt(4, dMax);
+    const d2 = d1 % 2 === 0 ? randomInt(3, dMax) : randomInt(2, Math.floor(dMax / 2)) * 2;
     const area = (d1 * d2) / 2;
 
     return {
@@ -125,8 +162,47 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
     };
   }
 
+  if (shape === 'missing_height') {
+    const base =
+      difficulty === 'easy'
+        ? randomInt(2, 8)
+        : difficulty === 'medium'
+          ? randomInt(4, 12)
+          : randomInt(6, 18);
+    const height = difficulty === 'hard' ? randomInt(7, 20) : randomInt(3, 12);
+    const area = base * height;
+
+    return {
+      id,
+      topicId: 'geometry',
+      subtopic: '넓이로 높이 구하기',
+      difficulty,
+      question: `밑변이 ${base}cm인 평행사변형의 넓이가 ${area}cm²입니다. 높이는 몇 cm인가요?`,
+      hint: `평행사변형의 넓이는 밑변 × 높이예요. 넓이를 밑변으로 나누어 보세요.`,
+      answerType: 'number',
+      correctAnswer: height,
+      diagramType: 'parallelogram',
+      diagramData: { base, height },
+      explanations: [
+        {
+          title: '1단계: 넓이 공식 확인하기',
+          content: `넓이 = 밑변 × 높이이므로 ${area} = ${base} × □ 입니다.`,
+        },
+        {
+          title: '2단계: 높이 구하기',
+          content: `${area} ÷ ${base} = ${height}, 따라서 높이는 ${height}cm입니다.`,
+        },
+      ],
+    };
+  }
+
   // Circle area with pi = 3.14
-  const radius = randomInt(2, 6);
+  const radius =
+    difficulty === 'easy'
+      ? randomInt(2, 4)
+      : difficulty === 'medium'
+        ? randomInt(3, 7)
+        : randomInt(6, 12);
   const area = Math.round(radius * radius * 3.14 * 100) / 100;
 
   return {

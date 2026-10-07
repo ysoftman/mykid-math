@@ -40,7 +40,7 @@ export const Roadmap: React.FC<RoadmapProps> = ({ stats, onSelectTopic, onOpenWr
             <div className="flex items-center gap-2">
               <span className="text-3xl">⭐</span>
               <span className="text-3xl font-black">{currentStars}</span>
-              <span className="text-xs text-indigo-200">별 보유</span>
+              <span className="text-xs text-white/90">별 보유</span>
             </div>
             <div className="w-full bg-black/20 h-2.5 rounded-full mt-3 overflow-hidden">
               <div
@@ -48,7 +48,7 @@ export const Roadmap: React.FC<RoadmapProps> = ({ stats, onSelectTopic, onOpenWr
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <div className="text-[11px] text-indigo-100 mt-1 font-semibold">
+            <div className="text-xs text-indigo-100 mt-1 font-semibold">
               다음 레벨까지 별 {Math.max(0, nextLevelStars - currentStars)}개 남음
             </div>
           </div>
@@ -58,11 +58,11 @@ export const Roadmap: React.FC<RoadmapProps> = ({ stats, onSelectTopic, onOpenWr
         <div className="mt-6 pt-6 border-t border-white/15 grid grid-cols-3 gap-2 text-center">
           <div>
             <div className="text-xl sm:text-2xl font-black">{stats.totalSolved}</div>
-            <div className="text-[11px] text-indigo-200">총 푼 문제</div>
+            <div className="text-xs text-white/90">총 푼 문제</div>
           </div>
           <div>
             <div className="text-xl sm:text-2xl font-black">{stats.totalCorrect}</div>
-            <div className="text-[11px] text-indigo-200">정답 맞힌 문제</div>
+            <div className="text-xs text-white/90">정답 맞힌 문제</div>
           </div>
           <div>
             <div className="text-xl sm:text-2xl font-black">
@@ -70,7 +70,7 @@ export const Roadmap: React.FC<RoadmapProps> = ({ stats, onSelectTopic, onOpenWr
                 ? `${Math.round((stats.totalCorrect / stats.totalSolved) * 100)}%`
                 : '0%'}
             </div>
-            <div className="text-[11px] text-indigo-200">정답률</div>
+            <div className="text-xs text-white/90">정답률</div>
           </div>
         </div>
       </div>
@@ -89,13 +89,13 @@ export const Roadmap: React.FC<RoadmapProps> = ({ stats, onSelectTopic, onOpenWr
                 className={`p-3 rounded-xl border flex items-center gap-3 transition-all ${
                   unlocked
                     ? 'bg-amber-50/70 border-amber-200 text-amber-950 shadow-2xs'
-                    : 'bg-slate-50 border-slate-200 text-slate-400 opacity-60'
+                    : 'bg-slate-50 border-slate-200 text-slate-500'
                 }`}
               >
                 <span className="text-2xl">{unlocked ? badge.icon : '🔒'}</span>
                 <div>
                   <div className="text-xs font-bold">{badge.name}</div>
-                  <div className="text-[10px] line-clamp-1">{badge.desc}</div>
+                  <div className="text-xs line-clamp-1">{badge.desc}</div>
                 </div>
               </div>
             );
@@ -105,14 +105,14 @@ export const Roadmap: React.FC<RoadmapProps> = ({ stats, onSelectTopic, onOpenWr
 
       {/* Topics Roadmap List */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
           <h3 className="text-lg font-bold text-slate-800">단원별 학습 코스</h3>
           <button
             onClick={() => {
               sound.playPop();
               onOpenWrongNotes();
             }}
-            className="text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"
+            className="self-start text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 sm:self-auto"
           >
             <span>📝</span>
             <span>오답 노트 보러가기</span>
@@ -143,7 +143,7 @@ export const Roadmap: React.FC<RoadmapProps> = ({ stats, onSelectTopic, onOpenWr
                         {topic.icon}
                       </div>
                       <div>
-                        <span className="text-[11px] font-bold text-slate-400">
+                        <span className="text-xs font-bold text-slate-500">
                           단원 {index + 1} · {topic.grade}
                         </span>
                         <h4 className="font-extrabold text-slate-800 text-base group-hover:text-indigo-600 transition-colors">

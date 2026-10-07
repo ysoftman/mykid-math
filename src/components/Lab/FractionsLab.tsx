@@ -2,6 +2,7 @@ import type React from 'react';
 import { useState } from 'react';
 import { sound } from '../../utils/audio';
 import { lcm, simplifyFraction } from '../../utils/mathHelpers';
+import { LabGuide } from './LabGuide';
 
 export const FractionsLab: React.FC = () => {
   const [mode, setMode] = useState<'addition' | 'multiplication' | 'division'>('addition');
@@ -43,7 +44,7 @@ export const FractionsLab: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex bg-blue-50 p-1 rounded-xl">
+        <div className="flex flex-wrap bg-blue-50 p-1 rounded-xl">
           <button
             onClick={() => {
               sound.playPop();
@@ -72,6 +73,8 @@ export const FractionsLab: React.FC = () => {
           </button>
         </div>
       </div>
+
+      <LabGuide />
 
       {mode === 'addition' ? (
         <div className="space-y-6">
@@ -174,7 +177,7 @@ export const FractionsLab: React.FC = () => {
                     <div
                       key={idx}
                       className={`flex-1 border-r border-slate-300 last:border-r-0 flex items-center justify-center text-xs font-bold transition-all duration-300 ${
-                        isFilled ? 'bg-blue-500 text-white shadow-inner' : 'bg-white text-slate-400'
+                        isFilled ? 'bg-blue-500 text-white shadow-inner' : 'bg-white text-slate-500'
                       }`}
                     >
                       1/{isUnified ? commonDen : den1}
@@ -199,7 +202,7 @@ export const FractionsLab: React.FC = () => {
                       className={`flex-1 border-r border-slate-300 last:border-r-0 flex items-center justify-center text-xs font-bold transition-all duration-300 ${
                         isFilled
                           ? 'bg-indigo-500 text-white shadow-inner'
-                          : 'bg-white text-slate-400'
+                          : 'bg-white text-slate-500'
                       }`}
                     >
                       1/{isUnified ? commonDen : den2}
@@ -323,16 +326,16 @@ export const FractionsLab: React.FC = () => {
           </div>
 
           <div className="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-2xl text-white">
-            <div className="text-xs text-slate-300 mb-3">
+            <div className="text-xs text-slate-200 mb-3">
               전체 사각형을 가로 {mDen1}등분 × 세로 {mDen2}등분 = 총 <strong>{productDen}</strong>
               칸으로 나눕니다.
             </div>
 
             <div
-              className="grid gap-1 bg-slate-800 p-3 rounded-xl border border-slate-700"
+              className="grid max-w-full gap-1 overflow-hidden bg-slate-800 p-3 rounded-xl border border-slate-700"
               style={{
-                gridTemplateColumns: `repeat(${mDen1}, 42px)`,
-                gridTemplateRows: `repeat(${mDen2}, 42px)`,
+                gridTemplateColumns: `repeat(${mDen1}, minmax(0, 42px))`,
+                gridTemplateRows: `repeat(${mDen2}, minmax(32px, 42px))`,
               }}
             >
               {Array.from({ length: mDen2 }).map((_, r) =>
@@ -366,7 +369,7 @@ export const FractionsLab: React.FC = () => {
                 {mNum1}/{mDen1} × {mNum2}/{mDen2} = ({mNum1}×{mNum2}) / ({mDen1}×{mDen2}) ={' '}
                 {productNum}/{productDen}
               </div>
-              <div className="text-xs text-slate-300">
+              <div className="text-xs text-slate-200">
                 노란색 겹치는 영역 {productNum}칸 / 전체 {productDen}칸 = 약분하면{' '}
                 <strong className="text-white text-sm">
                   {simplifiedProduct.num}/{simplifiedProduct.den}

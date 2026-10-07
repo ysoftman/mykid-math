@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import { sound } from '../../utils/audio';
+import { LabGuide } from './LabGuide';
 
 export const GeometryLab: React.FC = () => {
   const [shape, setShape] = useState<'triangle' | 'trapezoid' | 'circle'>('triangle');
@@ -37,7 +38,7 @@ export const GeometryLab: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex bg-purple-50 p-1 rounded-xl gap-1">
+        <div className="flex flex-wrap bg-purple-50 p-1 rounded-xl gap-1">
           <button
             onClick={() => {
               sound.playPop();
@@ -79,6 +80,8 @@ export const GeometryLab: React.FC = () => {
           </button>
         </div>
       </div>
+
+      <LabGuide />
 
       {shape === 'triangle' && (
         <div className="space-y-6">
@@ -153,7 +156,7 @@ export const GeometryLab: React.FC = () => {
                 x={40 + (base * 15) / 2}
                 y="165"
                 fill="#f8fafc"
-                fontSize="12"
+                fontSize="16"
                 textAnchor="middle"
                 fontWeight="bold"
               >
@@ -172,7 +175,7 @@ export const GeometryLab: React.FC = () => {
                 x={45 + (base * 15) / 2}
                 y={150 - (height * 12) / 2}
                 fill="#fbbf24"
-                fontSize="11"
+                fontSize="15"
                 fontWeight="bold"
               >
                 높이 {height}cm
@@ -197,7 +200,7 @@ export const GeometryLab: React.FC = () => {
                   넓이 = ({base} × {height}) ÷ 2 ={' '}
                   <span className="text-white font-extrabold">{triArea}</span> cm²
                 </div>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-slate-300 mt-1">
                   💡 똑같은 삼각형 2개를 붙이면 평행사변형(밑변×높이)이 되기 때문에{' '}
                   <strong>반으로 나누는(÷2)</strong> 것입니다!
                 </p>
@@ -294,7 +297,7 @@ export const GeometryLab: React.FC = () => {
                 x={50 + 20 + (topBase * 12) / 2}
                 y={140 - trapHeight * 12}
                 fill="#e2e8f0"
-                fontSize="11"
+                fontSize="15"
                 textAnchor="middle"
               >
                 윗변 {topBase}cm
@@ -303,7 +306,7 @@ export const GeometryLab: React.FC = () => {
                 x={50 + (bottomBase * 12) / 2}
                 y="165"
                 fill="#e2e8f0"
-                fontSize="11"
+                fontSize="15"
                 textAnchor="middle"
               >
                 아랫변 {bottomBase}cm
@@ -326,7 +329,7 @@ export const GeometryLab: React.FC = () => {
                   넓이 = ({topBase} + {bottomBase}) × {trapHeight} ÷ 2 ={' '}
                   <span className="text-white font-extrabold">{trapArea}</span> cm²
                 </div>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="text-xs text-slate-300 mt-1">
                   💡 사다리꼴 2개를 거꾸로 붙이면 밑변이 (윗변+아랫변)인 거대한 평행사변형이
                   완성됩니다!
                 </p>
@@ -414,14 +417,14 @@ export const GeometryLab: React.FC = () => {
                     x={radius * 5}
                     y="-5"
                     fill="#facc15"
-                    fontSize="10"
+                    fontSize="14"
                     textAnchor="middle"
                     fontWeight="bold"
                   >
                     반지름 {radius}
                   </text>
                 </svg>
-                <div className="text-xs text-slate-400 mt-2">원 (피자 모양 조각내기)</div>
+                <div className="text-xs text-slate-300 mt-2">원 (피자 모양 조각내기)</div>
               </div>
 
               <div className="text-2xl text-purple-400">➡️</div>
@@ -443,7 +446,7 @@ export const GeometryLab: React.FC = () => {
                     ))}
                   </div>
                 </div>
-                <div className="text-xs text-slate-400 mt-2">
+                <div className="text-xs text-slate-300 mt-2">
                   엇갈려 이어붙인 모습 (가로 = 원주의 1/2, 세로 = 반지름)
                 </div>
               </div>
@@ -454,7 +457,7 @@ export const GeometryLab: React.FC = () => {
                 원의 넓이 = 반지름({radius}) × 반지름({radius}) × 3.14 ={' '}
                 <span className="text-white font-extrabold">{circleArea}</span> cm²
               </div>
-              <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-300">
                 (원주 = 2 × {radius} × 3.14 = {circumference}cm, 직사각형 가로 = {circumference / 2}
                 cm, 세로 = {radius}cm)
               </p>

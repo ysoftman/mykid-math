@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import { sound } from '../../utils/audio';
+import { LabGuide } from './LabGuide';
 
 export const RatiosLab: React.FC = () => {
   const [syrup, setSyrup] = useState<number>(2);
@@ -23,6 +24,8 @@ export const RatiosLab: React.FC = () => {
           </p>
         </div>
       </div>
+
+      <LabGuide />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="bg-rose-50/50 p-4 rounded-xl border border-rose-100">
@@ -78,30 +81,30 @@ export const RatiosLab: React.FC = () => {
                 boxShadow: '0 -4px 12px rgba(244, 63, 94, 0.4)',
               }}
             >
-              <span className="bg-black/40 px-2 py-0.5 rounded text-[11px] text-white">
+              <span className="bg-black/40 px-2 py-0.5 rounded text-xs text-white">
                 농도 {ratioVal}%
               </span>
             </div>
           </div>
-          <div className="text-xs text-slate-300 mt-2 font-medium">총 {total}컵의 주스 완성!</div>
+          <div className="text-xs text-slate-200 mt-2 font-medium">총 {total}컵의 주스 완성!</div>
         </div>
 
         {/* Ratio Stats */}
         <div className="space-y-4 max-w-sm w-full">
           <div className="bg-slate-800/90 p-4 rounded-xl border border-slate-700 space-y-2">
-            <div className="text-xs text-slate-400">딸기 시럽과 탄산수의 비</div>
+            <div className="text-xs text-slate-200">딸기 시럽과 탄산수의 비</div>
             <div className="text-2xl font-black text-rose-400">
               {syrup} : {water}
             </div>
           </div>
 
           <div className="bg-slate-800/90 p-4 rounded-xl border border-slate-700 space-y-2">
-            <div className="text-xs text-slate-400">전체 주스에 대한 시럽의 비율</div>
+            <div className="text-xs text-slate-200">전체 주스에 대한 시럽의 비율</div>
             <div className="text-xl font-bold text-white flex items-center gap-2">
               <span>
                 {syrup} / {total}
               </span>
-              <span className="text-xs text-slate-400">≈ {(syrup / total).toFixed(2)}</span>
+              <span className="text-xs text-slate-200">≈ {(syrup / total).toFixed(2)}</span>
             </div>
           </div>
 

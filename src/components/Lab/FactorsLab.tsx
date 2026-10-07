@@ -2,6 +2,7 @@ import type React from 'react';
 import { useState } from 'react';
 import { sound } from '../../utils/audio';
 import { gcd, getFactors, lcm } from '../../utils/mathHelpers';
+import { LabGuide } from './LabGuide';
 
 export const FactorsLab: React.FC = () => {
   const [tab, setTab] = useState<'rect' | 'gcd_lcm'>('rect');
@@ -50,7 +51,7 @@ export const FactorsLab: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex bg-amber-50 p-1 rounded-xl">
+        <div className="flex flex-wrap bg-amber-50 p-1 rounded-xl">
           <button
             onClick={() => {
               sound.playPop();
@@ -79,6 +80,8 @@ export const FactorsLab: React.FC = () => {
           </button>
         </div>
       </div>
+
+      <LabGuide />
 
       {tab === 'rect' ? (
         <div className="space-y-6">
@@ -135,7 +138,7 @@ export const FactorsLab: React.FC = () => {
           </div>
 
           <div className="bg-slate-900 rounded-2xl p-6 flex flex-col items-center justify-center min-h-[220px] text-white">
-            <div className="text-xs text-slate-400 mb-3">
+            <div className="text-xs text-slate-300 mb-3">
               {targetNum}개의 타일로 만든 직사각형 (가로 {selectedPair[1]}칸 × 세로{' '}
               {selectedPair[0]}칸)
             </div>
@@ -148,7 +151,7 @@ export const FactorsLab: React.FC = () => {
               {Array.from({ length: targetNum }).map((_, idx) => (
                 <div
                   key={idx}
-                  className="w-5 h-5 sm:w-6 sm:h-6 bg-gradient-to-br from-amber-400 to-amber-500 rounded flex items-center justify-center text-[10px] font-bold text-amber-950 shadow-sm"
+                  className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-amber-400 to-amber-500 rounded flex items-center justify-center text-xs font-bold text-amber-950 shadow-sm"
                 >
                   {idx + 1}
                 </div>

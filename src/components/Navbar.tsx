@@ -3,6 +3,10 @@ import { useState } from 'react';
 import type { UserStats } from '../types/math';
 import { sound } from '../utils/audio';
 
+const BUILD_DATE = new Intl.DateTimeFormat('sv-SE', {
+  timeZone: 'Asia/Seoul',
+}).format(new Date(__APP_BUILD_TIME__));
+
 interface NavbarProps {
   currentTab: 'roadmap' | 'lab' | 'quiz' | 'review';
   onTabChange: (tab: 'roadmap' | 'lab' | 'quiz' | 'review') => void;
@@ -41,11 +45,14 @@ export const Navbar: React.FC<NavbarProps> = ({
             📐
           </div>
           <div>
-            <div className="font-black text-slate-800 text-lg leading-tight tracking-tight">
-              키즈 매스 랩
+            <div className="font-black text-slate-800 text-sm sm:text-lg leading-tight tracking-tight">
+              준영이의 수학공부
             </div>
-            <div className="text-[10px] font-bold text-indigo-600 tracking-wider uppercase">
+            <div className="hidden text-sm font-bold text-indigo-600 tracking-wide sm:block">
               초등 5·6학년 생각하는 수학
+            </div>
+            <div className="text-[10px] leading-tight text-slate-500">
+              빌드 날짜 {BUILD_DATE.replaceAll('-', '.')}
             </div>
           </div>
         </div>
@@ -104,7 +111,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             📝 오답 노트
             {wrongCount > 0 && (
-              <span className="ml-1 px-1.5 py-0.2 bg-rose-500 text-white rounded-full text-[10px] font-bold">
+              <span className="ml-1 px-1.5 py-0.2 bg-rose-600 text-white rounded-full text-xs font-bold">
                 {wrongCount}
               </span>
             )}
@@ -130,13 +137,13 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={handleSoundToggle}
             title={soundOn ? '효과음 끄기' : '효과음 켜기'}
-            className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-sm transition-colors border border-slate-200"
+            className="w-11 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-sm transition-colors border border-slate-200"
           >
             {soundOn ? '🔊' : '🔇'}
           </button>
 
           {/* Level and Stars Badge */}
-          <div className="flex items-center gap-2 bg-amber-50 px-3 py-1 rounded-xl border border-amber-200 text-amber-900">
+          <div className="hidden items-center gap-2 bg-amber-50 px-3 py-1 rounded-xl border border-amber-200 text-amber-900 sm:flex">
             <span className="text-xs font-extrabold">Lv.{stats.level}</span>
             <span className="w-px h-3 bg-amber-200" />
             <div className="flex items-center gap-0.5 text-xs font-black text-amber-700">

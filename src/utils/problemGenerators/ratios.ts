@@ -2,12 +2,22 @@ import type { Difficulty, Problem } from '../../types/math';
 import { pickOne, randomInt } from '../mathHelpers';
 
 export function generateRatioProblem(difficulty: Difficulty): Problem {
-  const type = pickOne(['percentage', 'proportion_equation', 'proportional_distribution']);
+  const type = pickOne([
+    'percentage',
+    'proportion_equation',
+    'proportional_distribution',
+    'unit_price',
+  ]);
   const id = `rat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
   if (type === 'percentage') {
-    const total = pickOne([20, 25, 40, 50, 100]);
-    const part = randomInt(3, total - 2);
+    const total =
+      difficulty === 'easy'
+        ? 100
+        : difficulty === 'medium'
+          ? pickOne([20, 25, 40, 50])
+          : pickOne([30, 60, 80, 120]);
+    const part = difficulty === 'easy' ? randomInt(1, 9) * 10 : randomInt(3, total - 2);
     const percent = Math.round((part / total) * 100);
 
     return {
@@ -34,9 +44,24 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
 
   if (type === 'proportion_equation') {
     // a : b = c : x (x = b * c / a)
-    const a = randomInt(2, 6);
-    const b = randomInt(3, 8);
-    const multiplier = randomInt(2, 6);
+    const a =
+      difficulty === 'easy'
+        ? randomInt(2, 4)
+        : difficulty === 'medium'
+          ? randomInt(2, 6)
+          : randomInt(5, 12);
+    const b =
+      difficulty === 'easy'
+        ? randomInt(2, 6)
+        : difficulty === 'medium'
+          ? randomInt(3, 8)
+          : randomInt(6, 15);
+    const multiplier =
+      difficulty === 'easy'
+        ? randomInt(2, 4)
+        : difficulty === 'medium'
+          ? randomInt(2, 6)
+          : randomInt(4, 9);
     const c = a * multiplier;
     const x = b * multiplier;
 
@@ -62,10 +87,44 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
     };
   }
 
+  if (type === 'unit_price') {
+    const unitPrice = difficulty === 'easy' ? randomInt(2, 8) * 100 : randomInt(5, 30) * 100;
+    const unitCount = difficulty === 'hard' ? randomInt(4, 12) : randomInt(2, 8);
+    const totalPrice = unitPrice * unitCount;
+
+    return {
+      id,
+      topicId: 'ratios',
+      subtopic: '비례 관계와 가격',
+      difficulty,
+      context: '문구점에서 연필 사기',
+      question: `연필 ${unitCount}자루의 값이 ${totalPrice}원입니다. 연필 1자루의 값은 얼마인가요?`,
+      hint: `전체 가격을 연필 개수로 나누면 한 자루의 값을 알 수 있어요.`,
+      answerType: 'number',
+      correctAnswer: unitPrice,
+      explanations: [
+        {
+          title: '1단계: 한 자루의 값 구하기',
+          content: `${totalPrice}원을 ${unitCount}자루로 똑같이 나누어요.`,
+        },
+        {
+          title: '2단계: 나누어 계산하기',
+          content: `${totalPrice} ÷ ${unitCount} = ${unitPrice}원`,
+        },
+      ],
+    };
+  }
+
   // Proportional distribution
-  const r1 = randomInt(1, 4);
-  const r2 = randomInt(2, 5);
-  const unit = randomInt(3, 10);
+  const maxRatio = difficulty === 'easy' ? 3 : difficulty === 'medium' ? 5 : 9;
+  const r1 = randomInt(1, maxRatio);
+  const r2 = randomInt(2, maxRatio);
+  const unit =
+    difficulty === 'easy'
+      ? randomInt(2, 6)
+      : difficulty === 'medium'
+        ? randomInt(3, 10)
+        : randomInt(8, 20);
   const total = (r1 + r2) * unit;
   const person = pickOne(['민수', '지우', '태호', '서연']);
   const isFirst = Math.random() > 0.5;
