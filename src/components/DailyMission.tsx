@@ -8,8 +8,6 @@ import {
   todayKey,
 } from '../utils/storage';
 
-// Local 'YYYY-MM-DD', same format as todayKey()
-
 export const DailyMission: React.FC<{ stats: UserStats }> = ({ stats }) => {
   const today = todayKey();
   const solvedToday = stats.daily.date === today ? stats.daily.solved : 0;
@@ -27,7 +25,7 @@ export const DailyMission: React.FC<{ stats: UserStats }> = ({ stats }) => {
     <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2">
-          <span>🎯</span> 오늘의 미션: 문제 {DAILY_MISSION_GOAL}개 풀기
+          <span>🎯</span> 오늘의 미션: 도전 퀴즈 {DAILY_MISSION_GOAL}문제 풀기
         </h3>
         {streak > 0 && (
           <span className="text-xs font-bold text-orange-700 bg-orange-50 border border-orange-200 px-2.5 py-1 rounded-full">
@@ -40,11 +38,12 @@ export const DailyMission: React.FC<{ stats: UserStats }> = ({ stats }) => {
         <div className="flex items-center justify-between text-xs font-bold mb-1.5">
           {done ? (
             <span className="text-emerald-700">
-              🎉 미션 완료! 별 {DAILY_MISSION_BONUS}개를 받았어요
+              🎉 미션 완료! 출석 도장과 별 {DAILY_MISSION_BONUS}개를 받았어요
             </span>
           ) : (
             <span className="text-slate-500">
-              {DAILY_MISSION_GOAL - solvedToday}문제만 더 풀면 별 {DAILY_MISSION_BONUS}개!
+              {DAILY_MISSION_GOAL - solvedToday}문제만 더 풀면 출석 도장과 별 {DAILY_MISSION_BONUS}
+              개!
             </span>
           )}
           <span className="text-slate-700">
@@ -60,7 +59,11 @@ export const DailyMission: React.FC<{ stats: UserStats }> = ({ stats }) => {
       </div>
 
       <div>
-        <div className="text-xs font-bold text-slate-500 mb-2">출석 도장 (최근 2주)</div>
+        <div className="text-xs font-bold text-slate-500">출석 도장 (최근 2주)</div>
+        <p className="text-xs text-slate-500 mt-0.5 mb-2">
+          도장 받는 법: 🎯 도전 퀴즈에서 하루 {DAILY_MISSION_GOAL}문제 풀기 (틀려도 괜찮아요).
+          게임과 오답 노트 문제는 세지 않아요.
+        </p>
         <div className="grid grid-cols-7 gap-1.5">
           {days.map((d) => {
             const key = dateKey(d);
@@ -75,11 +78,15 @@ export const DailyMission: React.FC<{ stats: UserStats }> = ({ stats }) => {
                 } ${isToday ? 'ring-2 ring-indigo-500' : ''}`}
               >
                 <span
-                  className={`text-xs ${isToday ? 'font-black text-indigo-700' : 'text-slate-500'}`}
+                  className={`text-[11px] whitespace-nowrap ${isToday ? 'font-black text-indigo-700' : 'text-slate-500'}`}
                 >
-                  {isToday ? '오늘' : d.getDate()}
+                  {d.getMonth() + 1}/{d.getDate()}
                 </span>
-                <span className="text-lg leading-none mt-0.5">{stamped ? '✅' : '·'}</span>
+                <span
+                  className={`leading-none mt-0.5 ${stamped ? 'text-lg' : isToday ? 'text-[11px] font-black text-indigo-700' : 'text-lg'}`}
+                >
+                  {stamped ? '✅' : isToday ? '오늘' : '·'}
+                </span>
               </div>
             );
           })}
