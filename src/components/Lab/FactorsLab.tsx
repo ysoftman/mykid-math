@@ -158,8 +158,15 @@ export const FactorsLab: React.FC = () => {
               ))}
             </div>
             <div className="mt-4 text-center text-sm text-amber-200">
-              💡 빈틈없이 직사각형을 만들 수 있는 변의 길이(<strong>{selectedPair[0]}</strong>와{' '}
-              <strong>{selectedPair[1]}</strong>)가 바로 <strong>{targetNum}의 약수</strong>입니다!
+              💡 이 직사각형의 두 변 <strong>{selectedPair[0]}</strong>,{' '}
+              <strong>{selectedPair[1]}</strong>은(는) {targetNum}의 약수예요.
+              <br />
+              만들 수 있는 모든 직사각형(
+              {pairs.map(([w, h]) => `${w}×${h}`).join(', ')})의 변을 모으면{' '}
+              <strong>
+                {targetNum}의 약수 {factors.join(', ')}
+              </strong>
+              이(가) 모두 나와요!
             </div>
           </div>
         </div>
