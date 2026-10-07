@@ -56,3 +56,10 @@ export function shuffle<T>(array: T[]): T[] {
 export function withGwa(n: number): string {
   return `${n}${[0, 1, 3, 6, 7, 8].includes(n % 10) ? '과' : '와'}`;
 }
+
+// Numerator in [min, den - 1] that is coprime with den, so the fraction is already in lowest terms
+export function randomNumerator(den: number, min = 1): number {
+  let num = randomInt(min, den - 1);
+  while (gcd(num, den) !== 1) num = randomInt(min, den - 1);
+  return num;
+}

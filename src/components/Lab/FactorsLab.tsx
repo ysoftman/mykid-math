@@ -142,20 +142,22 @@ export const FactorsLab: React.FC = () => {
               {targetNum}개의 타일로 만든 직사각형 (가로 {selectedPair[1]}칸 × 세로{' '}
               {selectedPair[0]}칸)
             </div>
-            <div
-              className="grid gap-1 bg-slate-800/80 p-3 rounded-xl border border-slate-700"
-              style={{
-                gridTemplateColumns: `repeat(${selectedPair[1]}, minmax(0, 1fr))`,
-              }}
-            >
-              {Array.from({ length: targetNum }).map((_, idx) => (
-                <div
-                  key={idx}
-                  className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-amber-400 to-amber-500 rounded flex items-center justify-center text-xs font-bold text-amber-950 shadow-sm"
-                >
-                  {idx + 1}
-                </div>
-              ))}
+            <div className="max-w-full overflow-x-auto">
+              <div
+                className="grid w-max gap-1 bg-slate-800/80 p-3 rounded-xl border border-slate-700"
+                style={{
+                  gridTemplateColumns: `repeat(${selectedPair[1]}, auto)`,
+                }}
+              >
+                {Array.from({ length: targetNum }).map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="w-6 h-6 sm:w-7 sm:h-7 bg-gradient-to-br from-amber-400 to-amber-500 rounded flex items-center justify-center text-xs font-bold text-amber-950 shadow-sm"
+                  >
+                    {idx + 1}
+                  </div>
+                ))}
+              </div>
             </div>
             <div className="mt-4 text-center text-sm text-amber-200">
               💡 이 직사각형의 두 변 <strong>{selectedPair[0]}</strong>,{' '}

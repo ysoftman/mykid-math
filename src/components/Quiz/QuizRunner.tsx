@@ -2,6 +2,7 @@ import confetti from 'canvas-confetti';
 import type React from 'react';
 import { useState } from 'react';
 import type { Difficulty, Problem, TopicId } from '../../types/math';
+import { checkAnswer, formatAnswer } from '../../utils/answer';
 import { sound } from '../../utils/audio';
 import { generateProblem } from '../../utils/problemGenerators';
 import { addWrongNote, recordProblemResult } from '../../utils/storage';
@@ -43,6 +44,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [showHint, setShowHint] = useState<boolean>(false);
   const [showSolution, setShowSolution] = useState<boolean>(false);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const handleDifficultyChange = (newDiff: Difficulty) => {
     sound.playPop();
@@ -56,6 +58,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
     setIsCorrect(null);
     setShowHint(false);
     setShowSolution(false);
+    setNotice(null);
   };
 
   const loadNewProblem = () => {
@@ -68,33 +71,29 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
     setIsCorrect(null);
     setShowHint(false);
     setShowSolution(false);
+    setNotice(null);
   };
 
   const handleCheckAnswer = () => {
     if (isAnswered) return;
 
-    let correct = false;
-    let userAnsStr = '';
-
-    if (problem.answerType === 'fraction') {
-      const uNum = parseInt(fracNum, 10);
-      const uDen = parseInt(fracDen, 10);
-      userAnsStr = `${fracNum}/${fracDen}`;
-
-      const targetFrac = problem.correctAnswer as { num: number; den: number };
-      if (!isNaN(uNum) && !isNaN(uDen) && uDen !== 0) {
-        // Compare values or simplified
-        correct = uNum === targetFrac.num && uDen === targetFrac.den;
-      }
-    } else {
-      // number
-      const uVal = parseFloat(numAnswer);
-      userAnsStr = numAnswer;
-      const targetVal = Number(problem.correctAnswer);
-      if (!isNaN(uVal)) {
-        correct = Math.abs(uVal - targetVal) < 0.001;
-      }
+    const userAnsStr =
+      problem.answerType !== 'fraction'
+        ? numAnswer
+        : fracDen.trim()
+          ? `${fracNum}/${fracDen}`
+          : fracNum;
+    const result = checkAnswer(problem, userAnsStr);
+    if (result === 'empty') {
+      setNotice('답을 먼저 입력해 주세요!');
+      return;
     }
+    if (result === 'unreduced') {
+      setNotice('값은 맞았어요! 더 이상 약분되지 않도록 기약분수로 고쳐 보세요.');
+      return;
+    }
+    setNotice(null);
+    const correct = result === 'correct';
 
     setIsAnswered(true);
     setIsCorrect(correct);
@@ -120,14 +119,6 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
     }
 
     onStatsUpdated();
-  };
-
-  const formattedCorrectAnswer = () => {
-    if (problem.answerType === 'fraction') {
-      const f = problem.correctAnswer as { num: number; den: number };
-      return `${f.num}/${f.den}`;
-    }
-    return String(problem.correctAnswer);
   };
 
   return (
@@ -211,7 +202,9 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
                 onChangeDenominator={setFracDen}
                 disabled={isAnswered}
               />
-              <span className="text-xs text-slate-500">(기약분수로 적어주세요)</span>
+              <span className="text-xs text-slate-500">
+                (기약분수로 적어요. 답이 자연수면 분자 칸에만!)
+              </span>
             </div>
           ) : (
             <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -229,6 +222,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
               />
             </div>
           )}
+          {notice && <p className="text-xs font-bold text-amber-700">{notice}</p>}
         </div>
 
         {/* Action Buttons */}
@@ -273,7 +267,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
                   : '아쉬워요! 풀이를 보고 다시 원리를 익혀볼까요?'}
               </div>
               <div className="text-xs mt-0.5 opacity-90">
-                정답: <strong>{formattedCorrectAnswer()}</strong>
+                정답: <strong>{formatAnswer(problem)}</strong>
               </div>
             </div>
           </div>

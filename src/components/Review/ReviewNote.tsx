@@ -2,6 +2,7 @@ import confetti from 'canvas-confetti';
 import type React from 'react';
 import { useState } from 'react';
 import type { WrongNoteItem } from '../../types/math';
+import { checkAnswer, formatAnswer } from '../../utils/answer';
 import { sound } from '../../utils/audio';
 import { getWrongNotes, removeWrongNote } from '../../utils/storage';
 
@@ -18,24 +19,18 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats 
   const [expandedExplanationId, setExpandedExplanationId] = useState<string | null>(null);
 
   const handleRetrySubmit = (item: WrongNoteItem) => {
-    let isCorrect = false;
     const p = item.problem;
-
-    if (p.answerType === 'fraction') {
-      const targetFrac = p.correctAnswer as { num: number; den: number };
-      const [uNum, uDen] = retryInput.split('/').map((s) => parseInt(s.trim(), 10));
-      if (!isNaN(uNum) && !isNaN(uDen)) {
-        isCorrect = uNum === targetFrac.num && uDen === targetFrac.den;
-      }
-    } else {
-      const uVal = parseFloat(retryInput);
-      const targetVal = Number(p.correctAnswer);
-      if (!isNaN(uVal)) {
-        isCorrect = Math.abs(uVal - targetVal) < 0.001;
-      }
+    const result = checkAnswer(p, retryInput);
+    if (result === 'empty') {
+      setRetryFeedback('답을 먼저 입력해 주세요!');
+      return;
+    }
+    if (result === 'unreduced') {
+      setRetryFeedback('값은 맞았어요! 기약분수로 약분해 보세요.');
+      return;
     }
 
-    if (isCorrect) {
+    if (result === 'correct') {
       sound.playCorrect();
       confetti({ particleCount: 60, spread: 50 });
       setRetryFeedback('🎉 완벽해요! 오답을 완전히 정복했습니다!');
@@ -140,9 +135,7 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats 
                   <div>
                     <span className="text-slate-600">정답: </span>
                     <strong className="text-indigo-600 font-mono">
-                      {typeof item.problem.correctAnswer === 'object'
-                        ? `${(item.problem.correctAnswer as any).num}/${(item.problem.correctAnswer as any).den}`
-                        : item.problem.correctAnswer}
+                      {formatAnswer(item.problem)}
                     </strong>
                   </div>
                 </div>

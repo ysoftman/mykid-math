@@ -1,5 +1,13 @@
 import type { Difficulty, Problem } from '../../types/math';
-import { gcd, lcm, pickOne, randomInt, simplifyFraction, withGwa } from '../mathHelpers';
+import {
+  gcd,
+  lcm,
+  pickOne,
+  randomInt,
+  randomNumerator,
+  simplifyFraction,
+  withGwa,
+} from '../mathHelpers';
 
 export function generateFractionProblem(difficulty: Difficulty): Problem {
   const type = pickOne([
@@ -65,10 +73,8 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
     while (den1 === den2) den2 = pickOne(unlikeDenominators);
     const w1 = randomInt(1, difficulty === 'hard' ? 5 : 3);
     const w2 = randomInt(1, difficulty === 'hard' ? 5 : 3);
-    let num1 = randomInt(1, den1 - 1);
-    let num2 = randomInt(1, den2 - 1);
-    while (gcd(num1, den1) !== 1) num1 = randomInt(1, den1 - 1);
-    while (gcd(num2, den2) !== 1) num2 = randomInt(1, den2 - 1);
+    const num1 = randomNumerator(den1);
+    const num2 = randomNumerator(den2);
     const commonDen = lcm(den1, den2);
     const improper1 = (w1 * den1 + num1) * (commonDen / den1);
     const improper2 = (w2 * den2 + num2) * (commonDen / den2);
@@ -108,8 +114,7 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
           ? [3, 4, 5, 6, 8]
           : [5, 6, 7, 8, 9];
     const den = pickOne(dens);
-    let num = randomInt(1, den - 1);
-    while (gcd(num, den) !== 1) num = randomInt(1, den - 1);
+    const num = randomNumerator(den);
     const count = difficulty === 'easy' ? randomInt(2, 6) : randomInt(4, 12);
     const total = simplifyFraction(num * count, den);
     const totalText = total.den === 1 ? `${total.num}` : `${total.num}/${total.den}`;
@@ -143,8 +148,8 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
     let den2 = pickOne(unlikeDenominators);
     while (den1 === den2) den2 = pickOne(unlikeDenominators);
 
-    const num1 = randomInt(1, den1 - 1);
-    const num2 = randomInt(1, den2 - 1);
+    const num1 = randomNumerator(den1);
+    const num2 = randomNumerator(den2);
 
     const commonDen = lcm(den1, den2);
     const m1 = commonDen / den1;
@@ -164,8 +169,6 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
       hint: `분모가 다를 때는 최소공배수로 '통분'하여 분모를 똑같이 만들어준 뒤 분자끼리 더해요. 마지막에 약분도 잊지 마세요!`,
       answerType: 'fraction',
       correctAnswer: { num: simplified.num, den: simplified.den },
-      diagramType: 'fraction_pie',
-      diagramData: { frac1: { num: num1, den: den1 }, frac2: { num: num2, den: den2 } },
       explanations: [
         {
           title: '1단계: 공통분모(통분) 구하기',
@@ -190,8 +193,8 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
     let den2 = pickOne(subtractionDenominators);
     while (den1 === den2) den2 = pickOne(subtractionDenominators);
 
-    let num1 = randomInt(1, den1 - 1);
-    let num2 = randomInt(1, den2 - 1);
+    let num1 = randomNumerator(den1);
+    let num2 = randomNumerator(den2);
 
     if (num1 / den1 <= num2 / den2) {
       // Swap or adjust
@@ -249,9 +252,9 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
           ? [3, 4, 5, 6, 7]
           : [5, 6, 7, 8, 9];
     const den1 = pickOne(multiplicationDenominators);
-    const num1 = randomInt(1, den1 - 1);
+    const num1 = randomNumerator(den1);
     const den2 = pickOne(multiplicationDenominators);
-    const num2 = randomInt(1, den2 - 1);
+    const num2 = randomNumerator(den2);
 
     const multNum = num1 * num2;
     const multDen = den1 * den2;
@@ -286,7 +289,7 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
         : difficulty === 'medium'
           ? randomInt(3, 7)
           : randomInt(5, 10);
-    const num = randomInt(1, den - 1);
+    const num = randomNumerator(den);
     const unit =
       difficulty === 'easy'
         ? randomInt(2, 8)
@@ -326,9 +329,9 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
         ? [3, 4, 5, 6, 8]
         : [5, 6, 8, 9, 10];
   const den1 = pickOne(divisionDenominators);
-  const num1 = randomInt(2, den1 - 1);
+  const num1 = randomNumerator(den1, 2);
   const den2 = pickOne(divisionDenominators.filter((den) => den > 2));
-  const num2 = randomInt(1, den2 - 1);
+  const num2 = randomNumerator(den2);
 
   // num1/den1 ÷ num2/den2 = num1/den1 × den2/num2
   const divNum = num1 * den2;

@@ -135,8 +135,6 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
       hint: `약수는 ${num}을 나누어 떨어지게 하는 수예요. 1부터 차례대로 짝을 지어 찾아보세요.`,
       answerType: 'number',
       correctAnswer: factors.length,
-      diagramType: 'grid',
-      diagramData: { number: num, factors },
       explanations: [
         {
           title: '1단계: 곱해서 나오는 짝 찾기',

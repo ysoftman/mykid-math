@@ -16,7 +16,6 @@ export type Difficulty = 'easy' | 'medium' | 'hard';
 export interface StepExplanation {
   title: string;
   content: string;
-  visual?: string; // Optional visual cue or diagram type
 }
 
 export interface Problem {
@@ -26,8 +25,6 @@ export interface Problem {
   difficulty: Difficulty;
   question: string;
   context?: string; // Additional context or scenario
-  diagramType?: string; // 'rect' | 'triangle' | 'trapezoid' | 'circle' | 'fraction_pie' | 'grid'
-  diagramData?: Record<string, any>;
   hint: string;
   answerType: 'number' | 'fraction' | 'choice' | 'text';
   correctAnswer: number | string | { whole?: number; num: number; den: number };

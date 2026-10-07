@@ -58,7 +58,19 @@ export const TOPICS: TopicInfo[] = [
   },
 ];
 
+const recentQuestions: string[] = [];
+
 export function generateProblem(topicId: TopicId, difficulty: Difficulty = 'medium'): Problem {
+  let problem = generateFreshProblem(topicId, difficulty);
+  for (let i = 0; i < 20 && recentQuestions.includes(problem.question); i++) {
+    problem = generateFreshProblem(topicId, difficulty);
+  }
+  recentQuestions.push(problem.question);
+  if (recentQuestions.length > 30) recentQuestions.shift();
+  return problem;
+}
+
+function generateFreshProblem(topicId: TopicId, difficulty: Difficulty): Problem {
   switch (topicId) {
     case 'factors':
       return generateFactorProblem(difficulty);
