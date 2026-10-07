@@ -13,9 +13,12 @@ export const ScratchPad: React.FC<ScratchPadProps> = ({ isOpen, onClose }) => {
   const [color, setColor] = useState('#2563eb'); // blue default
   const [lineWidth, setLineWidth] = useState(3);
   const [isEraser, setIsEraser] = useState(false);
+  // Resizing a canvas clears it, so size it only on the first open and keep it mounted afterwards
+  const isSizedRef = useRef(false);
 
   useEffect(() => {
-    if (isOpen && canvasRef.current) {
+    if (isOpen && !isSizedRef.current && canvasRef.current) {
+      isSizedRef.current = true;
       const canvas = canvasRef.current;
       const parent = canvas.parentElement;
       if (parent) {
@@ -34,8 +37,6 @@ export const ScratchPad: React.FC<ScratchPadProps> = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
-  if (!isOpen) return null;
-
   const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
     setIsDrawing(true);
     const canvas = canvasRef.current;
@@ -52,7 +53,8 @@ export const ScratchPad: React.FC<ScratchPadProps> = ({ isOpen, onClose }) => {
 
     ctx.beginPath();
     ctx.moveTo(x, y);
-    ctx.strokeStyle = isEraser ? '#ffffff' : color;
+    ctx.globalCompositeOperation = isEraser ? 'destination-out' : 'source-over';
+    ctx.strokeStyle = color;
     ctx.lineWidth = isEraser ? 20 : lineWidth;
   };
 
@@ -88,7 +90,9 @@ export const ScratchPad: React.FC<ScratchPadProps> = ({ isOpen, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 sm:inset-auto sm:right-6 sm:bottom-6 sm:w-[480px] sm:h-[420px] bg-white rounded-2xl shadow-2xl border-2 border-indigo-200 z-50 flex flex-col overflow-hidden animate-in fade-in zoom-in-95">
+    <div
+      className={`${isOpen ? 'flex' : 'hidden'} fixed inset-0 sm:inset-auto sm:right-6 sm:bottom-6 sm:w-[480px] sm:h-[420px] bg-white rounded-2xl shadow-2xl border-2 border-indigo-200 z-50 flex-col overflow-hidden animate-in fade-in zoom-in-95`}
+    >
       {/* Header */}
       <div className="bg-indigo-600 text-white px-4 py-3 flex items-center justify-between select-none">
         <div className="flex items-center gap-2 font-bold text-sm">

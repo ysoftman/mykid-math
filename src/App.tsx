@@ -52,7 +52,7 @@ export const App: React.FC = () => {
         currentTab={currentTab}
         onTabChange={setCurrentTab}
         stats={stats}
-        onOpenScratchPad={() => setIsScratchPadOpen(true)}
+        onOpenScratchPad={() => setIsScratchPadOpen((open) => !open)}
         wrongCount={wrongNotesCount}
       />
 
@@ -168,7 +168,7 @@ export const App: React.FC = () => {
               topicId={selectedTopicId}
               onStatsUpdated={refreshStats}
               onReward={setReward}
-              onOpenScratchPad={() => setIsScratchPadOpen(true)}
+              onOpenScratchPad={() => setIsScratchPadOpen((open) => !open)}
             />
           </div>
         )}
