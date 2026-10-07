@@ -1,4 +1,5 @@
-import React, { useRef, useState, useEffect } from 'react';
+import type React from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { sound } from '../utils/audio';
 
 interface ScratchPadProps {
@@ -127,7 +128,9 @@ export const ScratchPad: React.FC<ScratchPadProps> = ({ isOpen, onClose }) => {
               }}
               style={{ backgroundColor: c }}
               className={`w-6 h-6 rounded-full border-2 transition-transform ${
-                !isEraser && color === c ? 'scale-125 border-white ring-2 ring-indigo-500' : 'border-transparent'
+                !isEraser && color === c
+                  ? 'scale-125 border-white ring-2 ring-indigo-500'
+                  : 'border-transparent'
               }`}
             />
           ))}

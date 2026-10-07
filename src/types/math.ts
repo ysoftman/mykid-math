@@ -41,11 +41,14 @@ export interface UserStats {
   stars: number;
   level: number;
   badges: string[];
-  topicProgress: Record<TopicId, {
-    solvedCount: number;
-    correctCount: number;
-    stars: number;
-  }>;
+  topicProgress: Record<
+    TopicId,
+    {
+      solvedCount: number;
+      correctCount: number;
+      stars: number;
+    }
+  >;
 }
 
 export interface WrongNoteItem {

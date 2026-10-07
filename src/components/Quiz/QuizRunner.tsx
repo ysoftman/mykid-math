@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
-import type { Problem, TopicId, Difficulty } from '../../types/math';
-import { generateProblem } from '../../utils/problemGenerators';
-import { FractionInput } from './FractionInput';
+import type React from 'react';
+import { useState } from 'react';
+import type { Difficulty, Problem, TopicId } from '../../types/math';
 import { sound } from '../../utils/audio';
-import { recordProblemResult, addWrongNote } from '../../utils/storage';
+import { generateProblem } from '../../utils/problemGenerators';
+import { addWrongNote, recordProblemResult } from '../../utils/storage';
+import { FractionInput } from './FractionInput';
 
 interface QuizRunnerProps {
   topicId: TopicId;
@@ -31,10 +32,19 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
   const [showHint, setShowHint] = useState<boolean>(false);
   const [showSolution, setShowSolution] = useState<boolean>(false);
 
-  // Load new problem on topic/difficulty change
-  useEffect(() => {
-    loadNewProblem();
-  }, [topicId, difficulty]);
+  const handleDifficultyChange = (newDiff: Difficulty) => {
+    sound.playPop();
+    setDifficulty(newDiff);
+    const nextP = generateProblem(topicId, newDiff);
+    setProblem(nextP);
+    setNumAnswer('');
+    setFracNum('');
+    setFracDen('');
+    setIsAnswered(false);
+    setIsCorrect(null);
+    setShowHint(false);
+    setShowSolution(false);
+  };
 
   const loadNewProblem = () => {
     const nextP = generateProblem(topicId, difficulty);
@@ -121,7 +131,10 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
 
         <div className="flex items-center gap-2">
           <button
-            onClick={() => { sound.playPop(); onOpenScratchPad(); }}
+            onClick={() => {
+              sound.playPop();
+              onOpenScratchPad();
+            }}
             className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors border border-indigo-200"
           >
             <span>✏️</span>
@@ -133,7 +146,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
             {(['easy', 'medium', 'hard'] as Difficulty[]).map((d) => (
               <button
                 key={d}
-                onClick={() => { sound.playPop(); setDifficulty(d); }}
+                onClick={() => handleDifficultyChange(d)}
                 className={`px-2 py-1 rounded-md transition-all ${
                   difficulty === d
                     ? 'bg-white text-indigo-600 shadow-sm font-bold'
@@ -174,9 +187,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
                 onChangeDenominator={setFracDen}
                 disabled={isAnswered}
               />
-              <span className="text-xs text-slate-500">
-                (기약분수로 적어주세요)
-              </span>
+              <span className="text-xs text-slate-500">(기약분수로 적어주세요)</span>
             </div>
           ) : (
             <div className="flex items-center gap-2 w-full sm:w-auto">
@@ -207,7 +218,10 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
             </button>
           ) : (
             <button
-              onClick={() => { sound.playPop(); loadNewProblem(); }}
+              onClick={() => {
+                sound.playPop();
+                loadNewProblem();
+              }}
               className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold rounded-xl shadow-md hover:brightness-105 active:scale-95 transition-all text-base flex items-center justify-center gap-2"
             >
               <span>다음 문제 풀기</span>
@@ -230,7 +244,9 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
             <span className="text-3xl">{isCorrect ? '🎉' : '💡'}</span>
             <div>
               <div className="font-extrabold text-base">
-                {isCorrect ? '정답입니다! 참 잘했어요! (+2 ⭐)' : '아쉬워요! 풀이를 보고 다시 원리를 익혀볼까요?'}
+                {isCorrect
+                  ? '정답입니다! 참 잘했어요! (+2 ⭐)'
+                  : '아쉬워요! 풀이를 보고 다시 원리를 익혀볼까요?'}
               </div>
               <div className="text-xs mt-0.5 opacity-90">
                 정답: <strong>{formattedCorrectAnswer()}</strong>
@@ -239,7 +255,10 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
           </div>
 
           <button
-            onClick={() => { sound.playPop(); setShowSolution(!showSolution); }}
+            onClick={() => {
+              sound.playPop();
+              setShowSolution(!showSolution);
+            }}
             className={`text-xs font-bold px-3 py-1.5 rounded-lg border transition-colors ${
               isCorrect
                 ? 'bg-emerald-100 border-emerald-300 text-emerald-800 hover:bg-emerald-200'
@@ -255,7 +274,10 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
       {!isAnswered && (
         <div>
           <button
-            onClick={() => { sound.playPop(); setShowHint(!showHint); }}
+            onClick={() => {
+              sound.playPop();
+              setShowHint(!showHint);
+            }}
             className="text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors"
           >
             <span>💡</span>

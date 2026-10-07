@@ -1,5 +1,5 @@
-import type { Problem, Difficulty } from '../../types/math';
-import { lcm, simplifyFraction, randomInt, pickOne } from '../mathHelpers';
+import type { Difficulty, Problem } from '../../types/math';
+import { lcm, pickOne, randomInt, simplifyFraction } from '../mathHelpers';
 
 export function generateFractionProblem(difficulty: Difficulty): Problem {
   const type = pickOne(['addition', 'subtraction', 'multiplication', 'division']);
@@ -62,9 +62,12 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
 
     if (num1 / den1 <= num2 / den2) {
       // Swap or adjust
-      const tempN = num1; const tempD = den1;
-      num1 = num2; den1 = den2;
-      num2 = tempN; den2 = tempD;
+      const tempN = num1;
+      const tempD = den1;
+      num1 = num2;
+      den1 = den2;
+      num2 = tempN;
+      den2 = tempD;
       if (num1 / den1 <= num2 / den2) {
         num1 = den1 - 1;
         num2 = 1;

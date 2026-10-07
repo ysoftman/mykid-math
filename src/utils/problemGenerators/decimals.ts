@@ -1,5 +1,5 @@
-import type { Problem, Difficulty } from '../../types/math';
-import { randomInt, pickOne } from '../mathHelpers';
+import type { Difficulty, Problem } from '../../types/math';
+import { pickOne, randomInt } from '../mathHelpers';
 
 export function generateDecimalProblem(difficulty: Difficulty): Problem {
   const type = pickOne(['multiplication', 'division', 'word_problem']);
@@ -35,8 +35,8 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
       };
     } else {
       // Decimal x Decimal
-      const a = (randomInt(2, 9) / 10);
-      const b = (randomInt(3, 8) / 10);
+      const a = randomInt(2, 9) / 10;
+      const b = randomInt(3, 8) / 10;
       const ans = Math.round(a * b * 100) / 100;
 
       return {
@@ -65,7 +65,7 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
   if (type === 'division') {
     // Division: Choose clean quotient
     const quotient = randomInt(2, 8);
-    const divisor = (randomInt(2, 6) / 10);
+    const divisor = randomInt(2, 6) / 10;
     const dividend = Math.round(divisor * quotient * 10) / 10;
 
     return {

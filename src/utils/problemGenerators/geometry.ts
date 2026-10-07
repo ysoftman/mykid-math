@@ -1,5 +1,5 @@
-import type { Problem, Difficulty } from '../../types/math';
-import { randomInt, pickOne } from '../mathHelpers';
+import type { Difficulty, Problem } from '../../types/math';
+import { pickOne, randomInt } from '../mathHelpers';
 
 export function generateGeometryProblem(difficulty: Difficulty): Problem {
   const shape = pickOne(['triangle', 'parallelogram', 'trapezoid', 'rhombus', 'circle']);

@@ -1,7 +1,7 @@
-import type { TopicId, TopicInfo, Problem, Difficulty } from '../../types/math';
+import type { Difficulty, Problem, TopicId, TopicInfo } from '../../types/math';
+import { generateDecimalProblem } from './decimals';
 import { generateFactorProblem } from './factors';
 import { generateFractionProblem } from './fractions';
-import { generateDecimalProblem } from './decimals';
 import { generateGeometryProblem } from './geometry';
 import { generateRatioProblem } from './ratios';
 

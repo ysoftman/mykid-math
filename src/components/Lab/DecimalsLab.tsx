@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { sound } from '../../utils/audio';
 
 export const DecimalsLab: React.FC = () => {
@@ -63,9 +64,7 @@ export const DecimalsLab: React.FC = () => {
 
       {/* 10x10 Grid View */}
       <div className="bg-slate-900 rounded-2xl p-6 flex flex-col items-center justify-center text-white">
-        <div className="text-xs text-slate-300 mb-4">
-          전체 1개 큰 정사각형 = 100칸 (1칸 = 0.01)
-        </div>
+        <div className="text-xs text-slate-300 mb-4">전체 1개 큰 정사각형 = 100칸 (1칸 = 0.01)</div>
 
         <div className="grid grid-cols-10 gap-0.5 sm:gap-1 bg-slate-800 p-2 sm:p-3 rounded-xl border border-slate-700">
           {Array.from({ length: 10 }).map((_, r) =>
@@ -81,16 +80,16 @@ export const DecimalsLab: React.FC = () => {
                     isOverlap
                       ? 'bg-emerald-400 border-emerald-300 text-emerald-950 font-bold shadow'
                       : inCol
-                      ? 'bg-emerald-800/40 border-emerald-700/40'
-                      : inRow
-                      ? 'bg-teal-800/40 border-teal-700/40'
-                      : 'bg-slate-800 border-slate-700'
+                        ? 'bg-emerald-800/40 border-emerald-700/40'
+                        : inRow
+                          ? 'bg-teal-800/40 border-teal-700/40'
+                          : 'bg-slate-800 border-slate-700'
                   }`}
                 >
                   {isOverlap ? '•' : ''}
                 </div>
               );
-            })
+            }),
           )}
         </div>
 
@@ -100,7 +99,10 @@ export const DecimalsLab: React.FC = () => {
           </div>
           <p className="text-sm text-slate-300">
             100칸 중 <strong className="text-white">{overlapCount}칸</strong>이 겹치므로{' '}
-            <strong className="text-emerald-300">{overlapCount} / 100 = {product.toFixed(2)}</strong> 입니다!
+            <strong className="text-emerald-300">
+              {overlapCount} / 100 = {product.toFixed(2)}
+            </strong>{' '}
+            입니다!
           </p>
         </div>
       </div>

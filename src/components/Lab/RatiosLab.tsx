@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { sound } from '../../utils/audio';
 
 export const RatiosLab: React.FC = () => {
@@ -36,7 +37,10 @@ export const RatiosLab: React.FC = () => {
             min="1"
             max="6"
             value={syrup}
-            onChange={(e) => { sound.playPop(); setSyrup(Number(e.target.value)); }}
+            onChange={(e) => {
+              sound.playPop();
+              setSyrup(Number(e.target.value));
+            }}
             className="w-full accent-rose-600 cursor-pointer"
           />
         </div>
@@ -53,7 +57,10 @@ export const RatiosLab: React.FC = () => {
             min="1"
             max="8"
             value={water}
-            onChange={(e) => { sound.playPop(); setWater(Number(e.target.value)); }}
+            onChange={(e) => {
+              sound.playPop();
+              setWater(Number(e.target.value));
+            }}
             className="w-full accent-sky-600 cursor-pointer"
           />
         </div>
@@ -91,16 +98,16 @@ export const RatiosLab: React.FC = () => {
           <div className="bg-slate-800/90 p-4 rounded-xl border border-slate-700 space-y-2">
             <div className="text-xs text-slate-400">전체 주스에 대한 시럽의 비율</div>
             <div className="text-xl font-bold text-white flex items-center gap-2">
-              <span>{syrup} / {total}</span>
+              <span>
+                {syrup} / {total}
+              </span>
               <span className="text-xs text-slate-400">≈ {(syrup / total).toFixed(2)}</span>
             </div>
           </div>
 
           <div className="bg-gradient-to-r from-rose-600 to-pink-600 p-4 rounded-xl text-white shadow-md">
             <div className="text-xs font-semibold text-rose-100">백분율 (퍼센트 %)</div>
-            <div className="text-3xl font-black mt-1">
-              {ratioVal}%
-            </div>
+            <div className="text-3xl font-black mt-1">{ratioVal}%</div>
             <div className="text-xs text-rose-100 mt-1">
               (비교하는 양 {syrup} ÷ 기준량 {total}) × 100 = {ratioVal}%
             </div>

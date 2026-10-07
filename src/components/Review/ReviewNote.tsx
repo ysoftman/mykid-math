@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
 import confetti from 'canvas-confetti';
+import type React from 'react';
+import { useState } from 'react';
 import type { WrongNoteItem } from '../../types/math';
-import { getWrongNotes, removeWrongNote } from '../../utils/storage';
 import { sound } from '../../utils/audio';
+import { getWrongNotes, removeWrongNote } from '../../utils/storage';
 
 interface ReviewNoteProps {
   onClose: () => void;
@@ -75,7 +76,10 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats 
         </div>
 
         <button
-          onClick={() => { sound.playPop(); onClose(); }}
+          onClick={() => {
+            sound.playPop();
+            onClose();
+          }}
           className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-colors"
         >
           돌아가기
@@ -129,7 +133,9 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats 
                 <div className="flex flex-wrap items-center gap-4 text-xs bg-white p-3 rounded-xl border border-slate-200">
                   <div>
                     <span className="text-slate-400">내가 적은 오답: </span>
-                    <strong className="text-rose-600 font-mono">{item.userAnswer || '미입력'}</strong>
+                    <strong className="text-rose-600 font-mono">
+                      {item.userAnswer || '미입력'}
+                    </strong>
                   </div>
                   <div>
                     <span className="text-slate-400">정답: </span>
@@ -170,7 +176,9 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats 
                       <input
                         type="text"
                         value={retryInput}
-                        placeholder={item.problem.answerType === 'fraction' ? '예: 3/4' : '정답 입력'}
+                        placeholder={
+                          item.problem.answerType === 'fraction' ? '예: 3/4' : '정답 입력'
+                        }
                         onChange={(e) => setRetryInput(e.target.value)}
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') handleRetrySubmit(item);
@@ -203,7 +211,10 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats 
                 {isExpanded && (
                   <div className="space-y-2 pt-2 border-t border-slate-200">
                     {item.problem.explanations.map((exp, idx) => (
-                      <div key={idx} className="bg-white p-3 rounded-lg border border-slate-200 text-xs space-y-0.5">
+                      <div
+                        key={idx}
+                        className="bg-white p-3 rounded-lg border border-slate-200 text-xs space-y-0.5"
+                      >
                         <div className="font-bold text-indigo-600">{exp.title}</div>
                         <div className="text-slate-700">{exp.content}</div>
                       </div>

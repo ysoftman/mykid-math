@@ -1,12 +1,17 @@
-import type { Problem, Difficulty } from '../../types/math';
-import { gcd, lcm, getFactors, randomInt, pickOne } from '../mathHelpers';
+import type { Difficulty, Problem } from '../../types/math';
+import { gcd, getFactors, lcm, pickOne, randomInt } from '../mathHelpers';
 
 export function generateFactorProblem(difficulty: Difficulty): Problem {
   const type = pickOne(['factors_count', 'gcd', 'lcm', 'word_problem']);
   const id = `fac_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
   if (type === 'factors_count') {
-    const num = difficulty === 'easy' ? randomInt(12, 30) : difficulty === 'medium' ? randomInt(24, 60) : randomInt(40, 84);
+    const num =
+      difficulty === 'easy'
+        ? randomInt(12, 30)
+        : difficulty === 'medium'
+          ? randomInt(24, 60)
+          : randomInt(40, 84);
     const factors = getFactors(num);
 
     return {

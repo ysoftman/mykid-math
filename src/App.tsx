@@ -1,21 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import type { TopicId, UserStats } from './types/math';
-import { getStats, getWrongNotes } from './utils/storage';
-import { TOPICS } from './utils/problemGenerators';
-import { sound } from './utils/audio';
-
-import { Navbar } from './components/Navbar';
-import { Roadmap } from './components/Roadmap';
-import { QuizRunner } from './components/Quiz/QuizRunner';
-import { ReviewNote } from './components/Review/ReviewNote';
-import { ScratchPad } from './components/ScratchPad';
-
+import type React from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { DecimalsLab } from './components/Lab/DecimalsLab';
 // Labs
 import { FactorsLab } from './components/Lab/FactorsLab';
 import { FractionsLab } from './components/Lab/FractionsLab';
-import { DecimalsLab } from './components/Lab/DecimalsLab';
 import { GeometryLab } from './components/Lab/GeometryLab';
 import { RatiosLab } from './components/Lab/RatiosLab';
+import { Navbar } from './components/Navbar';
+import { QuizRunner } from './components/Quiz/QuizRunner';
+import { ReviewNote } from './components/Review/ReviewNote';
+import { Roadmap } from './components/Roadmap';
+import { ScratchPad } from './components/ScratchPad';
+import type { TopicId, UserStats } from './types/math';
+import { sound } from './utils/audio';
+import { TOPICS } from './utils/problemGenerators';
+import { getStats, getWrongNotes } from './utils/storage';
 
 export const App: React.FC = () => {
   const [currentTab, setCurrentTab] = useState<'roadmap' | 'lab' | 'quiz' | 'review'>('roadmap');
@@ -24,14 +23,16 @@ export const App: React.FC = () => {
   const [wrongNotesCount, setWrongNotesCount] = useState<number>(getWrongNotes().length);
   const [isScratchPadOpen, setIsScratchPadOpen] = useState<boolean>(false);
 
-  const refreshStats = () => {
+  const refreshStats = useCallback(() => {
     setStats(getStats());
     setWrongNotesCount(getWrongNotes().length);
-  };
+  }, []);
 
   useEffect(() => {
-    refreshStats();
-  }, []);
+    const handleStorage = () => refreshStats();
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [refreshStats]);
 
   const handleSelectTopicFromRoadmap = (topicId: TopicId) => {
     setSelectedTopicId(topicId);
@@ -136,9 +137,7 @@ export const App: React.FC = () => {
                   <h2 className="text-base font-black text-slate-800">
                     {currentTopic.title} 도전 퀴즈
                   </h2>
-                  <p className="text-xs text-slate-400">
-                    문제를 맞혀 별을 획득하고 레벨업하세요!
-                  </p>
+                  <p className="text-xs text-slate-400">문제를 맞혀 별을 획득하고 레벨업하세요!</p>
                 </div>
               </div>
 
@@ -156,6 +155,7 @@ export const App: React.FC = () => {
             </div>
 
             <QuizRunner
+              key={selectedTopicId}
               topicId={selectedTopicId}
               onStatsUpdated={refreshStats}
               onOpenScratchPad={() => setIsScratchPadOpen(true)}
@@ -164,18 +164,12 @@ export const App: React.FC = () => {
         )}
 
         {currentTab === 'review' && (
-          <ReviewNote
-            onClose={() => setCurrentTab('roadmap')}
-            onRefreshStats={refreshStats}
-          />
+          <ReviewNote onClose={() => setCurrentTab('roadmap')} onRefreshStats={refreshStats} />
         )}
       </main>
 
       {/* Floating ScratchPad Modal */}
-      <ScratchPad
-        isOpen={isScratchPadOpen}
-        onClose={() => setIsScratchPadOpen(false)}
-      />
+      <ScratchPad isOpen={isScratchPadOpen} onClose={() => setIsScratchPadOpen(false)} />
 
       {/* Footer */}
       <footer className="mt-auto border-t border-slate-200 bg-white py-6 text-center text-xs text-slate-400">

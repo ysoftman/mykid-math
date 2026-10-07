@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { lcm, simplifyFraction } from '../../utils/mathHelpers';
+import type React from 'react';
+import { useState } from 'react';
 import { sound } from '../../utils/audio';
+import { lcm, simplifyFraction } from '../../utils/mathHelpers';
 
 export const FractionsLab: React.FC = () => {
   const [mode, setMode] = useState<'addition' | 'multiplication' | 'division'>('addition');
@@ -44,17 +45,27 @@ export const FractionsLab: React.FC = () => {
 
         <div className="flex bg-blue-50 p-1 rounded-xl">
           <button
-            onClick={() => { sound.playPop(); setMode('addition'); }}
+            onClick={() => {
+              sound.playPop();
+              setMode('addition');
+            }}
             className={`px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
-              mode === 'addition' ? 'bg-blue-600 text-white shadow-sm' : 'text-blue-800 hover:bg-blue-100'
+              mode === 'addition'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-blue-800 hover:bg-blue-100'
             }`}
           >
             ➕ 통분과 덧셈
           </button>
           <button
-            onClick={() => { sound.playPop(); setMode('multiplication'); }}
+            onClick={() => {
+              sound.playPop();
+              setMode('multiplication');
+            }}
             className={`px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
-              mode === 'multiplication' ? 'bg-blue-600 text-white shadow-sm' : 'text-blue-800 hover:bg-blue-100'
+              mode === 'multiplication'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-blue-800 hover:bg-blue-100'
             }`}
           >
             ✖️ 곱셈 (면적 모델)
@@ -67,7 +78,9 @@ export const FractionsLab: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Fraction 1 Controls */}
             <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
-              <span className="text-xs font-bold text-blue-800">첫 번째 분수: {num1} / {den1}</span>
+              <span className="text-xs font-bold text-blue-800">
+                첫 번째 분수: {num1} / {den1}
+              </span>
               <div className="mt-2 flex gap-4 items-center">
                 <div className="flex-1">
                   <div className="text-xs text-slate-500 mb-1">분모: {den1}</div>
@@ -106,7 +119,9 @@ export const FractionsLab: React.FC = () => {
 
             {/* Fraction 2 Controls */}
             <div className="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
-              <span className="text-xs font-bold text-indigo-800">두 번째 분수: {num2} / {den2}</span>
+              <span className="text-xs font-bold text-indigo-800">
+                두 번째 분수: {num2} / {den2}
+              </span>
               <div className="mt-2 flex gap-4 items-center">
                 <div className="flex-1">
                   <div className="text-xs text-slate-500 mb-1">분모: {den2}</div>
@@ -148,7 +163,9 @@ export const FractionsLab: React.FC = () => {
           <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
             <div>
               <div className="flex justify-between text-xs font-bold text-slate-600 mb-1">
-                <span>첫 번째 막대: {isUnified ? `${unifiedNum1}/${commonDen}` : `${num1}/${den1}`}</span>
+                <span>
+                  첫 번째 막대: {isUnified ? `${unifiedNum1}/${commonDen}` : `${num1}/${den1}`}
+                </span>
               </div>
               <div className="h-9 w-full bg-slate-200 rounded-lg overflow-hidden flex border border-slate-300">
                 {Array.from({ length: isUnified ? commonDen : den1 }).map((_, idx) => {
@@ -169,7 +186,9 @@ export const FractionsLab: React.FC = () => {
 
             <div>
               <div className="flex justify-between text-xs font-bold text-slate-600 mb-1">
-                <span>두 번째 막대: {isUnified ? `${unifiedNum2}/${commonDen}` : `${num2}/${den2}`}</span>
+                <span>
+                  두 번째 막대: {isUnified ? `${unifiedNum2}/${commonDen}` : `${num2}/${den2}`}
+                </span>
               </div>
               <div className="h-9 w-full bg-slate-200 rounded-lg overflow-hidden flex border border-slate-300">
                 {Array.from({ length: isUnified ? commonDen : den2 }).map((_, idx) => {
@@ -178,7 +197,9 @@ export const FractionsLab: React.FC = () => {
                     <div
                       key={idx}
                       className={`flex-1 border-r border-slate-300 last:border-r-0 flex items-center justify-center text-xs font-bold transition-all duration-300 ${
-                        isFilled ? 'bg-indigo-500 text-white shadow-inner' : 'bg-white text-slate-400'
+                        isFilled
+                          ? 'bg-indigo-500 text-white shadow-inner'
+                          : 'bg-white text-slate-400'
                       }`}
                     >
                       1/{isUnified ? commonDen : den2}
@@ -225,7 +246,9 @@ export const FractionsLab: React.FC = () => {
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
-              <span className="text-xs font-bold text-blue-800">가로 분수: {mNum1} / {mDen1}</span>
+              <span className="text-xs font-bold text-blue-800">
+                가로 분수: {mNum1} / {mDen1}
+              </span>
               <div className="mt-2 flex gap-4">
                 <div className="flex-1">
                   <div className="text-xs text-slate-500 mb-1">분모: {mDen1}</div>
@@ -261,7 +284,9 @@ export const FractionsLab: React.FC = () => {
             </div>
 
             <div className="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
-              <span className="text-xs font-bold text-indigo-800">세로 분수: {mNum2} / {mDen2}</span>
+              <span className="text-xs font-bold text-indigo-800">
+                세로 분수: {mNum2} / {mDen2}
+              </span>
               <div className="mt-2 flex gap-4">
                 <div className="flex-1">
                   <div className="text-xs text-slate-500 mb-1">분모: {mDen2}</div>
@@ -299,7 +324,8 @@ export const FractionsLab: React.FC = () => {
 
           <div className="flex flex-col items-center justify-center p-6 bg-slate-900 rounded-2xl text-white">
             <div className="text-xs text-slate-300 mb-3">
-              전체 사각형을 가로 {mDen1}등분 × 세로 {mDen2}등분 = 총 <strong>{productDen}</strong>칸으로 나눕니다.
+              전체 사각형을 가로 {mDen1}등분 × 세로 {mDen2}등분 = 총 <strong>{productDen}</strong>
+              칸으로 나눕니다.
             </div>
 
             <div
@@ -322,22 +348,23 @@ export const FractionsLab: React.FC = () => {
                         isOverlap
                           ? 'bg-amber-400 border-amber-300 text-amber-950 shadow-md ring-2 ring-amber-300'
                           : isHoriz
-                          ? 'bg-blue-600/40 border-blue-500/40 text-blue-200'
-                          : isVert
-                          ? 'bg-indigo-600/40 border-indigo-500/40 text-indigo-200'
-                          : 'bg-slate-800 border-slate-700 text-slate-600'
+                            ? 'bg-blue-600/40 border-blue-500/40 text-blue-200'
+                            : isVert
+                              ? 'bg-indigo-600/40 border-indigo-500/40 text-indigo-200'
+                              : 'bg-slate-800 border-slate-700 text-slate-600'
                       }`}
                     >
                       {isOverlap ? '★' : ''}
                     </div>
                   );
-                })
+                }),
               )}
             </div>
 
             <div className="mt-5 text-center space-y-1">
               <div className="text-lg font-black text-amber-300">
-                {mNum1}/{mDen1} × {mNum2}/{mDen2} = ({mNum1}×{mNum2}) / ({mDen1}×{mDen2}) = {productNum}/{productDen}
+                {mNum1}/{mDen1} × {mNum2}/{mDen2} = ({mNum1}×{mNum2}) / ({mDen1}×{mDen2}) ={' '}
+                {productNum}/{productDen}
               </div>
               <div className="text-xs text-slate-300">
                 노란색 겹치는 영역 {productNum}칸 / 전체 {productDen}칸 = 약분하면{' '}

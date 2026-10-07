@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import type { UserStats } from '../types/math';
 import { sound } from '../utils/audio';
 
@@ -30,7 +31,10 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         {/* Brand */}
         <div
-          onClick={() => { sound.playPop(); onTabChange('roadmap'); }}
+          onClick={() => {
+            sound.playPop();
+            onTabChange('roadmap');
+          }}
           className="flex items-center gap-2 cursor-pointer select-none group"
         >
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white text-xl shadow-md group-hover:scale-105 transition-transform">
@@ -49,7 +53,10 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Navigation Tabs */}
         <nav className="hidden md:flex items-center bg-slate-100 p-1 rounded-xl gap-1">
           <button
-            onClick={() => { sound.playPop(); onTabChange('roadmap'); }}
+            onClick={() => {
+              sound.playPop();
+              onTabChange('roadmap');
+            }}
             className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
               currentTab === 'roadmap'
                 ? 'bg-white text-indigo-600 shadow-sm'
@@ -59,7 +66,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             🗺️ 로드맵
           </button>
           <button
-            onClick={() => { sound.playPop(); onTabChange('lab'); }}
+            onClick={() => {
+              sound.playPop();
+              onTabChange('lab');
+            }}
             className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
               currentTab === 'lab'
                 ? 'bg-white text-indigo-600 shadow-sm'
@@ -69,7 +79,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             🧪 개념 실험실
           </button>
           <button
-            onClick={() => { sound.playPop(); onTabChange('quiz'); }}
+            onClick={() => {
+              sound.playPop();
+              onTabChange('quiz');
+            }}
             className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
               currentTab === 'quiz'
                 ? 'bg-white text-indigo-600 shadow-sm'
@@ -79,7 +92,10 @@ export const Navbar: React.FC<NavbarProps> = ({
             🎯 도전 퀴즈
           </button>
           <button
-            onClick={() => { sound.playPop(); onTabChange('review'); }}
+            onClick={() => {
+              sound.playPop();
+              onTabChange('review');
+            }}
             className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all relative ${
               currentTab === 'review'
                 ? 'bg-white text-rose-600 shadow-sm'
@@ -99,7 +115,10 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center gap-2">
           {/* Scratchpad Button */}
           <button
-            onClick={() => { sound.playPop(); onOpenScratchPad(); }}
+            onClick={() => {
+              sound.playPop();
+              onOpenScratchPad();
+            }}
             title="수학 연습장 / 칠판 열기"
             className="flex items-center gap-1 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl transition-colors border border-slate-200"
           >
@@ -131,25 +150,37 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* Mobile Sub Navigation */}
       <div className="flex md:hidden border-t border-slate-100 px-2 py-1.5 bg-slate-50 justify-around text-xs font-bold">
         <button
-          onClick={() => { sound.playPop(); onTabChange('roadmap'); }}
+          onClick={() => {
+            sound.playPop();
+            onTabChange('roadmap');
+          }}
           className={`px-2 py-1 rounded-lg ${currentTab === 'roadmap' ? 'text-indigo-600 bg-white shadow-2xs' : 'text-slate-500'}`}
         >
           🗺️ 로드맵
         </button>
         <button
-          onClick={() => { sound.playPop(); onTabChange('lab'); }}
+          onClick={() => {
+            sound.playPop();
+            onTabChange('lab');
+          }}
           className={`px-2 py-1 rounded-lg ${currentTab === 'lab' ? 'text-indigo-600 bg-white shadow-2xs' : 'text-slate-500'}`}
         >
           🧪 실험실
         </button>
         <button
-          onClick={() => { sound.playPop(); onTabChange('quiz'); }}
+          onClick={() => {
+            sound.playPop();
+            onTabChange('quiz');
+          }}
           className={`px-2 py-1 rounded-lg ${currentTab === 'quiz' ? 'text-indigo-600 bg-white shadow-2xs' : 'text-slate-500'}`}
         >
           🎯 퀴즈
         </button>
         <button
-          onClick={() => { sound.playPop(); onTabChange('review'); }}
+          onClick={() => {
+            sound.playPop();
+            onTabChange('review');
+          }}
           className={`px-2 py-1 rounded-lg relative ${currentTab === 'review' ? 'text-rose-600 bg-white shadow-2xs' : 'text-slate-500'}`}
         >
           📝 오답({wrongCount})

@@ -1,8 +1,8 @@
-import React from 'react';
-import type { UserStats, TopicId } from '../types/math';
+import type React from 'react';
+import type { TopicId, UserStats } from '../types/math';
+import { sound } from '../utils/audio';
 import { TOPICS } from '../utils/problemGenerators';
 import { BADGE_DEFINITIONS } from '../utils/storage';
-import { sound } from '../utils/audio';
 
 interface RoadmapProps {
   stats: UserStats;
@@ -10,18 +10,14 @@ interface RoadmapProps {
   onOpenWrongNotes: () => void;
 }
 
-export const Roadmap: React.FC<RoadmapProps> = ({
-  stats,
-  onSelectTopic,
-  onOpenWrongNotes,
-}) => {
+export const Roadmap: React.FC<RoadmapProps> = ({ stats, onSelectTopic, onOpenWrongNotes }) => {
   const currentLevel = stats.level;
   const currentStars = stats.stars;
   const nextLevelStars = currentLevel * 10;
   const currentLevelBaseStars = (currentLevel - 1) * 10;
   const progressPercent = Math.min(
     100,
-    Math.max(0, ((currentStars - currentLevelBaseStars) / 10) * 100)
+    Math.max(0, ((currentStars - currentLevelBaseStars) / 10) * 100),
   );
 
   return (
@@ -33,11 +29,10 @@ export const Roadmap: React.FC<RoadmapProps> = ({
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold tracking-wide">
               <span>🚀</span> 초등 5~6학년 수학 마스터 로드맵
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black">
-              Lv. {currentLevel} 수학 탐험가
-            </h2>
+            <h2 className="text-2xl sm:text-3xl font-black">Lv. {currentLevel} 수학 탐험가</h2>
             <p className="text-indigo-100 text-xs sm:text-sm max-w-md">
-              문제를 맞히면 별(⭐)을 모으고 레벨업할 수 있어요! 단원별 실험실에서 원리를 먼저 살펴보고 도전해보세요.
+              문제를 맞히면 별(⭐)을 모으고 레벨업할 수 있어요! 단원별 실험실에서 원리를 먼저
+              살펴보고 도전해보세요.
             </p>
           </div>
 
@@ -113,7 +108,10 @@ export const Roadmap: React.FC<RoadmapProps> = ({
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-bold text-slate-800">단원별 학습 코스</h3>
           <button
-            onClick={() => { sound.playPop(); onOpenWrongNotes(); }}
+            onClick={() => {
+              sound.playPop();
+              onOpenWrongNotes();
+            }}
             className="text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"
           >
             <span>📝</span>
@@ -132,7 +130,10 @@ export const Roadmap: React.FC<RoadmapProps> = ({
             return (
               <div
                 key={topic.id}
-                onClick={() => { sound.playPop(); onSelectTopic(topic.id); }}
+                onClick={() => {
+                  sound.playPop();
+                  onSelectTopic(topic.id);
+                }}
                 className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-indigo-400 hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
               >
                 <div className="space-y-3">
@@ -157,14 +158,13 @@ export const Roadmap: React.FC<RoadmapProps> = ({
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    {topic.description}
-                  </p>
+                  <p className="text-xs text-slate-500 leading-relaxed">{topic.description}</p>
                 </div>
 
                 <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
                   <span className="text-slate-500">
-                    푼 문제: <strong className="text-slate-700">{progress.solvedCount}개</strong> (정답 {progress.correctCount}개)
+                    푼 문제: <strong className="text-slate-700">{progress.solvedCount}개</strong>{' '}
+                    (정답 {progress.correctCount}개)
                   </span>
                   <span className="font-bold text-indigo-600 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                     학습 시작 ➔

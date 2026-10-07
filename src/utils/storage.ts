@@ -20,11 +20,36 @@ const defaultStats: UserStats = {
 
 export const BADGE_DEFINITIONS = [
   { id: 'first_step', name: '첫 걸음', desc: '첫 문제를 맞혔어요!', icon: '🌱' },
-  { id: 'factor_pro', name: '약수 탐정', desc: '약수와 배수 문제를 5개 이상 맞혔어요!', icon: '🔍' },
-  { id: 'fraction_master', name: '분수 연금술사', desc: '분수 연산 문제를 5개 이상 맞혔어요!', icon: '🍕' },
-  { id: 'decimal_wiz', name: '소수 마법사', desc: '소수 연산 문제를 5개 이상 맞혔어요!', icon: '✨' },
-  { id: 'geometry_architect', name: '도형 건축가', desc: '도형 넓이 문제를 5개 이상 맞혔어요!', icon: '📐' },
-  { id: 'ratio_master', name: '비율의 달인', desc: '비와 비율 문제를 5개 이상 맞혔어요!', icon: '⚖️' },
+  {
+    id: 'factor_pro',
+    name: '약수 탐정',
+    desc: '약수와 배수 문제를 5개 이상 맞혔어요!',
+    icon: '🔍',
+  },
+  {
+    id: 'fraction_master',
+    name: '분수 연금술사',
+    desc: '분수 연산 문제를 5개 이상 맞혔어요!',
+    icon: '🍕',
+  },
+  {
+    id: 'decimal_wiz',
+    name: '소수 마법사',
+    desc: '소수 연산 문제를 5개 이상 맞혔어요!',
+    icon: '✨',
+  },
+  {
+    id: 'geometry_architect',
+    name: '도형 건축가',
+    desc: '도형 넓이 문제를 5개 이상 맞혔어요!',
+    icon: '📐',
+  },
+  {
+    id: 'ratio_master',
+    name: '비율의 달인',
+    desc: '비와 비율 문제를 5개 이상 맞혔어요!',
+    icon: '⚖️',
+  },
   { id: 'star_collector', name: '별자리 수집가', desc: '별을 20개 이상 모았어요!', icon: '⭐' },
   { id: 'math_hero', name: '수학 슈퍼히어로', desc: '레벨 5에 도달했어요!', icon: '👑' },
 ];
@@ -53,14 +78,18 @@ export function saveStats(stats: UserStats): void {
 
 export function recordProblemResult(
   topicId: TopicId,
-  isCorrect: boolean
+  isCorrect: boolean,
 ): { updatedStats: UserStats; newBadges: string[]; leveledUp: boolean } {
   const stats = getStats();
   const prevLevel = stats.level;
   const newBadges: string[] = [];
 
   stats.totalSolved += 1;
-  const currentTopic = stats.topicProgress[topicId] || { solvedCount: 0, correctCount: 0, stars: 0 };
+  const currentTopic = stats.topicProgress[topicId] || {
+    solvedCount: 0,
+    correctCount: 0,
+    stars: 0,
+  };
   currentTopic.solvedCount += 1;
 
   if (isCorrect) {
@@ -86,7 +115,10 @@ export function recordProblemResult(
     stats.badges.push('factor_pro');
     newBadges.push('factor_pro');
   }
-  if (stats.topicProgress.fractions.correctCount >= 5 && !stats.badges.includes('fraction_master')) {
+  if (
+    stats.topicProgress.fractions.correctCount >= 5 &&
+    !stats.badges.includes('fraction_master')
+  ) {
     stats.badges.push('fraction_master');
     newBadges.push('fraction_master');
   }
@@ -94,7 +126,10 @@ export function recordProblemResult(
     stats.badges.push('decimal_wiz');
     newBadges.push('decimal_wiz');
   }
-  if (stats.topicProgress.geometry.correctCount >= 5 && !stats.badges.includes('geometry_architect')) {
+  if (
+    stats.topicProgress.geometry.correctCount >= 5 &&
+    !stats.badges.includes('geometry_architect')
+  ) {
     stats.badges.push('geometry_architect');
     newBadges.push('geometry_architect');
   }

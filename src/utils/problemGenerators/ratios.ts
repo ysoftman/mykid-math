@@ -1,5 +1,5 @@
-import type { Problem, Difficulty } from '../../types/math';
-import { randomInt, pickOne } from '../mathHelpers';
+import type { Difficulty, Problem } from '../../types/math';
+import { pickOne, randomInt } from '../mathHelpers';
 
 export function generateRatioProblem(difficulty: Difficulty): Problem {
   const type = pickOne(['percentage', 'proportion_equation', 'proportional_distribution']);

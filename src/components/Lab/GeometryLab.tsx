@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import type React from 'react';
+import { useState } from 'react';
 import { sound } from '../../utils/audio';
 
 export const GeometryLab: React.FC = () => {
@@ -38,25 +39,40 @@ export const GeometryLab: React.FC = () => {
 
         <div className="flex bg-purple-50 p-1 rounded-xl gap-1">
           <button
-            onClick={() => { sound.playPop(); setShape('triangle'); }}
+            onClick={() => {
+              sound.playPop();
+              setShape('triangle');
+            }}
             className={`px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
-              shape === 'triangle' ? 'bg-purple-600 text-white shadow-sm' : 'text-purple-800 hover:bg-purple-100'
+              shape === 'triangle'
+                ? 'bg-purple-600 text-white shadow-sm'
+                : 'text-purple-800 hover:bg-purple-100'
             }`}
           >
             🔺 삼각형
           </button>
           <button
-            onClick={() => { sound.playPop(); setShape('trapezoid'); }}
+            onClick={() => {
+              sound.playPop();
+              setShape('trapezoid');
+            }}
             className={`px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
-              shape === 'trapezoid' ? 'bg-purple-600 text-white shadow-sm' : 'text-purple-800 hover:bg-purple-100'
+              shape === 'trapezoid'
+                ? 'bg-purple-600 text-white shadow-sm'
+                : 'text-purple-800 hover:bg-purple-100'
             }`}
           >
             ⏢ 사다리꼴
           </button>
           <button
-            onClick={() => { sound.playPop(); setShape('circle'); }}
+            onClick={() => {
+              sound.playPop();
+              setShape('circle');
+            }}
             className={`px-3 py-1.5 text-xs sm:text-sm font-semibold rounded-lg transition-all ${
-              shape === 'circle' ? 'bg-purple-600 text-white shadow-sm' : 'text-purple-800 hover:bg-purple-100'
+              shape === 'circle'
+                ? 'bg-purple-600 text-white shadow-sm'
+                : 'text-purple-800 hover:bg-purple-100'
             }`}
           >
             ⭕ 원의 변형
@@ -76,7 +92,10 @@ export const GeometryLab: React.FC = () => {
                 min="4"
                 max="12"
                 value={base}
-                onChange={(e) => { sound.playPop(); setBase(Number(e.target.value)); }}
+                onChange={(e) => {
+                  sound.playPop();
+                  setBase(Number(e.target.value));
+                }}
                 className="w-full accent-purple-600 cursor-pointer"
               />
             </div>
@@ -89,7 +108,10 @@ export const GeometryLab: React.FC = () => {
                 min="3"
                 max="10"
                 value={height}
-                onChange={(e) => { sound.playPop(); setHeight(Number(e.target.value)); }}
+                onChange={(e) => {
+                  sound.playPop();
+                  setHeight(Number(e.target.value));
+                }}
                 className="w-full accent-purple-600 cursor-pointer"
               />
             </div>
@@ -127,7 +149,14 @@ export const GeometryLab: React.FC = () => {
               )}
 
               {/* Labels */}
-              <text x={40 + (base * 15) / 2} y="165" fill="#f8fafc" fontSize="12" textAnchor="middle" fontWeight="bold">
+              <text
+                x={40 + (base * 15) / 2}
+                y="165"
+                fill="#f8fafc"
+                fontSize="12"
+                textAnchor="middle"
+                fontWeight="bold"
+              >
                 밑변 {base}cm
               </text>
               <line
@@ -139,7 +168,13 @@ export const GeometryLab: React.FC = () => {
                 strokeWidth="1.5"
                 strokeDasharray="3"
               />
-              <text x={45 + (base * 15) / 2} y={150 - (height * 12) / 2} fill="#fbbf24" fontSize="11" fontWeight="bold">
+              <text
+                x={45 + (base * 15) / 2}
+                y={150 - (height * 12) / 2}
+                fill="#fbbf24"
+                fontSize="11"
+                fontWeight="bold"
+              >
                 높이 {height}cm
               </text>
             </svg>
@@ -152,15 +187,19 @@ export const GeometryLab: React.FC = () => {
                 }}
                 className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl text-xs sm:text-sm font-bold shadow hover:brightness-110 transition-all"
               >
-                {showTriTwin ? '↩️ 원래 삼각형만 보기' : '✨ 똑같은 삼각형 1개 더 붙여보기 (평행사변형 완성!)'}
+                {showTriTwin
+                  ? '↩️ 원래 삼각형만 보기'
+                  : '✨ 똑같은 삼각형 1개 더 붙여보기 (평행사변형 완성!)'}
               </button>
 
               <div className="text-center">
                 <div className="text-lg font-bold text-purple-300">
-                  넓이 = ({base} × {height}) ÷ 2 = <span className="text-white font-extrabold">{triArea}</span> cm²
+                  넓이 = ({base} × {height}) ÷ 2 ={' '}
+                  <span className="text-white font-extrabold">{triArea}</span> cm²
                 </div>
                 <p className="text-xs text-slate-400 mt-1">
-                  💡 똑같은 삼각형 2개를 붙이면 평행사변형(밑변×높이)이 되기 때문에 <strong>반으로 나누는(÷2)</strong> 것입니다!
+                  💡 똑같은 삼각형 2개를 붙이면 평행사변형(밑변×높이)이 되기 때문에{' '}
+                  <strong>반으로 나누는(÷2)</strong> 것입니다!
                 </p>
               </div>
             </div>
@@ -180,7 +219,10 @@ export const GeometryLab: React.FC = () => {
                 min="2"
                 max="8"
                 value={topBase}
-                onChange={(e) => { sound.playPop(); setTopBase(Number(e.target.value)); }}
+                onChange={(e) => {
+                  sound.playPop();
+                  setTopBase(Number(e.target.value));
+                }}
                 className="w-full accent-purple-600 cursor-pointer"
               />
             </div>
@@ -193,7 +235,10 @@ export const GeometryLab: React.FC = () => {
                 min="5"
                 max="12"
                 value={bottomBase}
-                onChange={(e) => { sound.playPop(); setBottomBase(Number(e.target.value)); }}
+                onChange={(e) => {
+                  sound.playPop();
+                  setBottomBase(Number(e.target.value));
+                }}
                 className="w-full accent-purple-600 cursor-pointer"
               />
             </div>
@@ -206,7 +251,10 @@ export const GeometryLab: React.FC = () => {
                 min="3"
                 max="8"
                 value={trapHeight}
-                onChange={(e) => { sound.playPop(); setTrapHeight(Number(e.target.value)); }}
+                onChange={(e) => {
+                  sound.playPop();
+                  setTrapHeight(Number(e.target.value));
+                }}
                 className="w-full accent-purple-600 cursor-pointer"
               />
             </div>
@@ -242,17 +290,32 @@ export const GeometryLab: React.FC = () => {
               )}
 
               {/* Labels */}
-              <text x={50 + 20 + (topBase * 12) / 2} y={140 - trapHeight * 12} fill="#e2e8f0" fontSize="11" textAnchor="middle">
+              <text
+                x={50 + 20 + (topBase * 12) / 2}
+                y={140 - trapHeight * 12}
+                fill="#e2e8f0"
+                fontSize="11"
+                textAnchor="middle"
+              >
                 윗변 {topBase}cm
               </text>
-              <text x={50 + (bottomBase * 12) / 2} y="165" fill="#e2e8f0" fontSize="11" textAnchor="middle">
+              <text
+                x={50 + (bottomBase * 12) / 2}
+                y="165"
+                fill="#e2e8f0"
+                fontSize="11"
+                textAnchor="middle"
+              >
                 아랫변 {bottomBase}cm
               </text>
             </svg>
 
             <div className="mt-4 flex flex-col items-center gap-3">
               <button
-                onClick={() => { sound.playPop(); setShowTrapTwin(!showTrapTwin); }}
+                onClick={() => {
+                  sound.playPop();
+                  setShowTrapTwin(!showTrapTwin);
+                }}
                 className="px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl text-xs sm:text-sm font-bold shadow hover:brightness-110 transition-all"
               >
                 {showTrapTwin ? '↩️ 원래 사다리꼴만 보기' : '✨ 똑같은 사다리꼴 거꾸로 이어붙이기!'}
@@ -260,10 +323,12 @@ export const GeometryLab: React.FC = () => {
 
               <div className="text-center">
                 <div className="text-lg font-bold text-purple-300">
-                  넓이 = ({topBase} + {bottomBase}) × {trapHeight} ÷ 2 = <span className="text-white font-extrabold">{trapArea}</span> cm²
+                  넓이 = ({topBase} + {bottomBase}) × {trapHeight} ÷ 2 ={' '}
+                  <span className="text-white font-extrabold">{trapArea}</span> cm²
                 </div>
                 <p className="text-xs text-slate-400 mt-1">
-                  💡 사다리꼴 2개를 거꾸로 붙이면 밑변이 (윗변+아랫변)인 거대한 평행사변형이 완성됩니다!
+                  💡 사다리꼴 2개를 거꾸로 붙이면 밑변이 (윗변+아랫변)인 거대한 평행사변형이
+                  완성됩니다!
                 </p>
               </div>
             </div>
@@ -283,7 +348,10 @@ export const GeometryLab: React.FC = () => {
                 min="2"
                 max="6"
                 value={radius}
-                onChange={(e) => { sound.playPop(); setRadius(Number(e.target.value)); }}
+                onChange={(e) => {
+                  sound.playPop();
+                  setRadius(Number(e.target.value));
+                }}
                 className="w-full accent-purple-600 cursor-pointer"
               />
             </div>
@@ -295,7 +363,10 @@ export const GeometryLab: React.FC = () => {
                 {[8, 16, 32].map((s) => (
                   <button
                     key={s}
-                    onClick={() => { sound.playPop(); setSlices(s); }}
+                    onClick={() => {
+                      sound.playPop();
+                      setSlices(s);
+                    }}
                     className={`flex-1 py-1 rounded text-xs font-bold ${
                       slices === s ? 'bg-purple-600 text-white' : 'bg-white border text-slate-700'
                     }`}
@@ -312,7 +383,14 @@ export const GeometryLab: React.FC = () => {
               {/* Circle representation */}
               <div className="flex flex-col items-center">
                 <svg width="150" height="150" viewBox="-75 -75 150 150">
-                  <circle cx="0" cy="0" r={radius * 10} fill="#a855f7" stroke="#e9d5ff" strokeWidth="2" />
+                  <circle
+                    cx="0"
+                    cy="0"
+                    r={radius * 10}
+                    fill="#a855f7"
+                    stroke="#e9d5ff"
+                    strokeWidth="2"
+                  />
                   {/* Slices lines */}
                   {Array.from({ length: slices / 2 }).map((_, i) => {
                     const angle = (i * 360) / slices;
@@ -332,7 +410,14 @@ export const GeometryLab: React.FC = () => {
                   })}
                   {/* Radius line */}
                   <line x1="0" y1="0" x2={radius * 10} y2="0" stroke="#facc15" strokeWidth="2" />
-                  <text x={radius * 5} y="-5" fill="#facc15" fontSize="10" textAnchor="middle" fontWeight="bold">
+                  <text
+                    x={radius * 5}
+                    y="-5"
+                    fill="#facc15"
+                    fontSize="10"
+                    textAnchor="middle"
+                    fontWeight="bold"
+                  >
                     반지름 {radius}
                   </text>
                 </svg>
@@ -370,7 +455,8 @@ export const GeometryLab: React.FC = () => {
                 <span className="text-white font-extrabold">{circleArea}</span> cm²
               </div>
               <p className="text-xs text-slate-400">
-                (원주 = 2 × {radius} × 3.14 = {circumference}cm, 직사각형 가로 = {circumference / 2}cm, 세로 = {radius}cm)
+                (원주 = 2 × {radius} × 3.14 = {circumference}cm, 직사각형 가로 = {circumference / 2}
+                cm, 세로 = {radius}cm)
               </p>
             </div>
           </div>

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { getFactors, gcd, lcm } from '../../utils/mathHelpers';
+import type React from 'react';
+import { useState } from 'react';
 import { sound } from '../../utils/audio';
+import { gcd, getFactors, lcm } from '../../utils/mathHelpers';
 
 export const FactorsLab: React.FC = () => {
   const [tab, setTab] = useState<'rect' | 'gcd_lcm'>('rect');
@@ -51,17 +52,27 @@ export const FactorsLab: React.FC = () => {
 
         <div className="flex bg-amber-50 p-1 rounded-xl">
           <button
-            onClick={() => { sound.playPop(); setTab('rect'); }}
+            onClick={() => {
+              sound.playPop();
+              setTab('rect');
+            }}
             className={`px-4 py-1.5 text-sm font-semibold rounded-lg transition-all ${
-              tab === 'rect' ? 'bg-amber-500 text-white shadow-sm' : 'text-amber-800 hover:bg-amber-100'
+              tab === 'rect'
+                ? 'bg-amber-500 text-white shadow-sm'
+                : 'text-amber-800 hover:bg-amber-100'
             }`}
           >
             🧱 직사각형 타일 약수 탐색
           </button>
           <button
-            onClick={() => { sound.playPop(); setTab('gcd_lcm'); }}
+            onClick={() => {
+              sound.playPop();
+              setTab('gcd_lcm');
+            }}
             className={`px-4 py-1.5 text-sm font-semibold rounded-lg transition-all ${
-              tab === 'gcd_lcm' ? 'bg-amber-500 text-white shadow-sm' : 'text-amber-800 hover:bg-amber-100'
+              tab === 'gcd_lcm'
+                ? 'bg-amber-500 text-white shadow-sm'
+                : 'text-amber-800 hover:bg-amber-100'
             }`}
           >
             🤝 최대공약수 & 최소공배수
@@ -106,7 +117,10 @@ export const FactorsLab: React.FC = () => {
                 return (
                   <button
                     key={`${w}x${h}`}
-                    onClick={() => { sound.playPop(); setSelectedPair([w, h]); }}
+                    onClick={() => {
+                      sound.playPop();
+                      setSelectedPair([w, h]);
+                    }}
                     className={`px-3 py-2 rounded-xl text-sm font-bold border transition-all ${
                       isSelected
                         ? 'bg-amber-500 border-amber-600 text-white shadow-md scale-105'
@@ -122,7 +136,8 @@ export const FactorsLab: React.FC = () => {
 
           <div className="bg-slate-900 rounded-2xl p-6 flex flex-col items-center justify-center min-h-[220px] text-white">
             <div className="text-xs text-slate-400 mb-3">
-              {targetNum}개의 타일로 만든 직사각형 (가로 {selectedPair[1]}칸 × 세로 {selectedPair[0]}칸)
+              {targetNum}개의 타일로 만든 직사각형 (가로 {selectedPair[1]}칸 × 세로{' '}
+              {selectedPair[0]}칸)
             </div>
             <div
               className="grid gap-1 bg-slate-800/80 p-3 rounded-xl border border-slate-700"
@@ -140,7 +155,8 @@ export const FactorsLab: React.FC = () => {
               ))}
             </div>
             <div className="mt-4 text-center text-sm text-amber-200">
-              💡 빈틈없이 직사각형을 만들 수 있는 변의 길이(<strong>{selectedPair[0]}</strong>와 <strong>{selectedPair[1]}</strong>)가 바로 <strong>{targetNum}의 약수</strong>입니다!
+              💡 빈틈없이 직사각형을 만들 수 있는 변의 길이(<strong>{selectedPair[0]}</strong>와{' '}
+              <strong>{selectedPair[1]}</strong>)가 바로 <strong>{targetNum}의 약수</strong>입니다!
             </div>
           </div>
         </div>
@@ -150,14 +166,19 @@ export const FactorsLab: React.FC = () => {
             <div className="bg-amber-50/50 p-4 rounded-xl space-y-2">
               <label className="text-sm font-bold text-amber-900 flex justify-between">
                 <span>첫 번째 수 (A): {numA}</span>
-                <span className="text-xs text-amber-600 font-normal">약수: {factorsA.join(', ')}</span>
+                <span className="text-xs text-amber-600 font-normal">
+                  약수: {factorsA.join(', ')}
+                </span>
               </label>
               <input
                 type="range"
                 min="6"
                 max="36"
                 value={numA}
-                onChange={(e) => { sound.playPop(); setNumA(Number(e.target.value)); }}
+                onChange={(e) => {
+                  sound.playPop();
+                  setNumA(Number(e.target.value));
+                }}
                 className="w-full accent-amber-500 cursor-pointer"
               />
             </div>
@@ -165,14 +186,19 @@ export const FactorsLab: React.FC = () => {
             <div className="bg-blue-50/50 p-4 rounded-xl space-y-2">
               <label className="text-sm font-bold text-blue-900 flex justify-between">
                 <span>두 번째 수 (B): {numB}</span>
-                <span className="text-xs text-blue-600 font-normal">약수: {factorsB.join(', ')}</span>
+                <span className="text-xs text-blue-600 font-normal">
+                  약수: {factorsB.join(', ')}
+                </span>
               </label>
               <input
                 type="range"
                 min="6"
                 max="36"
                 value={numB}
-                onChange={(e) => { sound.playPop(); setNumB(Number(e.target.value)); }}
+                onChange={(e) => {
+                  sound.playPop();
+                  setNumB(Number(e.target.value));
+                }}
                 className="w-full accent-blue-500 cursor-pointer"
               />
             </div>
@@ -186,7 +212,8 @@ export const FactorsLab: React.FC = () => {
               <div className="text-xl font-bold text-slate-800">최대공약수 (GCD)</div>
               <div className="text-4xl font-black text-amber-600 my-2">{calculatedGCD}</div>
               <div className="text-xs text-slate-600">
-                공약수 목록: <strong className="text-amber-700">{commonFactors.join(', ')}</strong> 중 가장 큰 수는 <strong>{calculatedGCD}</strong>
+                공약수 목록: <strong className="text-amber-700">{commonFactors.join(', ')}</strong>{' '}
+                중 가장 큰 수는 <strong>{calculatedGCD}</strong>
               </div>
             </div>
 
