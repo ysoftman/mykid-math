@@ -1,5 +1,5 @@
 import type { Difficulty, Problem } from '../../types/math';
-import { pickOne, randomInt } from '../mathHelpers';
+import { gcd, pickOne, randomInt } from '../mathHelpers';
 
 export function generateRatioProblem(difficulty: Difficulty): Problem {
   const type = pickOne([
@@ -7,8 +7,97 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
     'proportion_equation',
     'proportional_distribution',
     'unit_price',
+    'discount',
+    'ratio_as_fraction',
+    'speed',
   ]);
   const id = `rat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+
+  if (type === 'discount') {
+    const price = (difficulty === 'easy' ? randomInt(2, 10) : randomInt(5, 50)) * 1000;
+    const rate = pickOne(difficulty === 'easy' ? [10, 20, 50] : [10, 15, 20, 25, 30, 40]);
+    const discount = (price * rate) / 100;
+    const sale = price - discount;
+
+    return {
+      id,
+      topicId: 'ratios',
+      subtopic: '할인율',
+      difficulty,
+      context: '할인 쇼핑',
+      question: `${price}원짜리 장난감을 ${rate}% 할인하여 팔고 있습니다. 할인된 가격은 얼마인가요?`,
+      hint: `먼저 할인 금액(정가 × ${rate}/100)을 구한 다음 정가에서 빼 보세요.`,
+      answerType: 'number',
+      correctAnswer: sale,
+      explanations: [
+        {
+          title: '1단계: 할인 금액 구하기',
+          content: `${price} × ${rate}/100 = ${discount}원`,
+        },
+        {
+          title: '2단계: 판매 가격 구하기',
+          content: `${price} - ${discount} = ${sale}원`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'ratio_as_fraction') {
+    const max = difficulty === 'easy' ? 6 : difficulty === 'medium' ? 10 : 15;
+    const sb = randomInt(3, max);
+    let sa = randomInt(1, sb - 1);
+    while (gcd(sa, sb) !== 1) sa = randomInt(1, sb - 1);
+    const m = difficulty === 'easy' ? randomInt(1, 3) : randomInt(2, 6);
+
+    return {
+      id,
+      topicId: 'ratios',
+      subtopic: '비율을 분수로',
+      difficulty,
+      question: `비 ${sa * m} : ${sb * m}의 비율을 기약분수로 나타내세요.`,
+      hint: `비 A : B의 비율은 A/B (비교하는 양 ÷ 기준량)이에요. 약분도 잊지 마세요!`,
+      answerType: 'fraction',
+      correctAnswer: { num: sa, den: sb },
+      explanations: [
+        {
+          title: '1단계: 비율을 분수로 쓰기',
+          content: `비교하는 양 ${sa * m}, 기준량 ${sb * m}이므로 비율은 ${sa * m}/${sb * m} 입니다.`,
+        },
+        {
+          title: '2단계: 약분하기',
+          content: `${sa * m}/${sb * m} = ${sa}/${sb}`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'speed') {
+    const hours = randomInt(2, difficulty === 'hard' ? 8 : 5);
+    const speed = difficulty === 'easy' ? randomInt(3, 9) * 10 : randomInt(30, 120);
+    const distance = speed * hours;
+
+    return {
+      id,
+      topicId: 'ratios',
+      subtopic: '걸린 시간에 대한 거리의 비율 (속력)',
+      difficulty,
+      context: '자동차 여행',
+      question: `자동차가 ${hours}시간 동안 ${distance}km를 달렸습니다. 걸린 시간에 대한 달린 거리의 비율은 얼마인가요? (1시간 동안 달린 거리)`,
+      hint: `걸린 시간이 기준량, 달린 거리가 비교하는 양이에요. 거리 ÷ 시간을 계산해요.`,
+      answerType: 'number',
+      correctAnswer: speed,
+      explanations: [
+        {
+          title: '1단계: 기준량과 비교하는 양',
+          content: `기준량은 걸린 시간 ${hours}시간, 비교하는 양은 거리 ${distance}km입니다.`,
+        },
+        {
+          title: '2단계: 비율 구하기',
+          content: `${distance} ÷ ${hours} = ${speed}, 1시간에 ${speed}km를 달린 셈입니다.`,
+        },
+      ],
+    };
+  }
 
   if (type === 'percentage') {
     const total =

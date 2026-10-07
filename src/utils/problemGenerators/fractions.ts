@@ -1,5 +1,5 @@
 import type { Difficulty, Problem } from '../../types/math';
-import { lcm, pickOne, randomInt, simplifyFraction } from '../mathHelpers';
+import { gcd, lcm, pickOne, randomInt, simplifyFraction, withGwa } from '../mathHelpers';
 
 export function generateFractionProblem(difficulty: Difficulty): Problem {
   const type = pickOne([
@@ -8,6 +8,9 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
     'multiplication',
     'division',
     'fraction_of_number',
+    'simplify',
+    'mixed_addition',
+    'division_word',
   ]);
   const id = `frac_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
   const unlikeDenominators =
@@ -16,6 +19,123 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
       : difficulty === 'medium'
         ? [2, 3, 4, 5, 6, 8]
         : [5, 6, 7, 8, 9, 10, 12];
+
+  if (type === 'simplify') {
+    const dens =
+      difficulty === 'easy'
+        ? [3, 4, 5]
+        : difficulty === 'medium'
+          ? [4, 5, 6, 7, 8]
+          : [7, 8, 9, 11, 12];
+    const sd = pickOne(dens);
+    let sn = randomInt(1, sd - 1);
+    while (gcd(sn, sd) !== 1) sn = randomInt(1, sd - 1);
+    const m =
+      difficulty === 'easy'
+        ? randomInt(2, 4)
+        : difficulty === 'medium'
+          ? randomInt(3, 6)
+          : randomInt(4, 9);
+
+    return {
+      id,
+      topicId: 'fractions',
+      subtopic: '약분',
+      difficulty,
+      question: `${sn * m}/${sd * m}을(를) 기약분수로 나타내세요.`,
+      hint: `분자와 분모의 최대공약수로 분자와 분모를 똑같이 나누어 보세요.`,
+      answerType: 'fraction',
+      correctAnswer: { num: sn, den: sd },
+      explanations: [
+        {
+          title: '1단계: 최대공약수 구하기',
+          content: `${sn * m}과 ${sd * m}의 최대공약수는 ${m}입니다.`,
+        },
+        {
+          title: '2단계: 분자와 분모를 나누기',
+          content: `${sn * m} ÷ ${m} = ${sn}, ${sd * m} ÷ ${m} = ${sd} 이므로 ${sn}/${sd} 입니다.`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'mixed_addition') {
+    const den1 = pickOne(unlikeDenominators);
+    let den2 = pickOne(unlikeDenominators);
+    while (den1 === den2) den2 = pickOne(unlikeDenominators);
+    const w1 = randomInt(1, difficulty === 'hard' ? 5 : 3);
+    const w2 = randomInt(1, difficulty === 'hard' ? 5 : 3);
+    let num1 = randomInt(1, den1 - 1);
+    let num2 = randomInt(1, den2 - 1);
+    while (gcd(num1, den1) !== 1) num1 = randomInt(1, den1 - 1);
+    while (gcd(num2, den2) !== 1) num2 = randomInt(1, den2 - 1);
+    const commonDen = lcm(den1, den2);
+    const improper1 = (w1 * den1 + num1) * (commonDen / den1);
+    const improper2 = (w2 * den2 + num2) * (commonDen / den2);
+    const simplified = simplifyFraction(improper1 + improper2, commonDen);
+
+    return {
+      id,
+      topicId: 'fractions',
+      subtopic: '대분수의 덧셈',
+      difficulty,
+      question: `다음 대분수의 덧셈을 계산하여 기약분수인 가분수로 나타내세요:  ${withGwa(w1)} ${num1}/${den1} + ${withGwa(w2)} ${num2}/${den2}`,
+      hint: `대분수를 가분수로 바꾼 다음 통분해서 더해요. 예: 2와 1/3 = 7/3`,
+      answerType: 'fraction',
+      correctAnswer: { num: simplified.num, den: simplified.den },
+      explanations: [
+        {
+          title: '1단계: 가분수로 바꾸기',
+          content: `${withGwa(w1)} ${num1}/${den1} = ${w1 * den1 + num1}/${den1},  ${withGwa(w2)} ${num2}/${den2} = ${w2 * den2 + num2}/${den2}`,
+        },
+        {
+          title: '2단계: 통분하여 더하기',
+          content: `${improper1}/${commonDen} + ${improper2}/${commonDen} = ${improper1 + improper2}/${commonDen}`,
+        },
+        {
+          title: '3단계: 약분하기',
+          content: `기약분수로 나타내면 ${simplified.num}/${simplified.den} 입니다.`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'division_word') {
+    const dens =
+      difficulty === 'easy'
+        ? [2, 3, 4, 5]
+        : difficulty === 'medium'
+          ? [3, 4, 5, 6, 8]
+          : [5, 6, 7, 8, 9];
+    const den = pickOne(dens);
+    let num = randomInt(1, den - 1);
+    while (gcd(num, den) !== 1) num = randomInt(1, den - 1);
+    const count = difficulty === 'easy' ? randomInt(2, 6) : randomInt(4, 12);
+    const total = simplifyFraction(num * count, den);
+    const totalText = total.den === 1 ? `${total.num}` : `${total.num}/${total.den}`;
+
+    return {
+      id,
+      topicId: 'fractions',
+      subtopic: '분수의 나눗셈 문장제',
+      difficulty,
+      context: '끈 자르기',
+      question: `길이가 ${totalText}m인 끈을 ${num}/${den}m씩 자르면 모두 몇 도막이 되나요?`,
+      hint: `전체 길이를 한 도막의 길이로 나누면 돼요. 분수의 나눗셈은 나누는 분수를 뒤집어 곱해요!`,
+      answerType: 'number',
+      correctAnswer: count,
+      explanations: [
+        {
+          title: '1단계: 식 세우기',
+          content: `도막 수 = ${totalText} ÷ ${num}/${den}`,
+        },
+        {
+          title: '2단계: 역수를 곱해 계산하기',
+          content: `${totalText} × ${den}/${num} = ${count}, 따라서 ${count}도막입니다.`,
+        },
+      ],
+    };
+  }
 
   if (type === 'addition') {
     // Unlike denominator addition

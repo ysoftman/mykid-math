@@ -51,3 +51,8 @@ export function shuffle<T>(array: T[]): T[] {
   }
   return copy;
 }
+
+// Korean particle 과/와 after a number, based on how its last digit is read (일, 삼, 육, 칠, 팔, 십 end in a consonant)
+export function withGwa(n: number): string {
+  return `${n}${[0, 1, 3, 6, 7, 8].includes(n % 10) ? '과' : '와'}`;
+}

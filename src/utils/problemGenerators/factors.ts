@@ -1,9 +1,121 @@
 import type { Difficulty, Problem } from '../../types/math';
-import { gcd, getFactors, lcm, pickOne, randomInt } from '../mathHelpers';
+import { gcd, getFactors, lcm, pickOne, randomInt, withGwa } from '../mathHelpers';
 
 export function generateFactorProblem(difficulty: Difficulty): Problem {
-  const type = pickOne(['factors_count', 'gcd', 'lcm', 'common_factors_count', 'word_problem']);
+  const type = pickOne([
+    'factors_count',
+    'gcd',
+    'lcm',
+    'common_factors_count',
+    'word_problem',
+    'multiples_count',
+    'lcm_word',
+    'smallest_3digit_common_multiple',
+  ]);
   const id = `fac_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+
+  if (type === 'multiples_count') {
+    const k =
+      difficulty === 'easy'
+        ? randomInt(2, 5)
+        : difficulty === 'medium'
+          ? randomInt(4, 9)
+          : randomInt(7, 15);
+    const limit =
+      difficulty === 'easy'
+        ? randomInt(20, 50)
+        : difficulty === 'medium'
+          ? randomInt(50, 100)
+          : randomInt(100, 300);
+    const count = Math.floor(limit / k);
+
+    return {
+      id,
+      topicId: 'factors',
+      subtopic: '배수의 개수',
+      difficulty,
+      question: `1부터 ${limit}까지의 자연수 중에서 ${k}의 배수는 모두 몇 개인가요?`,
+      hint: `${k}의 배수는 ${k}, ${k * 2}, ${k * 3}, ... 이에요. ${limit} 안에 ${k}가 몇 번 들어가는지 생각해 보세요.`,
+      answerType: 'number',
+      correctAnswer: count,
+      explanations: [
+        {
+          title: '1단계: 배수의 규칙 찾기',
+          content: `${k}의 배수는 ${k} × 1, ${k} × 2, ${k} × 3, ... 처럼 ${k}에 자연수를 곱한 수예요.`,
+        },
+        {
+          title: '2단계: 나눗셈으로 개수 세기',
+          content: `${limit} ÷ ${k} = ${count} ... ${limit % k} 이므로 ${k} × ${count} = ${k * count}까지 모두 ${count}개입니다.`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'lcm_word') {
+    const max = difficulty === 'easy' ? 6 : difficulty === 'medium' ? 12 : 20;
+    let a = randomInt(2, max);
+    let b = randomInt(2, max);
+    while (a === b || lcm(a, b) === Math.max(a, b)) {
+      a = randomInt(2, max);
+      b = randomInt(2, max);
+    }
+    const both = lcm(a, b);
+
+    return {
+      id,
+      topicId: 'factors',
+      subtopic: '최소공배수 문장제',
+      difficulty,
+      context: '버스 동시 출발',
+      question: `A 버스는 ${a}분마다, B 버스는 ${b}분마다 출발합니다. 두 버스가 동시에 출발했다면, 다음에 처음으로 다시 동시에 출발하는 것은 몇 분 후인가요?`,
+      hint: `두 버스가 함께 출발하는 시각은 ${a}의 배수이면서 ${b}의 배수예요. 그중 가장 작은 수를 찾아보세요!`,
+      answerType: 'number',
+      correctAnswer: both,
+      explanations: [
+        {
+          title: '1단계: 공배수 찾기',
+          content: `A 버스는 ${a}, ${a * 2}, ${a * 3}, ...분 후에, B 버스는 ${b}, ${b * 2}, ${b * 3}, ...분 후에 출발해요.`,
+        },
+        {
+          title: '2단계: 최소공배수 구하기',
+          content: `${withGwa(a)} ${b}의 최소공배수는 ${both}이므로 ${both}분 후에 다시 동시에 출발합니다.`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'smallest_3digit_common_multiple') {
+    const max = difficulty === 'easy' ? 6 : difficulty === 'medium' ? 10 : 15;
+    let a = randomInt(2, max);
+    let b = randomInt(2, max);
+    while (a === b || lcm(a, b) >= 100) {
+      a = randomInt(2, max);
+      b = randomInt(2, max);
+    }
+    const l = lcm(a, b);
+    const answer = Math.ceil(100 / l) * l;
+
+    return {
+      id,
+      topicId: 'factors',
+      subtopic: '공배수 활용',
+      difficulty,
+      question: `${withGwa(a)} ${b}의 공배수 중에서 가장 작은 세 자리 수를 구하세요.`,
+      hint: `두 수의 공배수는 최소공배수의 배수예요. 최소공배수를 먼저 구한 뒤 100을 넘는 첫 배수를 찾아보세요.`,
+      answerType: 'number',
+      correctAnswer: answer,
+      explanations: [
+        {
+          title: '1단계: 최소공배수 구하기',
+          content: `${withGwa(a)} ${b}의 최소공배수는 ${l}입니다. 공배수는 ${l}, ${l * 2}, ${l * 3}, ... 이에요.`,
+        },
+        {
+          title: '2단계: 처음으로 세 자리가 되는 배수 찾기',
+          content: `${l} × ${answer / l - 1} = ${answer - l}, ${l} × ${answer / l} = ${answer} 이므로 가장 작은 세 자리 수는 ${answer}입니다.`,
+        },
+      ],
+    };
+  }
 
   if (type === 'factors_count') {
     const num =

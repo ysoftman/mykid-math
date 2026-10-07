@@ -9,8 +9,130 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
     'rhombus',
     'missing_height',
     'circle',
+    'rectangle_perimeter',
+    'circumference',
+    'cuboid_volume',
+    'cube_surface_area',
   ]);
   const id = `geo_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+
+  if (shape === 'rectangle_perimeter') {
+    const max = difficulty === 'easy' ? 9 : difficulty === 'medium' ? 20 : 40;
+    const width = randomInt(2, max);
+    const height = randomInt(2, max);
+    const perimeter = (width + height) * 2;
+
+    return {
+      id,
+      topicId: 'geometry',
+      subtopic: '직사각형의 둘레',
+      difficulty,
+      question: `가로가 ${width}cm, 세로가 ${height}cm인 직사각형의 둘레는 몇 cm인가요?`,
+      hint: `직사각형은 마주 보는 변의 길이가 같아요. 공식: (가로 + 세로) × 2`,
+      answerType: 'number',
+      correctAnswer: perimeter,
+      explanations: [
+        {
+          title: '1단계: 둘레 공식',
+          content: `직사각형의 둘레 = (가로 + 세로) × 2`,
+        },
+        {
+          title: '2단계: 계산하기',
+          content: `(${width} + ${height}) × 2 = ${width + height} × 2 = ${perimeter}cm`,
+        },
+      ],
+    };
+  }
+
+  if (shape === 'circumference') {
+    const useRadius = difficulty === 'hard';
+    const value = difficulty === 'easy' ? randomInt(2, 10) : randomInt(5, 20);
+    const diameter = useRadius ? value * 2 : value;
+    const answer = Math.round(diameter * 314) / 100;
+
+    return {
+      id,
+      topicId: 'geometry',
+      subtopic: '원주',
+      difficulty,
+      question: `${useRadius ? '반지름' : '지름'}이 ${value}cm인 원의 원주(둘레)는 몇 cm인가요? (단, 원주율은 3.14로 계산합니다)`,
+      hint: `원주 = 지름 × 원주율(3.14)${useRadius ? '. 지름은 반지름의 2배예요!' : ''}`,
+      answerType: 'number',
+      correctAnswer: answer,
+      explanations: [
+        {
+          title: '1단계: 지름 확인하기',
+          content: useRadius
+            ? `지름 = 반지름 × 2 = ${value} × 2 = ${diameter}cm`
+            : `지름은 ${diameter}cm입니다.`,
+        },
+        {
+          title: '2단계: 원주 계산하기',
+          content: `${diameter} × 3.14 = ${answer}cm`,
+        },
+      ],
+    };
+  }
+
+  if (shape === 'cuboid_volume') {
+    const max = difficulty === 'easy' ? 5 : difficulty === 'medium' ? 10 : 15;
+    const a = randomInt(2, max);
+    const b = randomInt(2, max);
+    const c = randomInt(2, max);
+    const volume = a * b * c;
+
+    return {
+      id,
+      topicId: 'geometry',
+      subtopic: '직육면체의 부피',
+      difficulty,
+      question: `가로 ${a}cm, 세로 ${b}cm, 높이 ${c}cm인 직육면체의 부피는 몇 cm³인가요?`,
+      hint: `부피는 1cm³ 쌓기나무가 몇 개 들어가는지와 같아요. 공식: 가로 × 세로 × 높이`,
+      answerType: 'number',
+      correctAnswer: volume,
+      explanations: [
+        {
+          title: '1단계: 밑면에 놓이는 쌓기나무 수',
+          content: `${a} × ${b} = ${a * b}개`,
+        },
+        {
+          title: '2단계: 높이만큼 쌓기',
+          content: `${a * b} × ${c} = ${volume}cm³`,
+        },
+      ],
+    };
+  }
+
+  if (shape === 'cube_surface_area') {
+    const edge =
+      difficulty === 'easy'
+        ? randomInt(2, 6)
+        : difficulty === 'medium'
+          ? randomInt(4, 10)
+          : randomInt(8, 15);
+    const area = 6 * edge * edge;
+
+    return {
+      id,
+      topicId: 'geometry',
+      subtopic: '정육면체의 겉넓이',
+      difficulty,
+      question: `한 모서리의 길이가 ${edge}cm인 정육면체의 겉넓이는 몇 cm²인가요?`,
+      hint: `정육면체는 크기가 같은 정사각형 면 6개로 이루어져 있어요!`,
+      answerType: 'number',
+      correctAnswer: area,
+      explanations: [
+        {
+          title: '1단계: 한 면의 넓이',
+          content: `${edge} × ${edge} = ${edge * edge}cm²`,
+        },
+        {
+          title: '2단계: 면 6개의 넓이 더하기',
+          content: `${edge * edge} × 6 = ${area}cm²`,
+        },
+      ],
+    };
+  }
 
   if (shape === 'triangle') {
     const base =

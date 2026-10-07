@@ -1,9 +1,116 @@
 import type { Difficulty, Problem } from '../../types/math';
-import { pickOne, randomInt } from '../mathHelpers';
+import { pickOne, randomInt, simplifyFraction } from '../mathHelpers';
 
 export function generateDecimalProblem(difficulty: Difficulty): Problem {
-  const type = pickOne(['multiplication', 'division', 'addition_subtraction', 'word_problem']);
+  const type = pickOne([
+    'multiplication',
+    'division',
+    'addition_subtraction',
+    'word_problem',
+    'place_shift',
+    'to_fraction',
+    'rounding',
+  ]);
   const id = `dec_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+
+  if (type === 'place_shift') {
+    const op = pickOne(
+      difficulty === 'easy'
+        ? ['× 10', '× 100', '÷ 10']
+        : ['× 10', '× 100', '× 1000', '÷ 10', '÷ 100'],
+    );
+    const factor = Number(op.slice(2));
+    // ×: two decimal places, ÷10: one decimal place, ÷100: whole number, so the answer has at most 2 decimals
+    const valueText =
+      op[0] === '×'
+        ? String(randomInt(101, 9999) / 100)
+        : factor === 10
+          ? String(randomInt(11, 999) / 10)
+          : String(randomInt(12, 999));
+    const value = Number(valueText);
+    const answer = Number((op[0] === '×' ? value * factor : value / factor).toFixed(4));
+    const shift = String(factor).length - 1;
+
+    return {
+      id,
+      topicId: 'decimals',
+      subtopic: '소수점의 이동',
+      difficulty,
+      question: `다음을 계산하세요:  ${valueText} ${op}`,
+      hint: `10, 100, 1000을 곱하면 소수점이 오른쪽으로, 나누면 왼쪽으로 0의 개수만큼 이동해요!`,
+      answerType: 'number',
+      correctAnswer: answer,
+      explanations: [
+        {
+          title: '1단계: 소수점이 움직이는 방향',
+          content: `${op[0] === '×' ? '곱하기' : '나누기'} ${factor}이므로 소수점이 ${op[0] === '×' ? '오른쪽' : '왼쪽'}으로 ${shift}칸 이동합니다.`,
+        },
+        {
+          title: '2단계: 결과',
+          content: `${valueText} ${op} = ${answer}`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'to_fraction') {
+    const den = difficulty === 'easy' ? 10 : 100;
+    let num = randomInt(1, den - 1);
+    while (num % 10 === 0 && den === 100) num = randomInt(1, den - 1);
+    const simplified = simplifyFraction(num, den);
+    const decimalText = (num / den).toFixed(den === 10 ? 1 : 2);
+
+    return {
+      id,
+      topicId: 'decimals',
+      subtopic: '소수를 분수로',
+      difficulty,
+      question: `${decimalText}을(를) 기약분수로 나타내세요.`,
+      hint: `소수 첫째 자리는 분모가 10, 소수 둘째 자리는 분모가 100인 분수예요. 그다음 약분해요!`,
+      answerType: 'fraction',
+      correctAnswer: { num: simplified.num, den: simplified.den },
+      explanations: [
+        {
+          title: '1단계: 분모가 10 또는 100인 분수로 바꾸기',
+          content: `${decimalText} = ${num}/${den}`,
+        },
+        {
+          title: '2단계: 약분하기',
+          content: `${num}/${den} = ${simplified.num}/${simplified.den}`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'rounding') {
+    const places = difficulty === 'easy' ? 1 : 2;
+    const raw = randomInt(1001, 99999) / 1000;
+    const scale = 10 ** places;
+    const answer = Math.round(raw * scale) / scale;
+    const rawText = raw.toFixed(3);
+    const placeName = places === 1 ? '첫째' : '둘째';
+
+    return {
+      id,
+      topicId: 'decimals',
+      subtopic: '어림하기 (반올림)',
+      difficulty,
+      question: `${rawText}을(를) 반올림하여 소수 ${placeName} 자리까지 나타내세요.`,
+      hint: `소수 ${places === 1 ? '둘째' : '셋째'} 자리 숫자가 5 이상이면 올리고, 4 이하이면 버려요.`,
+      answerType: 'number',
+      correctAnswer: answer,
+      explanations: [
+        {
+          title: '1단계: 바로 아래 자리 숫자 확인',
+          content: `소수 ${places === 1 ? '둘째' : '셋째'} 자리 숫자는 ${rawText[rawText.indexOf('.') + places + 1]}입니다.`,
+        },
+        {
+          title: '2단계: 올림 또는 버림',
+          content: `반올림하면 ${answer.toFixed(places)} 입니다.`,
+        },
+      ],
+    };
+  }
 
   if (type === 'multiplication') {
     const isDoubleDecimal = difficulty !== 'easy';
@@ -106,6 +213,7 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
     const maxValue = difficulty === 'easy' ? 5 : difficulty === 'medium' ? 20 : 100;
     let a = randomInt(scale, maxValue * scale);
     let b = randomInt(scale, maxValue * scale);
+    while (a === b) b = randomInt(scale, maxValue * scale);
     const operation = pickOne(['+', '-']);
 
     if (operation === '-' && a < b) [a, b] = [b, a];
