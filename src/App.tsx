@@ -91,6 +91,7 @@ export const App: React.FC = () => {
             stats={stats}
             onSelectTopic={handleSelectTopicFromRoadmap}
             onOpenWrongNotes={() => setCurrentTab('review')}
+            onDataImported={refreshStats}
           />
         )}
 

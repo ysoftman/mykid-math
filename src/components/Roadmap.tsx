@@ -2,15 +2,21 @@ import type React from 'react';
 import type { TopicId, UserStats } from '../types/math';
 import { sound } from '../utils/audio';
 import { TOPICS } from '../utils/problemGenerators';
-import { BADGE_DEFINITIONS } from '../utils/storage';
+import { BADGE_DEFINITIONS, exportData, importData } from '../utils/storage';
 
 interface RoadmapProps {
   stats: UserStats;
   onSelectTopic: (topicId: TopicId) => void;
   onOpenWrongNotes: () => void;
+  onDataImported: () => void;
 }
 
-export const Roadmap: React.FC<RoadmapProps> = ({ stats, onSelectTopic, onOpenWrongNotes }) => {
+export const Roadmap: React.FC<RoadmapProps> = ({
+  stats,
+  onSelectTopic,
+  onOpenWrongNotes,
+  onDataImported,
+}) => {
   const currentLevel = stats.level;
   const currentStars = stats.stars;
   const nextLevelStars = currentLevel * 10;
@@ -19,6 +25,28 @@ export const Roadmap: React.FC<RoadmapProps> = ({ stats, onSelectTopic, onOpenWr
     100,
     Math.max(0, ((currentStars - currentLevelBaseStars) / 10) * 100),
   );
+
+  const handleExport = () => {
+    const url = URL.createObjectURL(new Blob([exportData()], { type: 'application/json' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `mykid-math-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file || !window.confirm('지금 기록을 불러온 파일로 바꿀까요?')) return;
+    try {
+      importData(await file.text());
+      onDataImported();
+      alert('기록을 불러왔어요!');
+    } catch {
+      alert('올바른 기록 파일이 아니에요.');
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -174,6 +202,26 @@ export const Roadmap: React.FC<RoadmapProps> = ({ stats, onSelectTopic, onOpenWr
             );
           })}
         </div>
+      </div>
+
+      {/* Backup */}
+      <div className="flex flex-wrap items-center justify-end gap-2 text-xs font-bold">
+        <span className="text-slate-500 mr-auto">기록 백업 (다른 기기로 옮기기)</span>
+        <button
+          onClick={handleExport}
+          className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700"
+        >
+          💾 내보내기
+        </button>
+        <label className="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 cursor-pointer">
+          📂 불러오기
+          <input
+            type="file"
+            accept="application/json,.json"
+            onChange={handleImport}
+            className="hidden"
+          />
+        </label>
       </div>
     </div>
   );

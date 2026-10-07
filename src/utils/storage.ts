@@ -172,3 +172,31 @@ export function removeWrongNote(problemId: string): void {
   const filtered = notes.filter((n) => n.problem.id !== problemId);
   localStorage.setItem(WRONG_NOTES_KEY, JSON.stringify(filtered));
 }
+
+export function exportData(): string {
+  return JSON.stringify(
+    {
+      app: 'mykid-math',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      stats: getStats(),
+      wrongNotes: getWrongNotes(),
+    },
+    null,
+    2,
+  );
+}
+
+export function importData(json: string): void {
+  const data = JSON.parse(json);
+  if (
+    data?.app !== 'mykid-math' ||
+    typeof data.stats?.stars !== 'number' ||
+    typeof data.stats?.topicProgress !== 'object' ||
+    !Array.isArray(data.wrongNotes)
+  ) {
+    throw new Error('Invalid backup file');
+  }
+  saveStats(data.stats);
+  localStorage.setItem(WRONG_NOTES_KEY, JSON.stringify(data.wrongNotes.slice(0, 50)));
+}
