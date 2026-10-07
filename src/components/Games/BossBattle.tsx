@@ -1,15 +1,24 @@
 import type React from 'react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { Problem, TopicId } from '../../types/math';
 import { formatAnswer } from '../../utils/answer';
 import { sound } from '../../utils/audio';
 import confetti from '../../utils/confetti';
+import { GAME_ASSETS } from '../../utils/gameAssets';
 import { generateProblem, TOPICS } from '../../utils/problemGenerators';
-import { BOSS_CLEAR_STARS, type RewardResult, recordBossClear } from '../../utils/storage';
+// Aliased: biome treats a `use`-prefixed call as a React hook (useHookAtTopLevel).
+import {
+  BOSS_CLEAR_STARS,
+  consumePowerUp,
+  type RewardResult,
+  recordBossClear,
+} from '../../utils/storage';
 import { GameProblem } from './GameProblem';
+import { PowerUpButton } from './PowerUpButton';
 
 const BOSS_HP = 5;
-const MAX_HEARTS = 3;
+const START_HEARTS = 3;
+const MAX_HEARTS = 5;
 
 const BOSSES: Record<TopicId, { icon: string; name: string }> = {
   factors: { icon: '🐉', name: '약수 드래곤' },
@@ -21,19 +30,32 @@ const BOSSES: Record<TopicId, { icon: string; name: string }> = {
 
 interface BossBattleProps {
   bossCleared: TopicId[];
+  heartRecovers: number;
+  shields: number;
   onReward: (r: RewardResult) => void;
+  onStatsChanged: () => void;
 }
 
 type Phase = 'select' | 'battle' | 'win' | 'lose';
 
-export const BossBattle: React.FC<BossBattleProps> = ({ bossCleared, onReward }) => {
+export const BossBattle: React.FC<BossBattleProps> = ({
+  bossCleared,
+  heartRecovers,
+  shields,
+  onReward,
+  onStatsChanged,
+}) => {
   const [phase, setPhase] = useState<Phase>('select');
   const [topicId, setTopicId] = useState<TopicId>('factors');
   const [problem, setProblem] = useState<Problem | null>(null);
   const [hits, setHits] = useState(0);
-  const [hearts, setHearts] = useState(MAX_HEARTS);
+  const [hearts, setHearts] = useState(START_HEARTS);
   const [missed, setMissed] = useState<Problem | null>(null);
   const [lastHit, setLastHit] = useState(false);
+  // An unused shield stays on for the next battle.
+  const [shieldOn, setShieldOn] = useState(false);
+  const [blocked, setBlocked] = useState(false);
+  const problemBoxRef = useRef<HTMLDivElement>(null);
 
   const boss = BOSSES[topicId];
 
@@ -42,10 +64,29 @@ export const BossBattle: React.FC<BossBattleProps> = ({ bossCleared, onReward })
     setTopicId(id);
     setProblem(generateProblem(id, 'hard'));
     setHits(0);
-    setHearts(MAX_HEARTS);
+    setHearts(START_HEARTS);
     setMissed(null);
     setLastHit(false);
     setPhase('battle');
+  };
+
+  const afterPowerUp = () => {
+    onStatsChanged();
+    problemBoxRef.current?.querySelector('input')?.focus();
+  };
+
+  const handleHeartRecover = () => {
+    if (hearts >= MAX_HEARTS || !consumePowerUp('heart_recover')) return;
+    sound.playCorrect();
+    setHearts((h) => Math.min(MAX_HEARTS, h + 1));
+    afterPowerUp();
+  };
+
+  const handleShield = () => {
+    if (shieldOn || !consumePowerUp('shield')) return;
+    sound.playPop();
+    setShieldOn(true);
+    afterPowerUp();
   };
 
   const handleAnswered = (correct: boolean) => {
@@ -67,9 +108,14 @@ export const BossBattle: React.FC<BossBattleProps> = ({ bossCleared, onReward })
       return;
     }
     sound.playWrong();
-    setHearts(hearts - 1);
     setLastHit(false);
     setMissed(problem);
+    setBlocked(shieldOn);
+    if (shieldOn) {
+      setShieldOn(false);
+      return;
+    }
+    setHearts(hearts - 1);
     if (hearts - 1 <= 0) setPhase('lose');
   };
 
@@ -82,7 +128,8 @@ export const BossBattle: React.FC<BossBattleProps> = ({ bossCleared, onReward })
   const missedPanel = missed && (
     <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 space-y-2 text-left">
       <div className="font-extrabold text-rose-900">
-        💔 앗, 보스의 반격! 정답은 <strong>{formatAnswer(missed)}</strong>
+        {blocked ? '🛡️ 보호막이 막아 줘서 하트는 그대로예요!' : '💔 앗, 보스의 반격!'} 정답은{' '}
+        <strong>{formatAnswer(missed)}</strong>
       </div>
       {missed.explanations[0] && (
         <div className="bg-white p-3 rounded-xl border border-rose-100 text-xs sm:text-sm space-y-1">
@@ -99,7 +146,7 @@ export const BossBattle: React.FC<BossBattleProps> = ({ bossCleared, onReward })
         <div className="text-center space-y-1">
           <h3 className="text-2xl font-black text-slate-800">⚔️ 단원 보스전</h3>
           <p className="text-sm text-slate-600">
-            어려운(상) 문제 {BOSS_HP}개를 맞혀 보스를 물리치세요! 하트는 {MAX_HEARTS}개예요.
+            어려운(상) 문제 {BOSS_HP}개를 맞혀 보스를 물리치세요! 하트는 {START_HEARTS}개예요.
             <br />
             승리하면 ⭐ {BOSS_CLEAR_STARS}개!
           </p>
@@ -191,11 +238,31 @@ export const BossBattle: React.FC<BossBattleProps> = ({ bossCleared, onReward })
   return (
     <div className="bg-white rounded-2xl p-5 sm:p-8 shadow-sm border border-slate-200 space-y-5">
       <div className="bg-slate-800 rounded-2xl p-4 text-white space-y-3">
-        <div className="flex items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="font-extrabold">{boss.name}</span>
-          <span className="text-lg" aria-label={`남은 하트 ${hearts}개`}>
-            {'❤️'.repeat(hearts)}
-            {'🤍'.repeat(MAX_HEARTS - hearts)}
+          <span className="flex items-center gap-2">
+            {shieldOn && (
+              <span className="flex items-center gap-1 bg-sky-100 text-sky-900 pl-1 pr-2.5 py-0.5 rounded-full text-xs font-bold">
+                <img
+                  src={GAME_ASSETS.shield}
+                  alt=""
+                  className="w-5 h-5 object-contain"
+                  draggable={false}
+                />
+                보호막 ON
+              </span>
+            )}
+            <span className="flex items-center" role="img" aria-label={`남은 하트 ${hearts}개`}>
+              {Array.from({ length: Math.max(START_HEARTS, hearts) }).map((_, i) => (
+                <img
+                  key={i}
+                  src={GAME_ASSETS.heart}
+                  alt=""
+                  className={`w-7 h-7 object-contain ${i < hearts ? '' : 'opacity-30 grayscale'}`}
+                  draggable={false}
+                />
+              ))}
+            </span>
           </span>
         </div>
         <div className="text-center">
@@ -225,6 +292,16 @@ export const BossBattle: React.FC<BossBattleProps> = ({ bossCleared, onReward })
         </div>
       </div>
 
+      <div className="flex flex-wrap gap-2">
+        <PowerUpButton
+          id="heart_recover"
+          count={heartRecovers}
+          onUse={handleHeartRecover}
+          disabled={hearts >= MAX_HEARTS}
+        />
+        <PowerUpButton id="shield" count={shields} onUse={handleShield} disabled={shieldOn} />
+      </div>
+
       {missed ? (
         <div className="space-y-3">
           {missedPanel}
@@ -237,7 +314,11 @@ export const BossBattle: React.FC<BossBattleProps> = ({ bossCleared, onReward })
           </button>
         </div>
       ) : (
-        problem && <GameProblem key={problem.id} problem={problem} onAnswered={handleAnswered} />
+        problem && (
+          <div ref={problemBoxRef}>
+            <GameProblem key={problem.id} problem={problem} onAnswered={handleAnswered} />
+          </div>
+        )
       )}
     </div>
   );

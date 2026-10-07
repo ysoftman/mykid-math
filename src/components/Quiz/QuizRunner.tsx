@@ -4,14 +4,23 @@ import type { Difficulty, Problem, TopicId } from '../../types/math';
 import { checkAnswer, formatAnswer } from '../../utils/answer';
 import { sound } from '../../utils/audio';
 import confetti from '../../utils/confetti';
+import { GAME_ASSETS } from '../../utils/gameAssets';
 import { generateProblem } from '../../utils/problemGenerators';
 import {
   addWrongNote,
+  consumePowerUp,
   DAILY_MISSION_BONUS,
+  getStats,
   type RewardResult,
   recordProblemResult,
+  XP_BOOST_STARS,
 } from '../../utils/storage';
 import { FractionInput } from './FractionInput';
+
+const readBoost = () => {
+  const stats = getStats();
+  return { owned: stats.inventory.xp_booster ?? 0, remaining: stats.boostRemaining };
+};
 
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
   easy: '하',
@@ -54,6 +63,16 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
   const [notice, setNotice] = useState<string | null>(null);
   const [combo, setCombo] = useState<number>(0);
   const [comboBonus, setComboBonus] = useState<boolean>(false);
+  const [boost, setBoost] = useState(readBoost);
+  const [boostBonus, setBoostBonus] = useState<boolean>(false);
+
+  const handleUseBooster = () => {
+    sound.playPop();
+    if (consumePowerUp('xp_booster')) {
+      setBoost(readBoost());
+      onStatsUpdated();
+    }
+  };
 
   const handleDifficultyChange = (newDiff: Difficulty) => {
     sound.playPop();
@@ -109,8 +128,13 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
 
     const nextCombo = correct ? combo + 1 : 0;
     setCombo(nextCombo);
+    const boosted = correct && boost.remaining > 0;
     const reward = recordProblemResult(topicId, correct, nextCombo);
-    setComboBonus(reward.bonusStars > (reward.missionCompleted ? DAILY_MISSION_BONUS : 0));
+    const otherBonus =
+      (reward.missionCompleted ? DAILY_MISSION_BONUS : 0) + (boosted ? XP_BOOST_STARS : 0);
+    setComboBonus(reward.bonusStars > otherBonus);
+    setBoostBonus(boosted);
+    setBoost(readBoost());
 
     if (correct) {
       sound.playCorrect();
@@ -150,7 +174,23 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
           <span className="text-xs text-slate-500">무한 생성 문제</span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={handleUseBooster}
+            disabled={boost.owned === 0}
+            title="다음 5문제 동안 정답 별 2배"
+            className="flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 rounded-xl transition-colors border border-amber-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-amber-50"
+          >
+            <img
+              src={GAME_ASSETS.xpBooster}
+              alt=""
+              className="h-5 w-5 object-contain"
+              draggable={false}
+            />
+            <span>부스터 사용 ({boost.owned})</span>
+          </button>
+
           <button
             onClick={() => {
               sound.playPop();
@@ -199,6 +239,18 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
         <h3 className="text-lg sm:text-xl font-bold text-slate-800 leading-relaxed">
           {problem.question}
         </h3>
+
+        {boost.remaining > 0 && (
+          <div className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-800 text-sm font-extrabold px-3 py-1 rounded-full border border-amber-200 mr-2">
+            <img
+              src={GAME_ASSETS.xpBooster}
+              alt=""
+              className="h-5 w-5 object-contain"
+              draggable={false}
+            />
+            부스터 {boost.remaining}문제 남음
+          </div>
+        )}
 
         {combo >= 2 && (
           <div className="inline-block bg-amber-50 text-amber-800 text-sm font-extrabold px-3 py-1 rounded-full border border-amber-200 animate-in fade-in">
@@ -287,6 +339,11 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
               </div>
               {comboBonus && (
                 <div className="text-sm font-bold text-amber-800 mt-0.5">🔥 +1 콤보 보너스 ⭐</div>
+              )}
+              {boostBonus && (
+                <div className="text-sm font-bold text-amber-800 mt-0.5">
+                  ⚡ +{XP_BOOST_STARS} 부스터 보너스 ⭐
+                </div>
               )}
               <div className="text-xs mt-0.5 opacity-90">
                 정답: <strong>{formatAnswer(problem)}</strong>

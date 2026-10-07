@@ -2,6 +2,7 @@ import type React from 'react';
 import { useState } from 'react';
 import type { UserStats } from '../types/math';
 import { sound } from '../utils/audio';
+import { GAME_ASSETS } from '../utils/gameAssets';
 
 const BUILD_DATE = new Intl.DateTimeFormat('sv-SE', {
   timeZone: 'Asia/Seoul',
@@ -171,7 +172,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="text-xs font-extrabold">Lv.{stats.level}</span>
             <span className="w-px h-3 bg-amber-200" />
             <div className="flex items-center gap-0.5 text-xs font-black text-amber-700">
-              <span>⭐</span>
+              <img
+                src={GAME_ASSETS.star}
+                alt="별"
+                className="w-4 h-4 object-contain"
+                draggable={false}
+              />
               <span>{stats.stars}</span>
             </div>
           </div>

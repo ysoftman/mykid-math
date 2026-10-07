@@ -1,14 +1,17 @@
 import type React from 'react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Difficulty, Problem } from '../../types/math';
 import { formatAnswer } from '../../utils/answer';
 import { sound } from '../../utils/audio';
 import confetti from '../../utils/confetti';
 import { generateProblem, TOPICS } from '../../utils/problemGenerators';
-import { type RewardResult, recordTimeAttack } from '../../utils/storage';
+// Aliased: biome treats a `use`-prefixed call as a React hook (useHookAtTopLevel).
+import { consumePowerUp, type RewardResult, recordTimeAttack } from '../../utils/storage';
 import { GameProblem } from './GameProblem';
+import { PowerUpButton } from './PowerUpButton';
 
 const DURATION = 60;
+const TIME_CHARGE_SECONDS = 10;
 
 function randomProblem(): Problem {
   const topic = TOPICS[Math.floor(Math.random() * TOPICS.length)];
@@ -18,13 +21,20 @@ function randomProblem(): Problem {
 
 interface TimeAttackProps {
   best: number;
+  timeCharges: number;
   onReward: (r: RewardResult) => void;
+  onStatsChanged: () => void;
 }
 
 type Phase = 'ready' | 'playing' | 'done';
 type Feedback = { correct: boolean; answer: string };
 
-export const TimeAttack: React.FC<TimeAttackProps> = ({ best, onReward }) => {
+export const TimeAttack: React.FC<TimeAttackProps> = ({
+  best,
+  timeCharges,
+  onReward,
+  onStatsChanged,
+}) => {
   const [phase, setPhase] = useState<Phase>('ready');
   const [timeLeft, setTimeLeft] = useState(DURATION);
   const [problem, setProblem] = useState<Problem>(randomProblem);
@@ -32,12 +42,13 @@ export const TimeAttack: React.FC<TimeAttackProps> = ({ best, onReward }) => {
   const [solvedCount, setSolvedCount] = useState(0);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [result, setResult] = useState<(RewardResult & { isNewBest: boolean }) | null>(null);
+  const endAtRef = useRef(0);
+  const problemBoxRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (phase !== 'playing') return;
-    const endAt = Date.now() + DURATION * 1000;
     const id = window.setInterval(() => {
-      setTimeLeft(Math.max(0, (endAt - Date.now()) / 1000));
+      setTimeLeft(Math.max(0, (endAtRef.current - Date.now()) / 1000));
     }, 100);
     return () => window.clearInterval(id);
   }, [phase]);
@@ -62,7 +73,17 @@ export const TimeAttack: React.FC<TimeAttackProps> = ({ best, onReward }) => {
     setFeedback(null);
     setResult(null);
     setTimeLeft(DURATION);
+    endAtRef.current = Date.now() + DURATION * 1000;
     setPhase('playing');
+  };
+
+  const handleTimeCharge = () => {
+    if (timeLeft <= 0 || !consumePowerUp('time_charge')) return;
+    sound.playCorrect();
+    endAtRef.current += TIME_CHARGE_SECONDS * 1000;
+    setTimeLeft(Math.max(0, (endAtRef.current - Date.now()) / 1000));
+    onStatsChanged();
+    problemBoxRef.current?.querySelector('input')?.focus();
   };
 
   const handleAnswered = (correct: boolean) => {
@@ -130,14 +151,21 @@ export const TimeAttack: React.FC<TimeAttackProps> = ({ best, onReward }) => {
     );
   }
 
-  const percent = (timeLeft / DURATION) * 100;
+  const percent = Math.min(100, (timeLeft / DURATION) * 100);
   return (
     <div className="bg-white rounded-2xl p-5 sm:p-8 shadow-sm border border-slate-200 space-y-5">
       <div className="space-y-2">
-        <div className="flex items-center justify-between text-sm font-bold">
-          <span className={timeLeft <= 10 ? 'text-rose-600' : 'text-slate-700'}>
+        <div className="flex flex-wrap items-center justify-between gap-2 text-sm font-bold">
+          <span className={timeLeft <= 10 ? 'text-rose-700' : 'text-slate-700'}>
             ⏱️ {Math.ceil(timeLeft)}초
           </span>
+          <PowerUpButton
+            id="time_charge"
+            label={`+${TIME_CHARGE_SECONDS}초`}
+            count={timeCharges}
+            onUse={handleTimeCharge}
+            disabled={timeLeft <= 0}
+          />
           <span className="text-indigo-600">✅ {correctCount}문제</span>
         </div>
         <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
@@ -162,7 +190,9 @@ export const TimeAttack: React.FC<TimeAttackProps> = ({ best, onReward }) => {
         </div>
       )}
 
-      <GameProblem key={problem.id} problem={problem} onAnswered={handleAnswered} compact />
+      <div ref={problemBoxRef}>
+        <GameProblem key={problem.id} problem={problem} onAnswered={handleAnswered} compact />
+      </div>
     </div>
   );
 };

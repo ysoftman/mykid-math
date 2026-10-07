@@ -1,6 +1,7 @@
 import type React from 'react';
 import type { TopicId, UserStats } from '../types/math';
 import { sound } from '../utils/audio';
+import { GAME_ASSETS } from '../utils/gameAssets';
 import { TOPICS } from '../utils/problemGenerators';
 import {
   BADGE_DEFINITIONS,
@@ -10,6 +11,7 @@ import {
   SHOP_ITEMS,
 } from '../utils/storage';
 import { DailyMission } from './DailyMission';
+import { CharacterAvatar } from './Shop';
 
 interface RoadmapProps {
   stats: UserStats;
@@ -73,8 +75,6 @@ export const Roadmap: React.FC<RoadmapProps> = ({
     Math.max(0, ((currentStars - currentLevelBaseStars) / 10) * 100),
   );
   const equippedItem = (id?: string) => SHOP_ITEMS.find((item) => item.id === id);
-  const hat = equippedItem(stats.equipped.hat);
-  const pet = equippedItem(stats.equipped.pet);
   const bannerGradient =
     equippedItem(stats.equipped.theme)?.gradient ?? 'from-indigo-700 via-indigo-600 to-violet-700';
 
@@ -111,15 +111,12 @@ export const Roadmap: React.FC<RoadmapProps> = ({
             <div className="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-xs font-bold tracking-wide">
               <span>🚀</span> 초등 5~6학년 수학 마스터 로드맵
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black flex items-center gap-2">
-              Lv. {currentLevel} 수학 탐험가
-              {(hat || pet) && (
-                <span title={[hat?.name, pet?.name].filter(Boolean).join(', ')}>
-                  {hat?.icon}
-                  {pet?.icon}
-                </span>
-              )}
-            </h2>
+            <div className="flex items-center gap-3 pt-2">
+              <CharacterAvatar stats={stats} size="sm" />
+              <h2 className="text-2xl sm:text-3xl font-black leading-tight">
+                Lv. {currentLevel} 수학 탐험가
+              </h2>
+            </div>
             <p className="text-white/90 text-xs sm:text-sm max-w-md">
               문제를 맞히면 별(⭐)을 모아 레벨업해요!
             </p>
@@ -138,7 +135,12 @@ export const Roadmap: React.FC<RoadmapProps> = ({
 
           <div className="bg-white/10 p-4 rounded-2xl border border-white/20 flex flex-col items-center min-w-[200px]">
             <div className="flex items-center gap-2">
-              <span className="text-3xl">⭐</span>
+              <img
+                src={GAME_ASSETS.star}
+                alt=""
+                className="w-9 h-9 object-contain"
+                draggable={false}
+              />
               <span className="text-3xl font-black">{currentStars}</span>
               <span className="text-xs text-white/90">별 보유</span>
             </div>
@@ -192,9 +194,14 @@ export const Roadmap: React.FC<RoadmapProps> = ({
             sound.playPop();
             onOpenShop();
           }}
-          className="bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-2xl p-4 text-left transition-colors flex items-center gap-3"
+          className="bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-2xl p-4 text-left transition-colors flex flex-col min-[480px]:flex-row items-start min-[480px]:items-center gap-2 min-[480px]:gap-3"
         >
-          <span className="text-3xl">🛍️</span>
+          <img
+            src={GAME_ASSETS.gift}
+            alt=""
+            className="w-12 h-12 shrink-0 object-contain"
+            draggable={false}
+          />
           <span>
             <span className="block text-sm font-black text-amber-900">별 상점</span>
             <span className="block text-xs text-amber-800">
@@ -208,9 +215,14 @@ export const Roadmap: React.FC<RoadmapProps> = ({
             sound.playPop();
             onOpenGames();
           }}
-          className="bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-2xl p-4 text-left transition-colors flex items-center gap-3"
+          className="bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-2xl p-4 text-left transition-colors flex flex-col min-[480px]:flex-row items-start min-[480px]:items-center gap-2 min-[480px]:gap-3"
         >
-          <span className="text-3xl">🎮</span>
+          <img
+            src={GAME_ASSETS.rocket}
+            alt=""
+            className="w-12 h-12 shrink-0 object-contain"
+            draggable={false}
+          />
           <span>
             <span className="block text-sm font-black text-indigo-900">수학 게임</span>
             <span className="block text-xs text-indigo-700">타임어택 · 보스전 · 가족 대결</span>

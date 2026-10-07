@@ -11,6 +11,8 @@ export interface TopicInfo {
   accentColor: string;
 }
 
+export type PowerUpId = 'time_charge' | 'heart_recover' | 'shield' | 'xp_booster';
+
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
 export interface StepExplanation {
@@ -50,11 +52,13 @@ export interface UserStats {
   bestCombo: number;
   wrongConquered: number;
   ownedItems: string[];
-  equipped: { hat?: string; pet?: string; theme?: string };
+  equipped: { hat?: string; pet?: string; theme?: string; character?: string }; // character is always set by getStats
   daily: { date: string; solved: number }; // date = local 'YYYY-MM-DD'
   attendance: string[]; // local dates on which the daily mission was completed
   timeAttackBest: number;
   bossCleared: TopicId[];
+  inventory: Partial<Record<PowerUpId, number>>; // power-up counts
+  boostRemaining: number; // problems left with the xp booster active
 }
 
 export interface WrongNoteItem {

@@ -51,6 +51,11 @@ export const GameHub: React.FC<GameHubProps> = ({ onReward, onStatsChanged }) =>
     [onReward, onStatsChanged],
   );
 
+  const handleStatsChanged = useCallback(() => {
+    setStats(getStats());
+    onStatsChanged();
+  }, [onStatsChanged]);
+
   if (game) {
     return (
       <div className="space-y-4">
@@ -64,8 +69,23 @@ export const GameHub: React.FC<GameHubProps> = ({ onReward, onStatsChanged }) =>
         >
           ⬅️ 게임 목록으로
         </button>
-        {game === 'time' && <TimeAttack best={stats.timeAttackBest} onReward={handleReward} />}
-        {game === 'boss' && <BossBattle bossCleared={stats.bossCleared} onReward={handleReward} />}
+        {game === 'time' && (
+          <TimeAttack
+            best={stats.timeAttackBest}
+            timeCharges={stats.inventory.time_charge ?? 0}
+            onReward={handleReward}
+            onStatsChanged={handleStatsChanged}
+          />
+        )}
+        {game === 'boss' && (
+          <BossBattle
+            bossCleared={stats.bossCleared}
+            heartRecovers={stats.inventory.heart_recover ?? 0}
+            shields={stats.inventory.shield ?? 0}
+            onReward={handleReward}
+            onStatsChanged={handleStatsChanged}
+          />
+        )}
         {game === 'duel' && <FamilyDuel />}
       </div>
     );

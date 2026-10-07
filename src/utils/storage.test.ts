@@ -2,11 +2,15 @@ import { afterEach, beforeEach, expect, setSystemTime, test } from 'bun:test';
 import {
   BOSS_CLEAR_STARS,
   buyItem,
+  buyPowerUp,
+  consumePowerUp,
   DAILY_MISSION_BONUS,
   DAILY_MISSION_GOAL,
   equipItem,
   getAttendanceStreak,
+  getEquippedCharacter,
   getStats,
+  POWER_UP_MAX,
   recordBossClear,
   recordProblemResult,
   recordTimeAttack,
@@ -152,7 +156,7 @@ test('buyItem rejects unknown, poor and duplicate purchases', () => {
   expect(buyItem('hat_tophat')).toBe(true); // 10
   let s = getStats();
   expect(s.spentStars).toBe(10);
-  expect(s.ownedItems).toEqual(['hat_tophat']);
+  expect(s.ownedItems).toEqual(['char_hero', 'hat_tophat']);
   expect(s.equipped.hat).toBe('hat_tophat');
   expect(buyItem('hat_tophat')).toBe(false); // already owned
   expect(buyItem('hat_cap')).toBe(false); // 5 > 2 spendable
@@ -170,7 +174,7 @@ test('equipItem only equips owned items into the right slot', () => {
   expect(getStats().equipped.pet).toBe('pet_dog');
   equipItem('pet_fox', 'pet'); // not owned
   equipItem('pet_cat', 'hat'); // wrong slot
-  expect(getStats().equipped).toEqual({ pet: 'pet_dog' });
+  expect(getStats().equipped).toEqual({ character: 'char_hero', pet: 'pet_dog' });
   equipItem(null, 'pet');
   expect(getStats().equipped.pet).toBeUndefined();
 });
@@ -189,11 +193,86 @@ test('old saves without new fields still work', () => {
   );
   const s = getStats();
   expect(s.spentStars).toBe(0);
-  expect(s.ownedItems).toEqual([]);
+  expect(s.ownedItems).toEqual(['char_hero']);
+  expect(s.equipped.character).toBe('char_hero');
+  expect(s.inventory).toEqual({});
+  expect(s.boostRemaining).toBe(0);
   expect(s.topicProgress.ratios.solvedCount).toBe(0);
   const r = recordProblemResult('factors', true, 3);
   expect(r.updatedStats.stars).toBe(7);
   expect(r.updatedStats.daily.solved).toBe(1);
   expect(getAttendanceStreak(r.updatedStats)).toBe(0);
   expect(buyItem('hat_cap')).toBe(true);
+});
+
+test('old saves with equipped items still get the default character', () => {
+  store.set(
+    'mykid_math_stats',
+    JSON.stringify({ stars: 30, ownedItems: ['pet_dog'], equipped: { pet: 'pet_dog' } }),
+  );
+  const s = getStats();
+  expect(s.ownedItems).toEqual(['char_hero', 'pet_dog']);
+  expect(s.equipped).toEqual({ character: 'char_hero', pet: 'pet_dog' });
+  expect(getEquippedCharacter(s).id).toBe('char_hero');
+  expect(getEquippedCharacter(s).image).toBe('hero');
+});
+
+test('characters can be bought and equipped, but the slot cannot be emptied', () => {
+  expect(buyItem('char_hero')).toBe(false); // owned by default
+  saveStats({ ...getStats(), stars: 50 });
+  expect(buyItem('char_wizard')).toBe(true);
+  expect(getEquippedCharacter(getStats()).id).toBe('char_wizard');
+  expect(buyItem('char_explorer')).toBe(false); // 30 > 20 spendable
+  equipItem('char_hero', 'character');
+  expect(getStats().equipped.character).toBe('char_hero');
+  equipItem('char_explorer', 'character'); // not owned
+  equipItem(null, 'character'); // ignored
+  expect(getStats().equipped.character).toBe('char_hero');
+});
+
+test('buyPowerUp checks spendable stars and the max count', () => {
+  expect(buyPowerUp('shield')).toBe(false); // 0 stars
+  saveStats({ ...getStats(), stars: 100 });
+  for (let i = 0; i < POWER_UP_MAX; i++) expect(buyPowerUp('time_charge')).toBe(true);
+  expect(buyPowerUp('time_charge')).toBe(false); // max reached
+  const s = getStats();
+  expect(s.inventory.time_charge).toBe(POWER_UP_MAX);
+  expect(s.spentStars).toBe(6 * POWER_UP_MAX);
+  saveStats({ ...getStats(), stars: 6 * POWER_UP_MAX + 6 }); // 6 spendable
+  expect(buyPowerUp('xp_booster')).toBe(false); // costs 10
+  expect(buyPowerUp('heart_recover')).toBe(true); // costs 6
+  expect(buyPowerUp('heart_recover')).toBe(false); // 0 spendable
+  expect(getStats().inventory).toEqual({ time_charge: POWER_UP_MAX, heart_recover: 1 });
+});
+
+test('consumePowerUp decrements and fails at zero', () => {
+  expect(consumePowerUp('shield')).toBe(false);
+  saveStats({ ...getStats(), inventory: { shield: 1 } });
+  expect(consumePowerUp('shield')).toBe(true);
+  expect(getStats().inventory.shield).toBe(0);
+  expect(getStats().boostRemaining).toBe(0);
+  expect(consumePowerUp('shield')).toBe(false);
+});
+
+test('xp booster gives +2 per correct answer for 5 recorded answers', () => {
+  saveStats({
+    ...getStats(),
+    inventory: { xp_booster: 1 },
+    daily: { date: todayKey(), solved: 99 },
+  });
+  expect(consumePowerUp('xp_booster')).toBe(true);
+  expect(getStats().boostRemaining).toBe(5);
+
+  expect(recordProblemResult('factors', true, 1).bonusStars).toBe(2);
+  expect(recordProblemResult('factors', false, 0).bonusStars).toBe(0); // still uses one
+  expect(recordProblemResult('factors', true, 1).bonusStars).toBe(2);
+  expect(recordProblemResult('factors', true, 2).bonusStars).toBe(2);
+  const last = recordProblemResult('factors', true, 3);
+  expect(last.bonusStars).toBe(3); // boost + combo
+  expect(last.updatedStats.boostRemaining).toBe(0);
+  expect(last.updatedStats.stars).toBe(4 * 2 + 4 * 2 + 1);
+
+  const after = recordProblemResult('factors', true, 4);
+  expect(after.bonusStars).toBe(0);
+  expect(after.updatedStats.boostRemaining).toBe(0);
 });

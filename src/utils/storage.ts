@@ -1,4 +1,7 @@
-import type { TopicId, UserStats, WrongNoteItem } from '../types/math';
+import type { PowerUpId, TopicId, UserStats, WrongNoteItem } from '../types/math';
+import type { GameAssetKey } from './gameAssets';
+
+export type { PowerUpId };
 
 const STATS_KEY = 'mykid_math_stats';
 const WRONG_NOTES_KEY = 'mykid_math_wrong_notes';
@@ -6,6 +9,9 @@ const WRONG_NOTES_KEY = 'mykid_math_wrong_notes';
 export const DAILY_MISSION_GOAL = 5;
 export const DAILY_MISSION_BONUS = 3;
 export const BOSS_CLEAR_STARS = 10;
+export const POWER_UP_MAX = 9; // max count per power-up in inventory
+export const XP_BOOST_PROBLEMS = 5;
+export const XP_BOOST_STARS = 2; // extra stars per correct answer while boosted
 
 export interface RewardResult {
   updatedStats: UserStats;
@@ -15,7 +21,7 @@ export interface RewardResult {
   missionCompleted: boolean;
 }
 
-export type ShopSlot = 'hat' | 'pet' | 'theme';
+export type ShopSlot = 'hat' | 'pet' | 'theme' | 'character';
 
 export interface ShopItem {
   id: string;
@@ -24,9 +30,37 @@ export interface ShopItem {
   slot: ShopSlot;
   price: number;
   gradient?: string; // roadmap banner classes, theme only
+  image?: GameAssetKey; // character only
 }
 
+const DEFAULT_CHARACTER = 'char_hero';
+
 export const SHOP_ITEMS: ShopItem[] = [
+  { id: 'char_hero', name: '수학 히어로', icon: '🦸', slot: 'character', price: 0, image: 'hero' },
+  {
+    id: 'char_solver',
+    name: '문제 해결사',
+    icon: '🧠',
+    slot: 'character',
+    price: 15,
+    image: 'solver',
+  },
+  {
+    id: 'char_wizard',
+    name: '수학 마법사',
+    icon: '🧙',
+    slot: 'character',
+    price: 30,
+    image: 'wizard',
+  },
+  {
+    id: 'char_explorer',
+    name: '탐험가',
+    icon: '🧭',
+    slot: 'character',
+    price: 30,
+    image: 'explorer',
+  },
   { id: 'hat_cap', name: '야구 모자', icon: '🧢', slot: 'hat', price: 5 },
   { id: 'hat_tophat', name: '신사 모자', icon: '🎩', slot: 'hat', price: 10 },
   { id: 'hat_grad', name: '박사 모자', icon: '🎓', slot: 'hat', price: 20 },
@@ -61,6 +95,27 @@ export const SHOP_ITEMS: ShopItem[] = [
   },
 ];
 
+export interface PowerUp {
+  id: PowerUpId;
+  name: string;
+  desc: string;
+  price: number;
+  image: GameAssetKey;
+}
+
+export const POWER_UPS: PowerUp[] = [
+  { id: 'time_charge', name: '시간 충전', desc: '타임어택 시간 +10초', price: 6, image: 'time' },
+  { id: 'heart_recover', name: '체력 회복', desc: '보스전 하트 +1', price: 6, image: 'heart' },
+  { id: 'shield', name: '보호막', desc: '보스전 오답 1번 막기', price: 8, image: 'shield' },
+  {
+    id: 'xp_booster',
+    name: '경험치 부스터',
+    desc: '도전 퀴즈 다음 5문제 별 2배',
+    price: 10,
+    image: 'xpBooster',
+  },
+];
+
 const defaultStats: UserStats = {
   totalSolved: 0,
   totalCorrect: 0,
@@ -77,12 +132,14 @@ const defaultStats: UserStats = {
   spentStars: 0,
   bestCombo: 0,
   wrongConquered: 0,
-  ownedItems: [],
-  equipped: {},
+  ownedItems: [DEFAULT_CHARACTER],
+  equipped: { character: DEFAULT_CHARACTER },
   daily: { date: '', solved: 0 },
   attendance: [],
   timeAttackBest: 0,
   bossCleared: [],
+  inventory: {},
+  boostRemaining: 0,
 };
 
 export const BADGE_DEFINITIONS = [
@@ -185,14 +242,17 @@ export function getStats(): UserStats {
     const raw = localStorage.getItem(STATS_KEY);
     if (!raw) return base;
     const parsed = JSON.parse(raw);
-    return {
+    const stats: UserStats = {
       ...base,
       ...parsed,
       topicProgress: {
         ...base.topicProgress,
         ...(parsed.topicProgress || {}),
       },
+      equipped: { ...base.equipped, ...(parsed.equipped || {}) },
     };
+    if (!stats.ownedItems.includes(DEFAULT_CHARACTER)) stats.ownedItems.unshift(DEFAULT_CHARACTER);
+    return stats;
   } catch {
     return base;
   }
@@ -244,6 +304,11 @@ export function recordProblemResult(topicId: TopicId, isCorrect: boolean, combo 
 
   stats.topicProgress[topicId] = currentTopic;
 
+  if (stats.boostRemaining > 0) {
+    stats.boostRemaining -= 1;
+    if (isCorrect) bonusStars += XP_BOOST_STARS;
+  }
+
   const today = todayKey();
   if (stats.daily.date !== today) stats.daily = { date: today, solved: 0 };
   stats.daily.solved += 1;
@@ -294,12 +359,40 @@ export function buyItem(itemId: string): boolean {
 
 export function equipItem(itemId: string | null, slot: ShopSlot): void {
   const stats = getStats();
+  if (itemId === null && slot === 'character') return; // character slot cannot be empty
   if (itemId !== null) {
     const item = SHOP_ITEMS.find((i) => i.id === itemId);
     if (!item || item.slot !== slot || !stats.ownedItems.includes(itemId)) return;
   }
   stats.equipped = { ...stats.equipped, [slot]: itemId ?? undefined };
   saveStats(stats);
+}
+
+export function getEquippedCharacter(stats: UserStats): ShopItem {
+  const characters = SHOP_ITEMS.filter((i) => i.slot === 'character');
+  return characters.find((i) => i.id === stats.equipped.character) ?? characters[0];
+}
+
+export function buyPowerUp(id: PowerUpId): boolean {
+  const stats = getStats();
+  const powerUp = POWER_UPS.find((p) => p.id === id);
+  const count = stats.inventory[id] ?? 0;
+  if (!powerUp || count >= POWER_UP_MAX) return false;
+  if (stats.stars - stats.spentStars < powerUp.price) return false;
+  stats.spentStars += powerUp.price;
+  stats.inventory = { ...stats.inventory, [id]: count + 1 };
+  saveStats(stats);
+  return true;
+}
+
+export function consumePowerUp(id: PowerUpId): boolean {
+  const stats = getStats();
+  const count = stats.inventory[id] ?? 0;
+  if (count <= 0) return false;
+  stats.inventory = { ...stats.inventory, [id]: count - 1 };
+  if (id === 'xp_booster') stats.boostRemaining += XP_BOOST_PROBLEMS;
+  saveStats(stats);
+  return true;
 }
 
 export function getWrongNotes(): WrongNoteItem[] {

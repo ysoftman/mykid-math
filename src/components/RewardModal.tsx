@@ -2,6 +2,7 @@ import type React from 'react';
 import { useEffect } from 'react';
 import { sound } from '../utils/audio';
 import confetti from '../utils/confetti';
+import { GAME_ASSETS } from '../utils/gameAssets';
 import { BADGE_DEFINITIONS, DAILY_MISSION_BONUS, type RewardResult } from '../utils/storage';
 
 interface RewardModalProps {
@@ -26,6 +27,11 @@ export const RewardModal: React.FC<RewardModalProps> = ({ reward, onClose }) => 
   if (!reward || !show) return null;
 
   const badges = BADGE_DEFINITIONS.filter((b) => reward.newBadges.includes(b.id));
+  const image = reward.leveledUp
+    ? GAME_ASSETS.gift
+    : reward.missionCompleted
+      ? GAME_ASSETS.coinChest
+      : GAME_ASSETS.gemChest;
   const close = () => {
     sound.playPop();
     onClose();
@@ -43,7 +49,12 @@ export const RewardModal: React.FC<RewardModalProps> = ({ reward, onClose }) => 
         className="w-full max-w-sm space-y-5 rounded-2xl border-4 border-amber-300 bg-white p-6 text-center shadow-2xl animate-in fade-in"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="text-6xl">🎊</div>
+        <img
+          src={image}
+          alt=""
+          className="mx-auto h-36 w-36 object-contain drop-shadow-md"
+          draggable={false}
+        />
 
         {reward.leveledUp && (
           <div>
