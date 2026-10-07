@@ -91,7 +91,7 @@ export const ScratchPad: React.FC<ScratchPadProps> = ({ isOpen, onClose }) => {
 
   return (
     <div
-      className={`${isOpen ? 'flex' : 'hidden'} fixed inset-0 sm:inset-auto sm:right-6 sm:bottom-6 sm:w-[480px] sm:h-[420px] bg-white rounded-2xl shadow-2xl border-2 border-indigo-200 z-50 flex-col overflow-hidden animate-in fade-in zoom-in-95`}
+      className={`${isOpen ? 'flex' : 'hidden'} fixed inset-0 sm:inset-auto sm:inset-x-0 sm:mx-auto sm:bottom-6 sm:w-[calc(min(100%,64rem)-3rem)] lg:w-[calc(min(100%,64rem)-4rem)] sm:h-[420px] bg-white rounded-2xl shadow-2xl border-2 border-indigo-200 z-50 flex-col overflow-hidden animate-in fade-in zoom-in-95`}
     >
       {/* Header */}
       <div className="bg-indigo-600 text-white px-4 py-3 flex items-center justify-between select-none">

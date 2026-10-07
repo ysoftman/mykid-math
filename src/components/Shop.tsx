@@ -20,15 +20,26 @@ const SLOTS: { slot: ShopSlot; title: string; icon: string }[] = [
   { slot: 'character', title: '캐릭터', icon: '🦸' },
   { slot: 'hat', title: '모자', icon: '🎩' },
   { slot: 'pet', title: '펫', icon: '🐾' },
+  { slot: 'prop', title: '소품', icon: '✏️' },
   { slot: 'theme', title: '배너 테마', icon: '🎨' },
 ];
 
 const AVATAR_SIZES = {
-  sm: { box: 'w-20 h-20', hat: '-top-6 w-12 h-10', pet: '-bottom-2 -right-4 w-10 h-10' },
-  lg: { box: 'w-28 h-28', hat: '-top-8 w-16 h-14', pet: '-bottom-2 -right-5 w-14 h-14' },
+  sm: {
+    box: 'w-20 h-20',
+    hat: '-top-6 w-12 h-10',
+    pet: '-bottom-2 -right-4 w-10 h-10',
+    prop: '-bottom-2 -left-4 w-9 h-9',
+  },
+  lg: {
+    box: 'w-28 h-28',
+    hat: '-top-8 w-16 h-14',
+    pet: '-bottom-2 -right-5 w-14 h-14',
+    prop: '-bottom-2 -left-5 w-12 h-12',
+  },
 };
 
-// Equipped character picture with the hat above the head and the pet at the bottom corner
+// Equipped character picture with the hat above the head, the pet at the bottom right and the prop at the bottom left
 export const CharacterAvatar: React.FC<{ stats: UserStats; size: 'sm' | 'lg' }> = ({
   stats,
   size,
@@ -36,6 +47,7 @@ export const CharacterAvatar: React.FC<{ stats: UserStats; size: 'sm' | 'lg' }> 
   const character = getEquippedCharacter(stats);
   const hat = SHOP_ITEMS.find((item) => item.id === stats.equipped.hat);
   const pet = SHOP_ITEMS.find((item) => item.id === stats.equipped.pet);
+  const prop = SHOP_ITEMS.find((item) => item.id === stats.equipped.prop);
   const s = AVATAR_SIZES[size];
   return (
     <div
@@ -43,7 +55,7 @@ export const CharacterAvatar: React.FC<{ stats: UserStats; size: 'sm' | 'lg' }> 
     >
       <img
         src={GAME_ASSETS[character.image ?? 'hero']}
-        alt={[character.name, hat?.name, pet?.name].filter(Boolean).join(', ')}
+        alt={[character.name, hat?.name, pet?.name, prop?.name].filter(Boolean).join(', ')}
         className="w-full h-full object-contain p-1"
         draggable={false}
       />
@@ -60,6 +72,14 @@ export const CharacterAvatar: React.FC<{ stats: UserStats; size: 'sm' | 'lg' }> 
           src={GAME_ASSETS[pet.image]}
           alt=""
           className={`absolute object-contain ${s.pet}`}
+          draggable={false}
+        />
+      )}
+      {prop?.image && (
+        <img
+          src={GAME_ASSETS[prop.image]}
+          alt=""
+          className={`absolute object-contain ${s.prop}`}
           draggable={false}
         />
       )}
@@ -134,8 +154,8 @@ export const Shop: React.FC<ShopProps> = ({ stats, onStatsChanged }) => {
         <div className="flex-1 text-center sm:text-left space-y-1">
           <h2 className="text-xl font-black text-slate-800">🛍️ {KID_CALL}의 별 상점</h2>
           <p className="text-xs text-slate-500">
-            문제를 풀어 모은 별로 캐릭터, 모자, 펫, 배너 테마와 게임 아이템을 사 보세요! 별을 써도
-            레벨은 그대로예요.
+            문제를 풀어 모은 별로 캐릭터, 모자, 펫, 소품, 배너 테마와 게임 아이템을 사 보세요! 별을
+            써도 레벨은 그대로예요.
           </p>
         </div>
         <div className="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-3 text-center">
@@ -197,7 +217,7 @@ export const Shop: React.FC<ShopProps> = ({ stats, onStatsChanged }) => {
                           onClick={() => handleEquip(null, slot)}
                           className="w-full text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700"
                         >
-                          {slot === 'theme' ? '기본으로' : '벗기'}
+                          {slot === 'theme' ? '기본으로' : slot === 'prop' ? '내려놓기' : '벗기'}
                         </button>
                       )}
                     </>

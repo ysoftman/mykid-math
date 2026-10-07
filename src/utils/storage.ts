@@ -21,7 +21,7 @@ export interface RewardResult {
   missionCompleted: boolean;
 }
 
-export type ShopSlot = 'hat' | 'pet' | 'theme' | 'character';
+export type ShopSlot = 'hat' | 'pet' | 'prop' | 'theme' | 'character';
 
 export interface ShopItem {
   id: string;
@@ -30,7 +30,7 @@ export interface ShopItem {
   slot: ShopSlot;
   price: number;
   gradient?: string; // roadmap banner classes, theme only
-  image?: GameAssetKey; // character, hat, pet
+  image?: GameAssetKey; // character, hat, pet, prop
 }
 
 const DEFAULT_CHARACTER = 'char_hero';
@@ -41,13 +41,36 @@ export const SHOP_ITEMS: ShopItem[] = [
   { id: 'char_wizard', name: '수학 마법사', slot: 'character', price: 30, image: 'wizard' },
   { id: 'char_explorer', name: '탐험가', slot: 'character', price: 30, image: 'explorer' },
   { id: 'hat_cap', name: '야구 모자', slot: 'hat', price: 5, image: 'hatCap' },
+  { id: 'hat_beanie', name: '눈꽃 비니', slot: 'hat', price: 8, image: 'hatBeanie' },
   { id: 'hat_captain', name: '선장 모자', slot: 'hat', price: 10, image: 'hatCaptain' },
+  { id: 'hat_cat', name: '고양이 모자', slot: 'hat', price: 12, image: 'hatCat' },
+  { id: 'hat_headphone', name: '헤드폰 모자', slot: 'hat', price: 12, image: 'hatHeadphone' },
+  { id: 'hat_bunny', name: '토끼 모자', slot: 'hat', price: 15, image: 'hatBunny' },
+  { id: 'hat_cowboy', name: '카우보이 모자', slot: 'hat', price: 15, image: 'hatCowboy' },
+  { id: 'hat_goggles', name: '탐험가 헬멧', slot: 'hat', price: 18, image: 'hatGoggles' },
   { id: 'hat_wizard', name: '마법사 모자', slot: 'hat', price: 20, image: 'hatWizard' },
+  { id: 'hat_dino', name: '공룡 모자', slot: 'hat', price: 20, image: 'hatDino' },
+  { id: 'hat_viking', name: '바이킹 투구', slot: 'hat', price: 25, image: 'hatViking' },
   { id: 'hat_crown', name: '황금 왕관', slot: 'hat', price: 35, image: 'hatCrown' },
   { id: 'pet_dog', name: '멍멍이', slot: 'pet', price: 8, image: 'petHusky' },
   { id: 'pet_cat', name: '야옹이', slot: 'pet', price: 8, image: 'petCat' },
+  { id: 'pet_chick', name: '삐약이', slot: 'pet', price: 8, image: 'petChick' },
+  { id: 'pet_slime', name: '말랑 슬라임', slot: 'pet', price: 10, image: 'petSlime' },
+  { id: 'pet_cactus', name: '선인장 친구', slot: 'pet', price: 12, image: 'petCactus' },
   { id: 'pet_penguin', name: '꼬마 펭귄', slot: 'pet', price: 15, image: 'petPenguin' },
+  { id: 'pet_panda', name: '아기 판다', slot: 'pet', price: 20, image: 'petPanda' },
+  { id: 'pet_robot', name: '꼬마 로봇', slot: 'pet', price: 25, image: 'petRobot' },
+  { id: 'pet_ghost', name: '물방울 요정', slot: 'pet', price: 25, image: 'petGhost' },
+  { id: 'pet_unicorn', name: '아기 유니콘', slot: 'pet', price: 35, image: 'petUnicorn' },
   { id: 'pet_dragon', name: '아기 드래곤', slot: 'pet', price: 40, image: 'petDragon' },
+  { id: 'pet_golem', name: '용암 골렘', slot: 'pet', price: 40, image: 'petGolem' },
+  { id: 'prop_pencil', name: '별 연필', slot: 'prop', price: 5, image: 'itemPencil' },
+  { id: 'prop_book', name: '수학 교재', slot: 'prop', price: 8, image: 'itemBook' },
+  { id: 'prop_calculator', name: '계산기', slot: 'prop', price: 10, image: 'itemCalculator' },
+  { id: 'prop_clover', name: '네잎클로버', slot: 'prop', price: 10, image: 'itemClover' },
+  { id: 'prop_potion', name: '에너지 포션', slot: 'prop', price: 12, image: 'itemPotion' },
+  { id: 'prop_magnet', name: '자석', slot: 'prop', price: 12, image: 'itemMagnet' },
+  { id: 'prop_rocket', name: '로켓', slot: 'prop', price: 20, image: 'rocket' },
   {
     id: 'theme_forest',
     name: '초록 숲',

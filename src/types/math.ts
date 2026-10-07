@@ -52,7 +52,7 @@ export interface UserStats {
   bestCombo: number;
   wrongConquered: number;
   ownedItems: string[];
-  equipped: { hat?: string; pet?: string; theme?: string; character?: string }; // character is always set by getStats
+  equipped: { hat?: string; pet?: string; prop?: string; theme?: string; character?: string }; // character is always set by getStats
   daily: { date: string; solved: number }; // date = local 'YYYY-MM-DD'
   attendance: string[]; // local dates on which the daily mission was completed
   timeAttackBest: number;

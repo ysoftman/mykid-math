@@ -52,9 +52,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="block font-black text-slate-800 text-sm sm:text-lg leading-tight tracking-tight">
               준영이의 수학공부
             </span>
-            <span className="hidden text-sm font-bold text-indigo-600 tracking-wide sm:block">
-              초등 5·6학년 생각하는 수학
-            </span>
             <span className="block text-[10px] leading-tight text-slate-500">
               빌드 날짜 {BUILD_DATE.replaceAll('-', '.')}
             </span>
