@@ -1,5 +1,6 @@
 import type { Difficulty, Problem } from '../../types/math';
 import { pickOne, randomInt } from '../mathHelpers';
+import { KID_CALL } from '../profile';
 
 export function generateGeometryProblem(difficulty: Difficulty): Problem {
   const shape = pickOne([
@@ -86,7 +87,8 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
       topicId: 'geometry',
       subtopic: '직육면체의 부피',
       difficulty,
-      question: `가로 ${a}cm, 세로 ${b}cm, 높이 ${c}cm인 직육면체의 부피는 몇 cm³인가요?`,
+      context: '보물 상자',
+      question: `${KID_CALL}의 보물 상자는 가로 ${a}cm, 세로 ${b}cm, 높이 ${c}cm인 직육면체 모양입니다. 이 상자의 부피는 몇 cm³인가요?`,
       hint: `부피는 1cm³ 쌓기나무가 몇 개 들어가는지와 같아요. 공식: 가로 × 세로 × 높이`,
       answerType: 'number',
       correctAnswer: volume,

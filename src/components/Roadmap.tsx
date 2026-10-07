@@ -2,13 +2,16 @@ import type React from 'react';
 import type { TopicId, UserStats } from '../types/math';
 import { sound } from '../utils/audio';
 import { TOPICS } from '../utils/problemGenerators';
-import { BADGE_DEFINITIONS, exportData, importData } from '../utils/storage';
+import { BADGE_DEFINITIONS, exportData, importData, SHOP_ITEMS } from '../utils/storage';
+import { DailyMission } from './DailyMission';
 
 interface RoadmapProps {
   stats: UserStats;
   onSelectTopic: (topicId: TopicId) => void;
   onOpenWrongNotes: () => void;
   onDataImported: () => void;
+  onOpenShop: () => void;
+  onOpenGames: () => void;
 }
 
 export const Roadmap: React.FC<RoadmapProps> = ({
@@ -16,6 +19,8 @@ export const Roadmap: React.FC<RoadmapProps> = ({
   onSelectTopic,
   onOpenWrongNotes,
   onDataImported,
+  onOpenShop,
+  onOpenGames,
 }) => {
   const currentLevel = stats.level;
   const currentStars = stats.stars;
@@ -25,6 +30,11 @@ export const Roadmap: React.FC<RoadmapProps> = ({
     100,
     Math.max(0, ((currentStars - currentLevelBaseStars) / 10) * 100),
   );
+  const equippedItem = (id?: string) => SHOP_ITEMS.find((item) => item.id === id);
+  const hat = equippedItem(stats.equipped.hat);
+  const pet = equippedItem(stats.equipped.pet);
+  const bannerGradient =
+    equippedItem(stats.equipped.theme)?.gradient ?? 'from-indigo-700 via-indigo-600 to-violet-700';
 
   const handleExport = () => {
     const url = URL.createObjectURL(new Blob([exportData()], { type: 'application/json' }));
@@ -51,13 +61,23 @@ export const Roadmap: React.FC<RoadmapProps> = ({
   return (
     <div className="space-y-6">
       {/* User Progress Banner */}
-      <div className="bg-gradient-to-r from-indigo-700 via-indigo-600 to-violet-700 rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
+      <div
+        className={`bg-gradient-to-r ${bannerGradient} rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden`}
+      >
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold tracking-wide">
               <span>🚀</span> 초등 5~6학년 수학 마스터 로드맵
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black">Lv. {currentLevel} 수학 탐험가</h2>
+            <h2 className="text-2xl sm:text-3xl font-black flex items-center gap-2">
+              Lv. {currentLevel} 수학 탐험가
+              {(hat || pet) && (
+                <span title={[hat?.name, pet?.name].filter(Boolean).join(', ')}>
+                  {hat?.icon}
+                  {pet?.icon}
+                </span>
+              )}
+            </h2>
             <p className="text-indigo-100 text-xs sm:text-sm max-w-md">
               문제를 맞히면 별(⭐)을 모으고 레벨업할 수 있어요! 단원별 실험실에서 원리를 먼저
               살펴보고 도전해보세요.
@@ -101,6 +121,40 @@ export const Roadmap: React.FC<RoadmapProps> = ({
             <div className="text-xs text-white/90">정답률</div>
           </div>
         </div>
+      </div>
+
+      <DailyMission stats={stats} />
+
+      {/* Shop & Games */}
+      <div className="grid grid-cols-2 gap-3">
+        <button
+          onClick={() => {
+            sound.playPop();
+            onOpenShop();
+          }}
+          className="bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-2xl p-4 text-left transition-colors flex items-center gap-3"
+        >
+          <span className="text-3xl">🛍️</span>
+          <span>
+            <span className="block text-sm font-black text-amber-900">별 상점</span>
+            <span className="block text-xs text-amber-800">
+              쓸 수 있는 별 ⭐ {stats.stars - stats.spentStars}
+            </span>
+          </span>
+        </button>
+        <button
+          onClick={() => {
+            sound.playPop();
+            onOpenGames();
+          }}
+          className="bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-2xl p-4 text-left transition-colors flex items-center gap-3"
+        >
+          <span className="text-3xl">🎮</span>
+          <span>
+            <span className="block text-sm font-black text-emerald-900">수학 게임</span>
+            <span className="block text-xs text-emerald-800">타임어택 · 보스전 · 가족 대결</span>
+          </span>
+        </button>
       </div>
 
       {/* Badges Earned */}

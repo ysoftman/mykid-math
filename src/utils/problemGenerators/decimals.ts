@@ -1,5 +1,6 @@
 import type { Difficulty, Problem } from '../../types/math';
 import { pickOne, randomInt, simplifyFraction } from '../mathHelpers';
+import { KID_CALL } from '../profile';
 
 export function generateDecimalProblem(difficulty: Difficulty): Problem {
   const type = pickOne([
@@ -265,7 +266,7 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
     subtopic: '소수 실생활 문제',
     difficulty,
     context: '리본 끈 자르기',
-    question: `길이가 ${length}m인 리본 끈이 ${count}개 있습니다. 이 리본 끈들을 모두 이어 붙이면 총 몇 m가 될까요?`,
+    question: `${KID_CALL}에게 길이가 ${length}m인 리본 끈이 ${count}개 있습니다. ${KID_CALL}가 이 리본 끈들을 모두 이어 붙이면 총 몇 m가 될까요?`,
     hint: `한 개의 길이 × 개수로 식을 세워보세요!`,
     answerType: 'number',
     correctAnswer: total,

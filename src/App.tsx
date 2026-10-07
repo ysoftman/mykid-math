@@ -1,27 +1,31 @@
 import type React from 'react';
 import { useCallback, useEffect, useState } from 'react';
+import { GameHub } from './components/Games/GameHub';
 import { DecimalsLab } from './components/Lab/DecimalsLab';
 // Labs
 import { FactorsLab } from './components/Lab/FactorsLab';
 import { FractionsLab } from './components/Lab/FractionsLab';
 import { GeometryLab } from './components/Lab/GeometryLab';
 import { RatiosLab } from './components/Lab/RatiosLab';
-import { Navbar } from './components/Navbar';
+import { Navbar, type Tab } from './components/Navbar';
 import { QuizRunner } from './components/Quiz/QuizRunner';
 import { ReviewNote } from './components/Review/ReviewNote';
+import { RewardModal } from './components/RewardModal';
 import { Roadmap } from './components/Roadmap';
 import { ScratchPad } from './components/ScratchPad';
+import { Shop } from './components/Shop';
 import type { TopicId, UserStats } from './types/math';
 import { sound } from './utils/audio';
 import { TOPICS } from './utils/problemGenerators';
-import { getStats, getWrongNotes } from './utils/storage';
+import { getStats, getWrongNotes, type RewardResult } from './utils/storage';
 
 export const App: React.FC = () => {
-  const [currentTab, setCurrentTab] = useState<'roadmap' | 'lab' | 'quiz' | 'review'>('roadmap');
+  const [currentTab, setCurrentTab] = useState<Tab>('roadmap');
   const [selectedTopicId, setSelectedTopicId] = useState<TopicId>('fractions');
   const [stats, setStats] = useState<UserStats>(getStats());
   const [wrongNotesCount, setWrongNotesCount] = useState<number>(getWrongNotes().length);
   const [isScratchPadOpen, setIsScratchPadOpen] = useState<boolean>(false);
+  const [reward, setReward] = useState<RewardResult | null>(null);
 
   const refreshStats = useCallback(() => {
     setStats(getStats());
@@ -91,6 +95,8 @@ export const App: React.FC = () => {
             stats={stats}
             onSelectTopic={handleSelectTopicFromRoadmap}
             onOpenWrongNotes={() => setCurrentTab('review')}
+            onOpenShop={() => setCurrentTab('shop')}
+            onOpenGames={() => setCurrentTab('games')}
             onDataImported={refreshStats}
           />
         )}
@@ -160,18 +166,37 @@ export const App: React.FC = () => {
               key={selectedTopicId}
               topicId={selectedTopicId}
               onStatsUpdated={refreshStats}
+              onReward={setReward}
               onOpenScratchPad={() => setIsScratchPadOpen(true)}
             />
           </div>
         )}
 
         {currentTab === 'review' && (
-          <ReviewNote onClose={() => setCurrentTab('roadmap')} onRefreshStats={refreshStats} />
+          <ReviewNote
+            onClose={() => setCurrentTab('roadmap')}
+            onRefreshStats={refreshStats}
+            onReward={setReward}
+          />
+        )}
+
+        {currentTab === 'shop' && <Shop stats={stats} onStatsChanged={refreshStats} />}
+
+        {currentTab === 'games' && (
+          <GameHub
+            onReward={(r) => {
+              refreshStats();
+              setReward(r);
+            }}
+            onStatsChanged={refreshStats}
+          />
         )}
       </main>
 
       {/* Floating ScratchPad Modal */}
       <ScratchPad isOpen={isScratchPadOpen} onClose={() => setIsScratchPadOpen(false)} />
+
+      <RewardModal reward={reward} onClose={() => setReward(null)} />
     </div>
   );
 };

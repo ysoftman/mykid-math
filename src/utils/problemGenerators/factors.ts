@@ -1,5 +1,6 @@
 import type { Difficulty, Problem } from '../../types/math';
 import { gcd, getFactors, lcm, pickOne, randomInt, withGwa } from '../mathHelpers';
+import { KID_CALL } from '../profile';
 
 export function generateFactorProblem(difficulty: Difficulty): Problem {
   const type = pickOne([
@@ -279,7 +280,7 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
     subtopic: '실생활 활용 (문장제)',
     difficulty,
     context: '사이좋은 간식 나누기',
-    question: `사탕 ${candies}개와 초콜릿 ${chocolates}개를 남김없이 가능한 한 많은 친구들에게 똑같이 나누어 주려고 합니다. 최대 몇 명의 친구들에게 나누어 줄 수 있을까요?`,
+    question: `${KID_CALL}가 사탕 ${candies}개와 초콜릿 ${chocolates}개를 남김없이 가능한 한 많은 친구들에게 똑같이 나누어 주려고 합니다. 최대 몇 명의 친구들에게 나누어 줄 수 있을까요?`,
     hint: `남김없이 똑같이 나눌 수 있는 '가장 큰 수'는 바로 두 수의 '최대공약수'예요!`,
     answerType: 'number',
     correctAnswer: g,

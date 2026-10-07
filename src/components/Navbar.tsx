@@ -7,9 +7,11 @@ const BUILD_DATE = new Intl.DateTimeFormat('sv-SE', {
   timeZone: 'Asia/Seoul',
 }).format(new Date(__APP_BUILD_TIME__));
 
+export type Tab = 'roadmap' | 'lab' | 'quiz' | 'review' | 'shop' | 'games';
+
 interface NavbarProps {
-  currentTab: 'roadmap' | 'lab' | 'quiz' | 'review';
-  onTabChange: (tab: 'roadmap' | 'lab' | 'quiz' | 'review') => void;
+  currentTab: Tab;
+  onTabChange: (tab: Tab) => void;
   stats: UserStats;
   onOpenScratchPad: () => void;
   wrongCount: number;
@@ -116,6 +118,27 @@ export const Navbar: React.FC<NavbarProps> = ({
               </span>
             )}
           </button>
+          {(
+            [
+              ['games', '🎮 게임'],
+              ['shop', '🛍️ 상점'],
+            ] as const
+          ).map(([tab, label]) => (
+            <button
+              key={tab}
+              onClick={() => {
+                sound.playPop();
+                onTabChange(tab);
+              }}
+              className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                currentTab === tab
+                  ? 'bg-white text-indigo-600 shadow-sm'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
         </nav>
 
         {/* Right Tools & Badges */}
@@ -155,43 +178,33 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* Mobile Sub Navigation */}
-      <div className="flex md:hidden border-t border-slate-100 px-2 py-1.5 bg-slate-50 justify-around text-xs font-bold">
-        <button
-          onClick={() => {
-            sound.playPop();
-            onTabChange('roadmap');
-          }}
-          className={`px-2 py-1 rounded-lg ${currentTab === 'roadmap' ? 'text-indigo-600 bg-white shadow-2xs' : 'text-slate-500'}`}
-        >
-          🗺️ 로드맵
-        </button>
-        <button
-          onClick={() => {
-            sound.playPop();
-            onTabChange('lab');
-          }}
-          className={`px-2 py-1 rounded-lg ${currentTab === 'lab' ? 'text-indigo-600 bg-white shadow-2xs' : 'text-slate-500'}`}
-        >
-          🧪 실험실
-        </button>
-        <button
-          onClick={() => {
-            sound.playPop();
-            onTabChange('quiz');
-          }}
-          className={`px-2 py-1 rounded-lg ${currentTab === 'quiz' ? 'text-indigo-600 bg-white shadow-2xs' : 'text-slate-500'}`}
-        >
-          🎯 퀴즈
-        </button>
-        <button
-          onClick={() => {
-            sound.playPop();
-            onTabChange('review');
-          }}
-          className={`px-2 py-1 rounded-lg relative ${currentTab === 'review' ? 'text-rose-600 bg-white shadow-2xs' : 'text-slate-500'}`}
-        >
-          📝 오답({wrongCount})
-        </button>
+      <div className="grid grid-cols-6 md:hidden border-t border-slate-100 px-1 py-1 bg-slate-50 text-[12px] font-bold">
+        {(
+          [
+            ['roadmap', '🗺️', '로드맵'],
+            ['lab', '🧪', '실험실'],
+            ['quiz', '🎯', '퀴즈'],
+            ['review', '📝', `오답(${wrongCount})`],
+            ['games', '🎮', '게임'],
+            ['shop', '🛍️', '상점'],
+          ] as const
+        ).map(([tab, icon, label]) => (
+          <button
+            key={tab}
+            onClick={() => {
+              sound.playPop();
+              onTabChange(tab);
+            }}
+            className={`flex flex-col items-center gap-0.5 rounded-lg px-0.5 py-1 leading-tight whitespace-nowrap ${
+              currentTab === tab
+                ? `${tab === 'review' ? 'text-rose-600' : 'text-indigo-600'} bg-white shadow-2xs`
+                : 'text-slate-500'
+            }`}
+          >
+            <span className="text-base">{icon}</span>
+            <span>{label}</span>
+          </button>
+        ))}
       </div>
     </header>
   );

@@ -8,6 +8,7 @@ import {
   simplifyFraction,
   withGwa,
 } from '../mathHelpers';
+import { KID_CALL } from '../profile';
 
 export function generateFractionProblem(difficulty: Difficulty): Problem {
   const type = pickOne([
@@ -125,7 +126,7 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
       subtopic: '분수의 나눗셈 문장제',
       difficulty,
       context: '끈 자르기',
-      question: `길이가 ${totalText}m인 끈을 ${num}/${den}m씩 자르면 모두 몇 도막이 되나요?`,
+      question: `${KID_CALL}가 길이가 ${totalText}m인 끈을 ${num}/${den}m씩 잘랐습니다. 모두 몇 도막이 되나요?`,
       hint: `전체 길이를 한 도막의 길이로 나누면 돼요. 분수의 나눗셈은 나누는 분수를 뒤집어 곱해요!`,
       answerType: 'number',
       correctAnswer: count,
@@ -304,7 +305,7 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
       topicId: 'fractions',
       subtopic: '어떤 수의 분수만큼 구하기',
       difficulty,
-      question: `쿠키 ${whole}개 중에서 ${num}/${den}만큼은 몇 개인가요?`,
+      question: `${KID_CALL}가 구운 쿠키 ${whole}개 중에서 ${num}/${den}만큼을 친구들에게 나누어 주었습니다. 나누어 준 쿠키는 몇 개인가요?`,
       hint: `전체를 분모 ${den}만큼 똑같이 나눈 다음, 그중 분자 ${num}만큼을 구해요.`,
       answerType: 'number',
       correctAnswer: answer,

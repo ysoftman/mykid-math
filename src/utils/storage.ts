@@ -3,6 +3,64 @@ import type { TopicId, UserStats, WrongNoteItem } from '../types/math';
 const STATS_KEY = 'mykid_math_stats';
 const WRONG_NOTES_KEY = 'mykid_math_wrong_notes';
 
+export const DAILY_MISSION_GOAL = 5;
+export const DAILY_MISSION_BONUS = 3;
+export const BOSS_CLEAR_STARS = 10;
+
+export interface RewardResult {
+  updatedStats: UserStats;
+  newBadges: string[];
+  leveledUp: boolean;
+  bonusStars: number; // extra stars beyond the base reward (combo bonus, mission bonus...)
+  missionCompleted: boolean;
+}
+
+export type ShopSlot = 'hat' | 'pet' | 'theme';
+
+export interface ShopItem {
+  id: string;
+  name: string;
+  icon: string;
+  slot: ShopSlot;
+  price: number;
+  gradient?: string; // roadmap banner classes, theme only
+}
+
+export const SHOP_ITEMS: ShopItem[] = [
+  { id: 'hat_cap', name: '야구 모자', icon: '🧢', slot: 'hat', price: 5 },
+  { id: 'hat_tophat', name: '신사 모자', icon: '🎩', slot: 'hat', price: 10 },
+  { id: 'hat_grad', name: '박사 모자', icon: '🎓', slot: 'hat', price: 20 },
+  { id: 'hat_crown', name: '황금 왕관', icon: '👑', slot: 'hat', price: 35 },
+  { id: 'pet_dog', name: '멍멍이', icon: '🐶', slot: 'pet', price: 8 },
+  { id: 'pet_cat', name: '야옹이', icon: '🐱', slot: 'pet', price: 8 },
+  { id: 'pet_fox', name: '꼬마 여우', icon: '🦊', slot: 'pet', price: 15 },
+  { id: 'pet_dragon', name: '아기 드래곤', icon: '🐉', slot: 'pet', price: 40 },
+  {
+    id: 'theme_forest',
+    name: '초록 숲',
+    icon: '🌲',
+    slot: 'theme',
+    price: 12,
+    gradient: 'from-emerald-600 to-teal-700',
+  },
+  {
+    id: 'theme_ocean',
+    name: '푸른 바다',
+    icon: '🌊',
+    slot: 'theme',
+    price: 12,
+    gradient: 'from-sky-600 to-blue-700',
+  },
+  {
+    id: 'theme_sunset',
+    name: '노을 하늘',
+    icon: '🌅',
+    slot: 'theme',
+    price: 25,
+    gradient: 'from-orange-500 via-rose-500 to-fuchsia-600',
+  },
+];
+
 const defaultStats: UserStats = {
   totalSolved: 0,
   totalCorrect: 0,
@@ -16,6 +74,15 @@ const defaultStats: UserStats = {
     geometry: { solvedCount: 0, correctCount: 0, stars: 0 },
     ratios: { solvedCount: 0, correctCount: 0, stars: 0 },
   },
+  spentStars: 0,
+  bestCombo: 0,
+  wrongConquered: 0,
+  ownedItems: [],
+  equipped: {},
+  daily: { date: '', solved: 0 },
+  attendance: [],
+  timeAttackBest: 0,
+  bossCleared: [],
 };
 
 export const BADGE_DEFINITIONS = [
@@ -52,23 +119,82 @@ export const BADGE_DEFINITIONS = [
   },
   { id: 'star_collector', name: '별자리 수집가', desc: '별을 20개 이상 모았어요!', icon: '⭐' },
   { id: 'math_hero', name: '수학 슈퍼히어로', desc: '레벨 5에 도달했어요!', icon: '👑' },
+  { id: 'combo_5', name: '콤보 마스터', desc: '5문제를 연속으로 맞혔어요!', icon: '🔥' },
+  {
+    id: 'wrong_conqueror',
+    name: '오답 정복자',
+    desc: '오답 노트 문제를 5개 다시 맞혔어요!',
+    icon: '🛡️',
+  },
+  {
+    id: 'attendance_7',
+    name: '꾸준함 챔피언',
+    desc: '7일 연속으로 오늘의 미션을 끝냈어요!',
+    icon: '📅',
+  },
+  {
+    id: 'time_attack_10',
+    name: '번개 계산왕',
+    desc: '타임어택에서 10문제 이상 맞혔어요!',
+    icon: '⚡',
+  },
+  { id: 'boss_slayer', name: '보스 사냥꾼', desc: '보스전을 처음으로 이겼어요!', icon: '🐲' },
 ];
 
+const BADGE_CHECKS: Record<string, (s: UserStats) => boolean> = {
+  first_step: (s) => s.totalCorrect >= 1,
+  factor_pro: (s) => s.topicProgress.factors.correctCount >= 5,
+  fraction_master: (s) => s.topicProgress.fractions.correctCount >= 5,
+  decimal_wiz: (s) => s.topicProgress.decimals.correctCount >= 5,
+  geometry_architect: (s) => s.topicProgress.geometry.correctCount >= 5,
+  ratio_master: (s) => s.topicProgress.ratios.correctCount >= 5,
+  star_collector: (s) => s.stars >= 20,
+  math_hero: (s) => s.level >= 5,
+  combo_5: (s) => s.bestCombo >= 5,
+  wrong_conqueror: (s) => s.wrongConquered >= 5,
+  attendance_7: (s) => getAttendanceStreak(s) >= 7,
+  time_attack_10: (s) => s.timeAttackBest >= 10,
+  boss_slayer: (s) => s.bossCleared.length >= 1,
+};
+
+export function dateKey(d: Date): string {
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${d.getFullYear()}-${mm}-${dd}`;
+}
+
+export function todayKey(): string {
+  return dateKey(new Date());
+}
+
+export function getAttendanceStreak(stats: UserStats): number {
+  const done = new Set(stats.attendance);
+  const day = new Date();
+  if (!done.has(dateKey(day))) day.setDate(day.getDate() - 1);
+  let streak = 0;
+  while (done.has(dateKey(day))) {
+    streak += 1;
+    day.setDate(day.getDate() - 1);
+  }
+  return streak;
+}
+
 export function getStats(): UserStats {
+  const base = structuredClone(defaultStats);
   try {
     const raw = localStorage.getItem(STATS_KEY);
-    if (!raw) return defaultStats;
+    if (!raw) return base;
     const parsed = JSON.parse(raw);
     return {
-      ...defaultStats,
+      ...base,
       ...parsed,
       topicProgress: {
-        ...defaultStats.topicProgress,
+        ...base.topicProgress,
         ...(parsed.topicProgress || {}),
       },
     };
   } catch {
-    return defaultStats;
+    return base;
   }
 }
 
@@ -76,13 +202,28 @@ export function saveStats(stats: UserStats): void {
   localStorage.setItem(STATS_KEY, JSON.stringify(stats));
 }
 
-export function recordProblemResult(
-  topicId: TopicId,
-  isCorrect: boolean,
-): { updatedStats: UserStats; newBadges: string[]; leveledUp: boolean } {
-  const stats = getStats();
+// Every star-giving action ends here: recalculates level, awards badges and saves.
+function commitReward(stats: UserStats, bonusStars = 0, missionCompleted = false): RewardResult {
   const prevLevel = stats.level;
-  const newBadges: string[] = [];
+  // Level calculation: Every 10 stars = 1 level up
+  stats.level = Math.max(1, Math.floor(stats.stars / 10) + 1);
+  const newBadges = BADGE_DEFINITIONS.map((b) => b.id).filter(
+    (id) => !stats.badges.includes(id) && BADGE_CHECKS[id](stats),
+  );
+  stats.badges.push(...newBadges);
+  saveStats(stats);
+  return {
+    updatedStats: stats,
+    newBadges,
+    leveledUp: stats.level > prevLevel,
+    bonusStars,
+    missionCompleted,
+  };
+}
+
+export function recordProblemResult(topicId: TopicId, isCorrect: boolean, combo = 0): RewardResult {
+  const stats = getStats();
+  let bonusStars = 0;
 
   stats.totalSolved += 1;
   const currentTopic = stats.topicProgress[topicId] || {
@@ -97,57 +238,68 @@ export function recordProblemResult(
     stats.stars += 2;
     currentTopic.correctCount += 1;
     currentTopic.stars += 2;
+    stats.bestCombo = Math.max(stats.bestCombo, combo);
+    if (combo > 0 && combo % 3 === 0) bonusStars += 1;
   }
 
   stats.topicProgress[topicId] = currentTopic;
 
-  // Level calculation: Every 10 stars = 1 level up
-  const calcLevel = Math.max(1, Math.floor(stats.stars / 10) + 1);
-  const leveledUp = calcLevel > prevLevel;
-  stats.level = calcLevel;
-
-  // Check Badges
-  if (stats.totalCorrect >= 1 && !stats.badges.includes('first_step')) {
-    stats.badges.push('first_step');
-    newBadges.push('first_step');
-  }
-  if (stats.topicProgress.factors.correctCount >= 5 && !stats.badges.includes('factor_pro')) {
-    stats.badges.push('factor_pro');
-    newBadges.push('factor_pro');
-  }
-  if (
-    stats.topicProgress.fractions.correctCount >= 5 &&
-    !stats.badges.includes('fraction_master')
-  ) {
-    stats.badges.push('fraction_master');
-    newBadges.push('fraction_master');
-  }
-  if (stats.topicProgress.decimals.correctCount >= 5 && !stats.badges.includes('decimal_wiz')) {
-    stats.badges.push('decimal_wiz');
-    newBadges.push('decimal_wiz');
-  }
-  if (
-    stats.topicProgress.geometry.correctCount >= 5 &&
-    !stats.badges.includes('geometry_architect')
-  ) {
-    stats.badges.push('geometry_architect');
-    newBadges.push('geometry_architect');
-  }
-  if (stats.topicProgress.ratios.correctCount >= 5 && !stats.badges.includes('ratio_master')) {
-    stats.badges.push('ratio_master');
-    newBadges.push('ratio_master');
-  }
-  if (stats.stars >= 20 && !stats.badges.includes('star_collector')) {
-    stats.badges.push('star_collector');
-    newBadges.push('star_collector');
-  }
-  if (stats.level >= 5 && !stats.badges.includes('math_hero')) {
-    stats.badges.push('math_hero');
-    newBadges.push('math_hero');
+  const today = todayKey();
+  if (stats.daily.date !== today) stats.daily = { date: today, solved: 0 };
+  stats.daily.solved += 1;
+  const missionCompleted =
+    stats.daily.solved === DAILY_MISSION_GOAL && !stats.attendance.includes(today);
+  if (missionCompleted) {
+    stats.attendance.push(today);
+    bonusStars += DAILY_MISSION_BONUS;
   }
 
+  stats.stars += bonusStars;
+  return commitReward(stats, bonusStars, missionCompleted);
+}
+
+export function recordWrongConquered(): RewardResult {
+  const stats = getStats();
+  stats.wrongConquered += 1;
+  stats.stars += 1;
+  return commitReward(stats);
+}
+
+export function recordTimeAttack(correctCount: number): RewardResult & { isNewBest: boolean } {
+  const stats = getStats();
+  const isNewBest = correctCount > stats.timeAttackBest;
+  if (isNewBest) stats.timeAttackBest = correctCount;
+  stats.stars += correctCount;
+  return { ...commitReward(stats), isNewBest };
+}
+
+export function recordBossClear(topicId: TopicId): RewardResult {
+  const stats = getStats();
+  if (!stats.bossCleared.includes(topicId)) stats.bossCleared.push(topicId);
+  stats.stars += BOSS_CLEAR_STARS;
+  return commitReward(stats);
+}
+
+export function buyItem(itemId: string): boolean {
+  const stats = getStats();
+  const item = SHOP_ITEMS.find((i) => i.id === itemId);
+  if (!item || stats.ownedItems.includes(itemId)) return false;
+  if (stats.stars - stats.spentStars < item.price) return false;
+  stats.spentStars += item.price;
+  stats.ownedItems.push(itemId);
+  stats.equipped = { ...stats.equipped, [item.slot]: itemId };
   saveStats(stats);
-  return { updatedStats: stats, newBadges, leveledUp };
+  return true;
+}
+
+export function equipItem(itemId: string | null, slot: ShopSlot): void {
+  const stats = getStats();
+  if (itemId !== null) {
+    const item = SHOP_ITEMS.find((i) => i.id === itemId);
+    if (!item || item.slot !== slot || !stats.ownedItems.includes(itemId)) return;
+  }
+  stats.equipped = { ...stats.equipped, [slot]: itemId ?? undefined };
+  saveStats(stats);
 }
 
 export function getWrongNotes(): WrongNoteItem[] {

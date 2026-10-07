@@ -1,5 +1,6 @@
 import type { Difficulty, Problem } from '../../types/math';
 import { gcd, pickOne, randomInt } from '../mathHelpers';
+import { KID_CALL } from '../profile';
 
 export function generateRatioProblem(difficulty: Difficulty): Problem {
   const type = pickOne([
@@ -25,7 +26,7 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
       subtopic: '할인율',
       difficulty,
       context: '할인 쇼핑',
-      question: `${price}원짜리 장난감을 ${rate}% 할인하여 팔고 있습니다. 할인된 가격은 얼마인가요?`,
+      question: `${KID_CALL}가 갖고 싶은 ${price}원짜리 장난감을 ${rate}% 할인하여 팔고 있습니다. 할인된 가격은 얼마인가요?`,
       hint: `먼저 할인 금액(정가 × ${rate}/100)을 구한 다음 정가에서 빼 보세요.`,
       answerType: 'number',
       correctAnswer: sale,
@@ -187,7 +188,7 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
       subtopic: '비례 관계와 가격',
       difficulty,
       context: '문구점에서 연필 사기',
-      question: `연필 ${unitCount}자루의 값이 ${totalPrice}원입니다. 연필 1자루의 값은 얼마인가요?`,
+      question: `${KID_CALL}가 문구점에서 연필 ${unitCount}자루를 ${totalPrice}원에 샀습니다. 연필 1자루의 값은 얼마인가요?`,
       hint: `전체 가격을 연필 개수로 나누면 한 자루의 값을 알 수 있어요.`,
       answerType: 'number',
       correctAnswer: unitPrice,
@@ -215,9 +216,10 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
         ? randomInt(3, 10)
         : randomInt(8, 20);
   const total = (r1 + r2) * unit;
-  const person = pickOne(['민수', '지우', '태호', '서연']);
+  // Names in their particle-ready form (서연 → 서연이) so '가/와/의' reads naturally
+  const friend = pickOne(['민수', '지우', '태호', '서연이']);
   const isFirst = Math.random() > 0.5;
-  const targetName = isFirst ? `${person}` : '친구';
+  const targetName = isFirst ? KID_CALL : friend;
   const targetAns = isFirst ? r1 * unit : r2 * unit;
 
   return {
@@ -226,7 +228,7 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
     subtopic: '비례배분',
     difficulty,
     context: '스티커 나누기',
-    question: `스티커 ${total}장을 ${person}와 친구가 ${r1} : ${r2}의 비로 나누어 가지려고 합니다. ${targetName}가 갖게 될 스티커는 몇 장일까요?`,
+    question: `스티커 ${total}장을 ${KID_CALL}와 ${friend}가 ${r1} : ${r2}의 비로 나누어 가지려고 합니다. ${targetName}가 갖게 될 스티커는 몇 장일까요?`,
     hint: `전체를 총 (${r1} + ${r2} = ${r1 + r2})조각으로 나눈 다음, 그 중 ${isFirst ? r1 : r2}조각의 양을 구하면 돼요!`,
     answerType: 'number',
     correctAnswer: targetAns,

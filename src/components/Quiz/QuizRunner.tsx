@@ -5,7 +5,12 @@ import type { Difficulty, Problem, TopicId } from '../../types/math';
 import { checkAnswer, formatAnswer } from '../../utils/answer';
 import { sound } from '../../utils/audio';
 import { generateProblem } from '../../utils/problemGenerators';
-import { addWrongNote, recordProblemResult } from '../../utils/storage';
+import {
+  addWrongNote,
+  DAILY_MISSION_BONUS,
+  type RewardResult,
+  recordProblemResult,
+} from '../../utils/storage';
 import { FractionInput } from './FractionInput';
 
 const DIFFICULTY_LABELS: Record<Difficulty, string> = {
@@ -24,12 +29,14 @@ interface QuizRunnerProps {
   topicId: TopicId;
   onStatsUpdated: () => void;
   onOpenScratchPad: () => void;
+  onReward: (r: RewardResult) => void;
 }
 
 export const QuizRunner: React.FC<QuizRunnerProps> = ({
   topicId,
   onStatsUpdated,
   onOpenScratchPad,
+  onReward,
 }) => {
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
   const [problem, setProblem] = useState<Problem>(() => generateProblem(topicId, 'medium'));
@@ -45,6 +52,8 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
   const [showHint, setShowHint] = useState<boolean>(false);
   const [showSolution, setShowSolution] = useState<boolean>(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [combo, setCombo] = useState<number>(0);
+  const [comboBonus, setComboBonus] = useState<boolean>(false);
 
   const handleDifficultyChange = (newDiff: Difficulty) => {
     sound.playPop();
@@ -98,6 +107,11 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
     setIsAnswered(true);
     setIsCorrect(correct);
 
+    const nextCombo = correct ? combo + 1 : 0;
+    setCombo(nextCombo);
+    const reward = recordProblemResult(topicId, correct, nextCombo);
+    setComboBonus(reward.bonusStars > (reward.missionCompleted ? DAILY_MISSION_BONUS : 0));
+
     if (correct) {
       sound.playCorrect();
       confetti({
@@ -105,10 +119,8 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
         spread: 60,
         origin: { y: 0.7 },
       });
-      recordProblemResult(topicId, true);
     } else {
       sound.playWrong();
-      recordProblemResult(topicId, false);
       addWrongNote({
         id: `wrong_${Date.now()}`,
         problem,
@@ -119,6 +131,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
     }
 
     onStatsUpdated();
+    onReward(reward);
   };
 
   return (
@@ -186,6 +199,12 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
         <h3 className="text-lg sm:text-xl font-bold text-slate-800 leading-relaxed">
           {problem.question}
         </h3>
+
+        {combo >= 2 && (
+          <div className="inline-block bg-orange-100 text-orange-700 text-sm font-extrabold px-3 py-1 rounded-full border border-orange-200 animate-in fade-in">
+            🔥 {combo}연속!
+          </div>
+        )}
       </div>
 
       {/* Answer Input Section */}
@@ -266,6 +285,9 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
                   ? '정답입니다! 참 잘했어요! (+2 ⭐)'
                   : '아쉬워요! 풀이를 보고 다시 원리를 익혀볼까요?'}
               </div>
+              {comboBonus && (
+                <div className="text-sm font-bold text-orange-600 mt-0.5">🔥 +1 콤보 보너스 ⭐</div>
+              )}
               <div className="text-xs mt-0.5 opacity-90">
                 정답: <strong>{formatAnswer(problem)}</strong>
               </div>

@@ -4,21 +4,29 @@ import { useState } from 'react';
 import type { WrongNoteItem } from '../../types/math';
 import { checkAnswer, formatAnswer } from '../../utils/answer';
 import { sound } from '../../utils/audio';
-import { getWrongNotes, removeWrongNote } from '../../utils/storage';
+import {
+  getWrongNotes,
+  type RewardResult,
+  recordWrongConquered,
+  removeWrongNote,
+} from '../../utils/storage';
 
 interface ReviewNoteProps {
   onClose: () => void;
   onRefreshStats: () => void;
+  onReward: (r: RewardResult) => void;
 }
 
-export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats }) => {
+export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats, onReward }) => {
   const [notes, setNotes] = useState<WrongNoteItem[]>(getWrongNotes());
   const [retryId, setRetryId] = useState<string | null>(null);
   const [retryInput, setRetryInput] = useState<string>('');
   const [retryFeedback, setRetryFeedback] = useState<string | null>(null);
   const [expandedExplanationId, setExpandedExplanationId] = useState<string | null>(null);
+  const [isConquering, setIsConquering] = useState<boolean>(false);
 
   const handleRetrySubmit = (item: WrongNoteItem) => {
+    if (isConquering) return;
     const p = item.problem;
     const result = checkAnswer(p, retryInput);
     if (result === 'empty') {
@@ -33,7 +41,9 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats 
     if (result === 'correct') {
       sound.playCorrect();
       confetti({ particleCount: 60, spread: 50 });
-      setRetryFeedback('🎉 완벽해요! 오답을 완전히 정복했습니다!');
+      setIsConquering(true);
+      const reward = recordWrongConquered();
+      setRetryFeedback('🎉 완벽해요! 오답을 완전히 정복했습니다! +1⭐');
       setTimeout(() => {
         removeWrongNote(p.id);
         const updated = getWrongNotes();
@@ -42,6 +52,8 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats 
         setRetryInput('');
         setRetryFeedback(null);
         onRefreshStats();
+        setIsConquering(false);
+        onReward(reward);
       }, 1200);
     } else {
       sound.playWrong();

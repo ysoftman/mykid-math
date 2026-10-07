@@ -46,6 +46,15 @@ export interface UserStats {
       stars: number;
     }
   >;
+  spentStars: number; // spendable = stars - spentStars; level still uses total stars
+  bestCombo: number;
+  wrongConquered: number;
+  ownedItems: string[];
+  equipped: { hat?: string; pet?: string; theme?: string };
+  daily: { date: string; solved: number }; // date = local 'YYYY-MM-DD'
+  attendance: string[]; // local dates on which the daily mission was completed
+  timeAttackBest: number;
+  bossCleared: TopicId[];
 }
 
 export interface WrongNoteItem {
