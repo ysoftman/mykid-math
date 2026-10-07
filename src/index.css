@@ -15,6 +15,15 @@
   --text-2xl--line-height: 1.2;
   --text-3xl: 2rem;
   --text-3xl--line-height: 1.15;
+
+  /* Warm paper palette: softer than pure white to reduce glare during long study sessions */
+  --color-white: #fffcf4;
+  --color-slate-50: #f6f0e4;
+  --color-slate-100: #eee6d6;
+  --color-slate-200: #e2d8c5;
+  --color-slate-300: #d1c5ae;
+  --color-slate-800: #36332e;
+  --color-slate-900: #2a2824;
 }
 
 @layer base {
@@ -24,8 +33,8 @@
   body {
     margin: 0;
     padding: 0;
-    background-color: #f8fafc;
-    color: #1e293b;
+    background-color: var(--color-slate-50);
+    color: var(--color-slate-800);
     font-family:
       -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Pretendard", "Noto Sans KR",
       sans-serif;
@@ -49,10 +58,10 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: var(--color-slate-100);
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
+  background: var(--color-slate-300);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
