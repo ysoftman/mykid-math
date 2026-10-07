@@ -15,6 +15,7 @@ import {
   recordProblemResult,
   XP_BOOST_STARS,
 } from '../../utils/storage';
+import { MathText } from '../MathText';
 import { FractionInput } from './FractionInput';
 
 const readBoost = () => {
@@ -237,7 +238,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
         )}
 
         <h3 className="text-lg sm:text-xl font-bold text-slate-800 leading-relaxed">
-          {problem.question}
+          <MathText text={problem.question} />
         </h3>
 
         {boost.remaining > 0 && (
@@ -346,7 +347,10 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
                 </div>
               )}
               <div className="text-xs mt-0.5 opacity-90">
-                정답: <strong>{formatAnswer(problem)}</strong>
+                정답:{' '}
+                <strong>
+                  <MathText text={formatAnswer(problem)} />
+                </strong>
               </div>
             </div>
           </div>
@@ -383,7 +387,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
 
           {showHint && (
             <div className="mt-2 p-3 bg-amber-50/70 border border-amber-200 rounded-xl text-xs sm:text-sm text-amber-900 animate-in fade-in">
-              {problem.hint}
+              <MathText text={problem.hint} />
             </div>
           )}
         </div>
@@ -402,7 +406,9 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
                 className="bg-white p-3.5 rounded-xl border border-indigo-100 text-xs sm:text-sm space-y-1 shadow-2xs"
               >
                 <div className="font-bold text-indigo-700">{exp.title}</div>
-                <div className="text-slate-700 leading-relaxed">{exp.content}</div>
+                <div className="text-slate-700 leading-relaxed">
+                  <MathText text={exp.content} />
+                </div>
               </div>
             ))}
           </div>

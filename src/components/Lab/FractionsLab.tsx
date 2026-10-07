@@ -2,6 +2,7 @@ import type React from 'react';
 import { useState } from 'react';
 import { sound } from '../../utils/audio';
 import { lcm, simplifyFraction } from '../../utils/mathHelpers';
+import { Fraction } from '../MathText';
 import { LabGuide } from './LabGuide';
 
 export const FractionsLab: React.FC = () => {
@@ -82,7 +83,7 @@ export const FractionsLab: React.FC = () => {
             {/* Fraction 1 Controls */}
             <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
               <span className="text-xs font-bold text-blue-800">
-                첫 번째 분수: {num1} / {den1}
+                첫 번째 분수: <Fraction num={num1} den={den1} />
               </span>
               <div className="mt-2 flex gap-4 items-center">
                 <div className="flex-1">
@@ -125,7 +126,7 @@ export const FractionsLab: React.FC = () => {
             {/* Fraction 2 Controls */}
             <div className="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
               <span className="text-xs font-bold text-indigo-800">
-                두 번째 분수: {num2} / {den2}
+                두 번째 분수: <Fraction num={num2} den={den2} />
               </span>
               <div className="mt-2 flex gap-4 items-center">
                 <div className="flex-1">
@@ -171,7 +172,11 @@ export const FractionsLab: React.FC = () => {
             <div>
               <div className="flex justify-between text-xs font-bold text-slate-600 mb-1">
                 <span>
-                  첫 번째 막대: {isUnified ? `${unifiedNum1}/${commonDen}` : `${num1}/${den1}`}
+                  첫 번째 막대:{' '}
+                  <Fraction
+                    num={isUnified ? unifiedNum1 : num1}
+                    den={isUnified ? commonDen : den1}
+                  />
                 </span>
               </div>
               <div className="h-9 w-full bg-slate-200 rounded-lg overflow-hidden flex border border-slate-300">
@@ -184,7 +189,7 @@ export const FractionsLab: React.FC = () => {
                         isFilled ? 'bg-blue-700 text-white shadow-inner' : 'bg-white text-slate-500'
                       }`}
                     >
-                      1/{isUnified ? commonDen : den1}
+                      <Fraction num={1} den={isUnified ? commonDen : den1} />
                     </div>
                   );
                 })}
@@ -194,7 +199,11 @@ export const FractionsLab: React.FC = () => {
             <div>
               <div className="flex justify-between text-xs font-bold text-slate-600 mb-1">
                 <span>
-                  두 번째 막대: {isUnified ? `${unifiedNum2}/${commonDen}` : `${num2}/${den2}`}
+                  두 번째 막대:{' '}
+                  <Fraction
+                    num={isUnified ? unifiedNum2 : num2}
+                    den={isUnified ? commonDen : den2}
+                  />
                 </span>
               </div>
               <div className="h-9 w-full bg-slate-200 rounded-lg overflow-hidden flex border border-slate-300">
@@ -209,7 +218,7 @@ export const FractionsLab: React.FC = () => {
                           : 'bg-white text-slate-500'
                       }`}
                     >
-                      1/{isUnified ? commonDen : den2}
+                      <Fraction num={1} den={isUnified ? commonDen : den2} />
                     </div>
                   );
                 })}
@@ -230,17 +239,20 @@ export const FractionsLab: React.FC = () => {
               <div className="text-sm font-bold text-slate-800 bg-white px-4 py-2 rounded-xl border border-slate-200">
                 합계:{' '}
                 <span className="text-blue-700">
-                  {num1}/{den1} + {num2}/{den2} ={' '}
+                  <Fraction num={num1} den={den1} /> + <Fraction num={num2} den={den2} /> ={' '}
                 </span>
                 <span className="text-indigo-700 font-extrabold text-base">
-                  {simplifiedSum.num}/{simplifiedSum.den}
+                  <Fraction num={simplifiedSum.num} den={simplifiedSum.den} />
                 </span>
                 {simplifiedSum.num >= simplifiedSum.den && (
                   <span className="text-xs text-slate-500 ml-1">
-                    (대분수: {Math.floor(simplifiedSum.num / simplifiedSum.den)}{' '}
-                    {simplifiedSum.num % simplifiedSum.den > 0
-                      ? `${simplifiedSum.num % simplifiedSum.den}/${simplifiedSum.den}`
-                      : ''}
+                    (대분수: {Math.floor(simplifiedSum.num / simplifiedSum.den)}
+                    {simplifiedSum.num % simplifiedSum.den > 0 && (
+                      <Fraction
+                        num={simplifiedSum.num % simplifiedSum.den}
+                        den={simplifiedSum.den}
+                      />
+                    )}
                     )
                   </span>
                 )}
@@ -254,7 +266,7 @@ export const FractionsLab: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100">
               <span className="text-xs font-bold text-blue-800">
-                가로 분수: {mNum1} / {mDen1}
+                가로 분수: <Fraction num={mNum1} den={mDen1} />
               </span>
               <div className="mt-2 flex gap-4">
                 <div className="flex-1">
@@ -294,7 +306,7 @@ export const FractionsLab: React.FC = () => {
 
             <div className="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
               <span className="text-xs font-bold text-indigo-800">
-                세로 분수: {mNum2} / {mDen2}
+                세로 분수: <Fraction num={mNum2} den={mDen2} />
               </span>
               <div className="mt-2 flex gap-4">
                 <div className="flex-1">
@@ -374,13 +386,14 @@ export const FractionsLab: React.FC = () => {
 
             <div className="mt-5 text-center space-y-1">
               <div className="text-lg font-black text-amber-300">
-                {mNum1}/{mDen1} × {mNum2}/{mDen2} = ({mNum1}×{mNum2}) / ({mDen1}×{mDen2}) ={' '}
-                {productNum}/{productDen}
+                <Fraction num={mNum1} den={mDen1} /> × <Fraction num={mNum2} den={mDen2} /> ={' '}
+                <Fraction num={`${mNum1}×${mNum2}`} den={`${mDen1}×${mDen2}`} /> ={' '}
+                <Fraction num={productNum} den={productDen} />
               </div>
               <div className="text-xs text-slate-200">
                 노란색 겹치는 영역 {productNum}칸 / 전체 {productDen}칸 = 약분하면{' '}
                 <strong className="text-white text-sm">
-                  {simplifiedProduct.num}/{simplifiedProduct.den}
+                  <Fraction num={simplifiedProduct.num} den={simplifiedProduct.den} />
                 </strong>
               </div>
             </div>

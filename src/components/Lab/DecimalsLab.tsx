@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import { sound } from '../../utils/audio';
+import { Fraction } from '../MathText';
 import { LabGuide } from './LabGuide';
 
 export const DecimalsLab: React.FC = () => {
@@ -105,7 +106,7 @@ export const DecimalsLab: React.FC = () => {
           <p className="text-sm text-slate-200">
             100칸 중 <strong className="text-white">{overlapCount}칸</strong>이 겹치므로{' '}
             <strong className="text-emerald-300">
-              {overlapCount} / 100 = {product.toFixed(2)}
+              <Fraction num={overlapCount} den={100} /> = {product.toFixed(2)}
             </strong>{' '}
             입니다!
           </p>

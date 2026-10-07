@@ -7,6 +7,7 @@ import confetti from '../../utils/confetti';
 import { generateProblem, TOPICS } from '../../utils/problemGenerators';
 // Aliased: biome treats a `use`-prefixed call as a React hook (useHookAtTopLevel).
 import { consumePowerUp, type RewardResult, recordTimeAttack } from '../../utils/storage';
+import { MathText } from '../MathText';
 import { GameProblem } from './GameProblem';
 import { PowerUpButton } from './PowerUpButton';
 
@@ -186,7 +187,11 @@ export const TimeAttack: React.FC<TimeAttackProps> = ({
               : 'bg-rose-50 text-rose-900 border border-rose-200'
           }`}
         >
-          {feedback.correct ? '⭕ 정답!' : `❌ 아쉬워요! 정답은 ${feedback.answer}`}
+          {feedback.correct ? (
+            '⭕ 정답!'
+          ) : (
+            <MathText text={`❌ 아쉬워요! 정답은 ${feedback.answer}`} />
+          )}
         </div>
       )}
 

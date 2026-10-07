@@ -6,6 +6,7 @@ import { sound } from '../../utils/audio';
 import confetti from '../../utils/confetti';
 import { generateProblem, TOPICS } from '../../utils/problemGenerators';
 import { KID_NAME } from '../../utils/profile';
+import { MathText } from '../MathText';
 import { GameProblem } from './GameProblem';
 
 const TURNS_PER_PLAYER = 5;
@@ -221,7 +222,11 @@ export const FamilyDuel: React.FC = () => {
           }`}
         >
           <div className="font-extrabold">
-            {turnResult.correct ? '🎉 정답! +1점' : `💡 아쉬워요! 정답은 ${turnResult.answer}`}
+            {turnResult.correct ? (
+              '🎉 정답! +1점'
+            ) : (
+              <MathText text={`💡 아쉬워요! 정답은 ${turnResult.answer}`} />
+            )}
           </div>
           <button
             type="button"

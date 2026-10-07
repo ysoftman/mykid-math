@@ -10,6 +10,7 @@ import {
   recordWrongConquered,
   removeWrongNote,
 } from '../../utils/storage';
+import { MathText } from '../MathText';
 
 type FeedbackTone = 'correct' | 'wrong' | 'notice';
 
@@ -147,20 +148,20 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
                 </div>
 
                 <div className="font-bold text-slate-800 text-sm sm:text-base">
-                  {item.problem.question}
+                  <MathText text={item.problem.question} />
                 </div>
 
                 <div className="flex flex-wrap items-center gap-4 text-xs bg-white p-3 rounded-xl border border-slate-200">
                   <div>
                     <span className="text-slate-600">내가 적은 오답: </span>
                     <strong className="text-rose-700 font-mono">
-                      {item.userAnswer || '미입력'}
+                      <MathText text={item.userAnswer || '미입력'} />
                     </strong>
                   </div>
                   <div>
                     <span className="text-slate-600">정답: </span>
                     <strong className="text-indigo-600 font-mono">
-                      {formatAnswer(item.problem)}
+                      <MathText text={formatAnswer(item.problem)} />
                     </strong>
                   </div>
                 </div>
@@ -236,7 +237,9 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
                         className="bg-white p-3 rounded-xl border border-slate-200 text-xs space-y-0.5"
                       >
                         <div className="font-bold text-indigo-600">{exp.title}</div>
-                        <div className="text-slate-700">{exp.content}</div>
+                        <div className="text-slate-700">
+                          <MathText text={exp.content} />
+                        </div>
                       </div>
                     ))}
                   </div>

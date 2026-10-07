@@ -13,6 +13,7 @@ import {
   type RewardResult,
   recordBossClear,
 } from '../../utils/storage';
+import { MathText } from '../MathText';
 import { GameProblem } from './GameProblem';
 import { PowerUpButton } from './PowerUpButton';
 
@@ -129,12 +130,16 @@ export const BossBattle: React.FC<BossBattleProps> = ({
     <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 space-y-2 text-left">
       <div className="font-extrabold text-rose-900">
         {blocked ? '🛡️ 보호막이 막아 줘서 하트는 그대로예요!' : '💔 앗, 보스의 반격!'} 정답은{' '}
-        <strong>{formatAnswer(missed)}</strong>
+        <strong>
+          <MathText text={formatAnswer(missed)} />
+        </strong>
       </div>
       {missed.explanations[0] && (
         <div className="bg-white p-3 rounded-xl border border-rose-100 text-xs sm:text-sm space-y-1">
           <div className="font-bold text-indigo-700">{missed.explanations[0].title}</div>
-          <div className="text-slate-700 leading-relaxed">{missed.explanations[0].content}</div>
+          <div className="text-slate-700 leading-relaxed">
+            <MathText text={missed.explanations[0].content} />
+          </div>
         </div>
       )}
     </div>

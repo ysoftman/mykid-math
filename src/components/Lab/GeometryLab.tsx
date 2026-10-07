@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import { sound } from '../../utils/audio';
+import { Fraction } from '../MathText';
 import { LabGuide } from './LabGuide';
 
 // Pizza slices of a circle laid out tip-up / tip-down in turn: chord c apart, arcs bulging out
@@ -492,7 +493,7 @@ export const GeometryLab: React.FC = () => {
                   ))}
                 </svg>
                 <div className="text-xs text-slate-300 mt-2">
-                  엇갈려 이어붙인 모습 (가로 = 원주의 1/2, 세로 = 반지름)
+                  엇갈려 이어붙인 모습 (가로 = 원주의 <Fraction num={1} den={2} />, 세로 = 반지름)
                 </div>
               </div>
             </div>

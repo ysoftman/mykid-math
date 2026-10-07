@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import { sound } from '../../utils/audio';
+import { Fraction } from '../MathText';
 import { LabGuide } from './LabGuide';
 
 export const RatiosLab: React.FC = () => {
@@ -103,9 +104,7 @@ export const RatiosLab: React.FC = () => {
           <div className="bg-slate-800/90 p-4 rounded-xl border border-slate-700 space-y-2">
             <div className="text-xs text-slate-200">전체 주스에 대한 시럽의 비율</div>
             <div className="text-xl font-bold text-white flex items-center gap-2">
-              <span>
-                {syrup} / {total}
-              </span>
+              <Fraction num={syrup} den={total} />
               <span className="text-xs text-slate-200">≈ {(syrup / total).toFixed(2)}</span>
             </div>
           </div>

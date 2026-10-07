@@ -2,6 +2,7 @@ import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import type { Problem } from '../../types/math';
 import { checkAnswer } from '../../utils/answer';
+import { MathText } from '../MathText';
 import { FractionInput } from '../Quiz/FractionInput';
 
 interface GameProblemProps {
@@ -59,7 +60,7 @@ export const GameProblem: React.FC<GameProblemProps> = ({
       <h3
         className={`font-bold text-slate-800 leading-relaxed ${compact ? 'text-base sm:text-lg' : 'text-lg sm:text-xl'}`}
       >
-        {problem.question}
+        <MathText text={problem.question} />
       </h3>
 
       <div
