@@ -26,49 +26,28 @@ export type ShopSlot = 'hat' | 'pet' | 'theme' | 'character';
 export interface ShopItem {
   id: string;
   name: string;
-  icon: string;
+  icon?: string; // theme only
   slot: ShopSlot;
   price: number;
   gradient?: string; // roadmap banner classes, theme only
-  image?: GameAssetKey; // character only
+  image?: GameAssetKey; // character, hat, pet
 }
 
 const DEFAULT_CHARACTER = 'char_hero';
 
 export const SHOP_ITEMS: ShopItem[] = [
-  { id: 'char_hero', name: '수학 히어로', icon: '🦸', slot: 'character', price: 0, image: 'hero' },
-  {
-    id: 'char_solver',
-    name: '문제 해결사',
-    icon: '🧠',
-    slot: 'character',
-    price: 15,
-    image: 'solver',
-  },
-  {
-    id: 'char_wizard',
-    name: '수학 마법사',
-    icon: '🧙',
-    slot: 'character',
-    price: 30,
-    image: 'wizard',
-  },
-  {
-    id: 'char_explorer',
-    name: '탐험가',
-    icon: '🧭',
-    slot: 'character',
-    price: 30,
-    image: 'explorer',
-  },
-  { id: 'hat_cap', name: '야구 모자', icon: '🧢', slot: 'hat', price: 5 },
-  { id: 'hat_tophat', name: '신사 모자', icon: '🎩', slot: 'hat', price: 10 },
-  { id: 'hat_grad', name: '박사 모자', icon: '🎓', slot: 'hat', price: 20 },
-  { id: 'hat_crown', name: '황금 왕관', icon: '👑', slot: 'hat', price: 35 },
-  { id: 'pet_dog', name: '멍멍이', icon: '🐶', slot: 'pet', price: 8 },
-  { id: 'pet_cat', name: '야옹이', icon: '🐱', slot: 'pet', price: 8 },
-  { id: 'pet_fox', name: '꼬마 여우', icon: '🦊', slot: 'pet', price: 15 },
-  { id: 'pet_dragon', name: '아기 드래곤', icon: '🐉', slot: 'pet', price: 40 },
+  { id: 'char_hero', name: '수학 히어로', slot: 'character', price: 0, image: 'hero' },
+  { id: 'char_solver', name: '문제 해결사', slot: 'character', price: 15, image: 'solver' },
+  { id: 'char_wizard', name: '수학 마법사', slot: 'character', price: 30, image: 'wizard' },
+  { id: 'char_explorer', name: '탐험가', slot: 'character', price: 30, image: 'explorer' },
+  { id: 'hat_cap', name: '야구 모자', slot: 'hat', price: 5, image: 'hatCap' },
+  { id: 'hat_captain', name: '선장 모자', slot: 'hat', price: 10, image: 'hatCaptain' },
+  { id: 'hat_wizard', name: '마법사 모자', slot: 'hat', price: 20, image: 'hatWizard' },
+  { id: 'hat_crown', name: '황금 왕관', slot: 'hat', price: 35, image: 'hatCrown' },
+  { id: 'pet_dog', name: '멍멍이', slot: 'pet', price: 8, image: 'petHusky' },
+  { id: 'pet_cat', name: '야옹이', slot: 'pet', price: 8, image: 'petCat' },
+  { id: 'pet_penguin', name: '꼬마 펭귄', slot: 'pet', price: 15, image: 'petPenguin' },
+  { id: 'pet_dragon', name: '아기 드래곤', slot: 'pet', price: 40, image: 'petDragon' },
   {
     id: 'theme_forest',
     name: '초록 숲',

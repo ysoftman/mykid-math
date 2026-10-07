@@ -24,11 +24,11 @@ const SLOTS: { slot: ShopSlot; title: string; icon: string }[] = [
 ];
 
 const AVATAR_SIZES = {
-  sm: { box: 'w-20 h-20', hat: '-top-4 text-3xl', pet: '-bottom-1 -right-2 text-2xl' },
-  lg: { box: 'w-28 h-28', hat: '-top-5 text-4xl', pet: '-bottom-1 -right-3 text-4xl' },
+  sm: { box: 'w-20 h-20', hat: '-top-6 w-12 h-10', pet: '-bottom-2 -right-4 w-10 h-10' },
+  lg: { box: 'w-28 h-28', hat: '-top-8 w-16 h-14', pet: '-bottom-2 -right-5 w-14 h-14' },
 };
 
-// Equipped character picture with the hat emoji above the head and the pet at the bottom corner
+// Equipped character picture with the hat above the head and the pet at the bottom corner
 export const CharacterAvatar: React.FC<{ stats: UserStats; size: 'sm' | 'lg' }> = ({
   stats,
   size,
@@ -47,15 +47,21 @@ export const CharacterAvatar: React.FC<{ stats: UserStats; size: 'sm' | 'lg' }> 
         className="w-full h-full object-contain p-1"
         draggable={false}
       />
-      {hat && (
-        <span aria-hidden className={`absolute left-1/2 -translate-x-1/2 ${s.hat}`}>
-          {hat.icon}
-        </span>
+      {hat?.image && (
+        <img
+          src={GAME_ASSETS[hat.image]}
+          alt=""
+          className={`absolute left-1/2 -translate-x-1/2 object-contain ${s.hat}`}
+          draggable={false}
+        />
       )}
-      {pet && (
-        <span aria-hidden className={`absolute ${s.pet}`}>
-          {pet.icon}
-        </span>
+      {pet?.image && (
+        <img
+          src={GAME_ASSETS[pet.image]}
+          alt=""
+          className={`absolute object-contain ${s.pet}`}
+          draggable={false}
+        />
       )}
     </div>
   );
@@ -172,14 +178,12 @@ export const Shop: React.FC<ShopProps> = ({ stats, onStatsChanged }) => {
                       className="w-24 h-24 object-contain"
                       draggable={false}
                     />
-                  ) : item.gradient ? (
+                  ) : (
                     <div
                       className={`w-full h-12 rounded-xl bg-gradient-to-r ${item.gradient} flex items-center justify-center text-2xl`}
                     >
                       {item.icon}
                     </div>
-                  ) : (
-                    <span className="text-4xl">{item.icon}</span>
                   )}
                   <div className="text-sm font-bold text-slate-800">{item.name}</div>
 

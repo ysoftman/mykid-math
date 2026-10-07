@@ -153,12 +153,12 @@ test('wrong conquered, time attack and boss rewards', () => {
 test('buyItem rejects unknown, poor and duplicate purchases', () => {
   expect(buyItem('nope')).toBe(false);
   saveStats({ ...getStats(), stars: 12 });
-  expect(buyItem('hat_tophat')).toBe(true); // 10
+  expect(buyItem('hat_captain')).toBe(true); // 10
   let s = getStats();
   expect(s.spentStars).toBe(10);
-  expect(s.ownedItems).toEqual(['char_hero', 'hat_tophat']);
-  expect(s.equipped.hat).toBe('hat_tophat');
-  expect(buyItem('hat_tophat')).toBe(false); // already owned
+  expect(s.ownedItems).toEqual(['char_hero', 'hat_captain']);
+  expect(s.equipped.hat).toBe('hat_captain');
+  expect(buyItem('hat_captain')).toBe(false); // already owned
   expect(buyItem('hat_cap')).toBe(false); // 5 > 2 spendable
   s = getStats();
   expect(s.stars).toBe(12);
@@ -172,7 +172,7 @@ test('equipItem only equips owned items into the right slot', () => {
   expect(getStats().equipped.pet).toBe('pet_cat');
   equipItem('pet_dog', 'pet');
   expect(getStats().equipped.pet).toBe('pet_dog');
-  equipItem('pet_fox', 'pet'); // not owned
+  equipItem('pet_penguin', 'pet'); // not owned
   equipItem('pet_cat', 'hat'); // wrong slot
   expect(getStats().equipped).toEqual({ character: 'char_hero', pet: 'pet_dog' });
   equipItem(null, 'pet');
