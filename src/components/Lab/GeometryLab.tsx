@@ -3,6 +3,19 @@ import { useState } from 'react';
 import { sound } from '../../utils/audio';
 import { LabGuide } from './LabGuide';
 
+// Pizza slices of a circle laid out tip-up / tip-down in turn: chord c apart, arcs bulging out
+function unfoldCircle(r: number, slices: number) {
+  const c = 2 * r * Math.sin(Math.PI / slices);
+  const sag = r * (1 - Math.cos(Math.PI / slices));
+  const paths: string[] = [];
+  for (let i = 0; i < slices / 2; i++) {
+    const x = i * c;
+    paths.push(`M ${x + c / 2} ${sag} L ${x} ${r} Q ${x + c / 2} ${r + 2 * sag} ${x + c} ${r} Z`);
+    paths.push(`M ${x + c} ${r} L ${x + c / 2} ${sag} Q ${x + c} ${-sag} ${x + 1.5 * c} ${sag} Z`);
+  }
+  return { paths, width: (slices / 2 + 0.5) * c, height: r + sag };
+}
+
 export const GeometryLab: React.FC = () => {
   const [shape, setShape] = useState<'triangle' | 'trapezoid' | 'circle'>('triangle');
 
@@ -25,6 +38,7 @@ export const GeometryLab: React.FC = () => {
   const trapArea = ((topBase + bottomBase) * trapHeight) / 2;
   const circleArea = Math.round(radius * radius * 3.14 * 100) / 100;
   const circumference = Math.round(2 * radius * 3.14 * 100) / 100;
+  const unfold = unfoldCircle(radius * 10, slices);
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-purple-100 space-y-6">
@@ -288,7 +302,7 @@ export const GeometryLab: React.FC = () => {
 
               {showTrapTwin && (
                 <polygon
-                  points={`${50 + bottomBase * 12},150 ${50 + (bottomBase + topBase) * 12},150 ${50 + (bottomBase + topBase) * 12 - 20},${150 - trapHeight * 12} ${50 + bottomBase * 12 - 20 + topBase * 12},${150 - trapHeight * 12}`}
+                  points={`${50 + bottomBase * 12},150 ${50 + (bottomBase + topBase) * 12},150 ${70 + (bottomBase + topBase) * 12},${150 - trapHeight * 12} ${70 + topBase * 12},${150 - trapHeight * 12}`}
                   fill="#f43f5e"
                   fillOpacity="0.7"
                   stroke="#fda4af"
@@ -298,6 +312,24 @@ export const GeometryLab: React.FC = () => {
               )}
 
               {/* Labels */}
+              <line
+                x1="70"
+                y1={150 - trapHeight * 12}
+                x2="70"
+                y2="150"
+                stroke="#fbbf24"
+                strokeWidth="1.5"
+                strokeDasharray="3"
+              />
+              <text
+                x="64"
+                y={150 - (trapHeight * 12) / 2}
+                fill="#fbbf24"
+                fontSize="14"
+                textAnchor="end"
+              >
+                높이 {trapHeight}
+              </text>
               <text
                 x={50 + 20 + (topBase * 12) / 2}
                 y={140 - trapHeight * 12}
@@ -308,13 +340,15 @@ export const GeometryLab: React.FC = () => {
                 윗변 {topBase}cm
               </text>
               <text
-                x={50 + (bottomBase * 12) / 2}
-                y="165"
+                x={50 + ((showTrapTwin ? bottomBase + topBase : bottomBase) * 12) / 2}
+                y="168"
                 fill="#e2e8f0"
                 fontSize="15"
                 textAnchor="middle"
               >
-                아랫변 {bottomBase}cm
+                {showTrapTwin
+                  ? `아랫변 ${bottomBase} + 윗변 ${topBase} = ${bottomBase + topBase}cm`
+                  : `아랫변 ${bottomBase}cm`}
               </text>
             </svg>
 
@@ -335,8 +369,8 @@ export const GeometryLab: React.FC = () => {
                   <span className="text-white font-extrabold">{trapArea}</span> cm²
                 </div>
                 <p className="text-xs text-slate-300 mt-1">
-                  💡 사다리꼴 2개를 거꾸로 붙이면 밑변이 (윗변+아랫변)인 거대한 평행사변형이
-                  완성됩니다!
+                  💡 똑같은 사다리꼴을 거꾸로 붙이면 밑변이 (윗변+아랫변), 높이가 같은 평행사변형이
+                  돼요. 사다리꼴은 그 절반이라서 <strong>÷2</strong>를 해요!
                 </p>
               </div>
             </div>
@@ -439,21 +473,24 @@ export const GeometryLab: React.FC = () => {
 
               {/* Unfolded teeth representation */}
               <div className="flex flex-col items-center">
-                <div
-                  className="h-16 flex items-center bg-purple-950/60 p-2 rounded-xl border border-purple-800"
-                  style={{ width: `${Math.min(240, slices * 8)}px` }}
+                <svg
+                  width={unfold.width + 4}
+                  height={unfold.height + 4}
+                  viewBox={`-2 -2 ${unfold.width + 4} ${unfold.height + 4}`}
+                  role="img"
+                  aria-label={`${slices}조각을 엇갈려 이어붙인 모양`}
                 >
-                  <div className="w-full flex justify-between h-full relative">
-                    {Array.from({ length: slices }).map((_, i) => (
-                      <div
-                        key={i}
-                        className={`w-2 h-full rounded-t transition-all duration-300 ${
-                          i % 2 === 0 ? 'bg-purple-500' : 'bg-pink-500 transform rotate-180'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                </div>
+                  {unfold.paths.map((d, i) => (
+                    <path
+                      key={d}
+                      d={d}
+                      fill={i % 2 === 0 ? '#a855f7' : '#ec4899'}
+                      stroke="#f5f3ff"
+                      strokeWidth="1"
+                      strokeLinejoin="round"
+                    />
+                  ))}
+                </svg>
                 <div className="text-xs text-slate-300 mt-2">
                   엇갈려 이어붙인 모습 (가로 = 원주의 1/2, 세로 = 반지름)
                 </div>
