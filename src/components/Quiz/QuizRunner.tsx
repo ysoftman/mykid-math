@@ -15,6 +15,7 @@ import {
   recordProblemResult,
   XP_BOOST_STARS,
 } from '../../utils/storage';
+import { GameIcon } from '../GameIcon';
 import { MathText } from '../MathText';
 import { FractionInput } from './FractionInput';
 
@@ -199,7 +200,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
             }}
             className="flex items-center gap-1.5 text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-xl transition-colors border border-indigo-200"
           >
-            <span>✏️</span>
+            <GameIcon name="uiPencil" />
             <span>연습장 열기</span>
           </button>
 
@@ -233,7 +234,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
       <div className="space-y-4">
         {problem.context && (
           <div className="inline-block bg-amber-50 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-lg border border-amber-200">
-            📖 {problem.context}
+            <GameIcon name="quizProblem" className="h-4 w-4" /> {problem.context}
           </div>
         )}
 
@@ -255,7 +256,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
 
         {combo >= 2 && (
           <div className="inline-block bg-amber-50 text-amber-800 text-sm font-extrabold px-3 py-1 rounded-full border border-amber-200 animate-in fade-in">
-            🔥 {combo}연속!
+            <GameIcon name="quizCombo" /> {combo}연속!
           </div>
         )}
       </div>
@@ -331,7 +332,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
           }`}
         >
           <div className="flex items-center gap-3">
-            <span className="text-3xl">{isCorrect ? '🎉' : '💡'}</span>
+            <GameIcon name={isCorrect ? 'quizCorrect' : 'quizHint'} className="h-10 w-10" />
             <div>
               <div className="font-extrabold text-base">
                 {isCorrect
@@ -339,7 +340,9 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
                   : '아쉬워요! 풀이를 보고 다시 원리를 익혀볼까요?'}
               </div>
               {comboBonus && (
-                <div className="text-sm font-bold text-amber-800 mt-0.5">🔥 +1 콤보 보너스 ⭐</div>
+                <div className="text-sm font-bold text-amber-800 mt-0.5">
+                  <GameIcon name="iconComboN" className="h-4 w-4" /> +1 콤보 보너스 ⭐
+                </div>
               )}
               {boostBonus && (
                 <div className="text-sm font-bold text-amber-800 mt-0.5">
@@ -381,7 +384,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
             }}
             className="text-xs font-bold text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition-colors"
           >
-            <span>💡</span>
+            <GameIcon name="quizHint" className="h-4 w-4" />
             <span>{showHint ? '힌트 숨기기' : '어려운가요? 힌트 보기'}</span>
           </button>
 
@@ -397,7 +400,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
       {showSolution && (
         <div className="border border-indigo-100 bg-indigo-50/40 rounded-2xl p-5 space-y-3 animate-in fade-in">
           <h4 className="font-bold text-indigo-950 text-sm flex items-center gap-2">
-            <span>📝</span> 단계별 친절한 풀이 과정:
+            <GameIcon name="quizSolution" /> 단계별 친절한 풀이 과정:
           </h4>
           <div className="space-y-2">
             {problem.explanations.map((exp, idx) => (

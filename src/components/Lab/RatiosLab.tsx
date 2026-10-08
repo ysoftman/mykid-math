@@ -2,6 +2,7 @@ import type React from 'react';
 import { useState } from 'react';
 import { sound } from '../../utils/audio';
 import { GAME_ASSETS } from '../../utils/gameAssets';
+import { GameIcon } from '../GameIcon';
 import { Fraction } from '../MathText';
 import { LabGuide } from './LabGuide';
 
@@ -40,7 +41,9 @@ export const RatiosLab: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="bg-rose-50/50 p-4 rounded-xl border border-rose-100">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-xs font-bold text-rose-800">🍓 딸기 시럽 (비교하는 양)</span>
+            <span className="inline-flex items-center gap-1 text-xs font-bold text-rose-800">
+              <GameIcon name="iconSyrup" /> 딸기 시럽 (비교하는 양)
+            </span>
             <span className="text-xs font-black text-rose-700 bg-white px-2 py-0.5 rounded-full border border-rose-200">
               {syrup} 컵
             </span>
@@ -61,7 +64,9 @@ export const RatiosLab: React.FC = () => {
 
         <div className="bg-sky-50/50 p-4 rounded-xl border border-sky-100">
           <div className="flex justify-between items-center mb-1">
-            <span className="text-xs font-bold text-sky-800">💧 탄산수 (물)</span>
+            <span className="inline-flex items-center gap-1 text-xs font-bold text-sky-800">
+              <GameIcon name="iconWater" /> 탄산수 (물)
+            </span>
             <span className="text-xs font-black text-sky-700 bg-white px-2 py-0.5 rounded-full border border-sky-200">
               {water} 컵
             </span>

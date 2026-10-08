@@ -26,11 +26,10 @@ export type ShopSlot = 'hat' | 'pet' | 'prop' | 'theme' | 'character';
 export interface ShopItem {
   id: string;
   name: string;
-  icon?: string; // theme only
   slot: ShopSlot;
   price: number;
   gradient?: string; // roadmap banner classes, theme only
-  image?: GameAssetKey; // character, hat, pet, prop
+  image: GameAssetKey;
 }
 
 const DEFAULT_CHARACTER = 'char_hero';
@@ -74,7 +73,7 @@ export const SHOP_ITEMS: ShopItem[] = [
   {
     id: 'theme_forest',
     name: '초록 숲',
-    icon: '🌲',
+    image: 'themeForest',
     slot: 'theme',
     price: 12,
     gradient: 'from-emerald-700 to-teal-800',
@@ -82,7 +81,7 @@ export const SHOP_ITEMS: ShopItem[] = [
   {
     id: 'theme_ocean',
     name: '푸른 바다',
-    icon: '🌊',
+    image: 'themeSea',
     slot: 'theme',
     price: 12,
     gradient: 'from-sky-700 to-blue-800',
@@ -90,7 +89,7 @@ export const SHOP_ITEMS: ShopItem[] = [
   {
     id: 'theme_sunset',
     name: '노을 하늘',
-    icon: '🌅',
+    image: 'themeSunset',
     slot: 'theme',
     price: 25,
     gradient: 'from-orange-700 via-rose-700 to-fuchsia-800',
@@ -148,67 +147,71 @@ export const BADGE_DEFINITIONS: {
   id: string;
   name: string;
   desc: string;
-  icon: string;
-  image?: GameAssetKey; // shown instead of icon when set
+  image: GameAssetKey;
 }[] = [
-  { id: 'first_step', name: '첫 걸음', desc: '첫 문제를 맞혔어요!', icon: '🌱' },
+  { id: 'first_step', name: '첫 걸음', desc: '첫 문제를 맞혔어요!', image: 'badgeFirstStep' },
   {
     id: 'factor_pro',
     name: '약수 탐정',
     desc: '약수와 배수 문제를 5개 이상 맞혔어요!',
-    icon: '🔍',
     image: 'topicFactors',
   },
   {
     id: 'fraction_master',
     name: '분수 연금술사',
     desc: '분수 연산 문제를 5개 이상 맞혔어요!',
-    icon: '🍕',
     image: 'topicFractions',
   },
   {
     id: 'decimal_wiz',
     name: '소수 마법사',
     desc: '소수 연산 문제를 5개 이상 맞혔어요!',
-    icon: '✨',
     image: 'topicDecimals',
   },
   {
     id: 'geometry_architect',
     name: '도형 건축가',
     desc: '도형 넓이 문제를 5개 이상 맞혔어요!',
-    icon: '📐',
     image: 'topicGeometry',
   },
   {
     id: 'ratio_master',
     name: '비율의 달인',
     desc: '비와 비율 문제를 5개 이상 맞혔어요!',
-    icon: '⚖️',
     image: 'topicRatios',
   },
-  { id: 'star_collector', name: '별자리 수집가', desc: '별을 20개 이상 모았어요!', icon: '⭐' },
-  { id: 'math_hero', name: '수학 슈퍼히어로', desc: '레벨 5에 도달했어요!', icon: '👑' },
-  { id: 'combo_5', name: '콤보 마스터', desc: '5문제를 연속으로 맞혔어요!', icon: '🔥' },
+  {
+    id: 'star_collector',
+    name: '별자리 수집가',
+    desc: '별을 20개 이상 모았어요!',
+    image: 'badgeStar',
+  },
+  { id: 'math_hero', name: '수학 슈퍼히어로', desc: '레벨 5에 도달했어요!', image: 'badgeHero' },
+  { id: 'combo_5', name: '콤보 마스터', desc: '5문제를 연속으로 맞혔어요!', image: 'badgeCombo' },
   {
     id: 'wrong_conqueror',
     name: '오답 정복자',
     desc: '오답 노트 문제를 5개 다시 맞혔어요!',
-    icon: '🛡️',
+    image: 'badgeWrong',
   },
   {
     id: 'attendance_7',
     name: '꾸준함 챔피언',
     desc: '7일 연속으로 오늘의 미션을 끝냈어요!',
-    icon: '📅',
+    image: 'badgeAttendance',
   },
   {
     id: 'time_attack_10',
     name: '번개 계산왕',
     desc: '타임어택에서 10문제 이상 맞혔어요!',
-    icon: '⚡',
+    image: 'badgeSpeed',
   },
-  { id: 'boss_slayer', name: '보스 사냥꾼', desc: '보스전을 처음으로 이겼어요!', icon: '🐲' },
+  {
+    id: 'boss_slayer',
+    name: '보스 사냥꾼',
+    desc: '보스전을 처음으로 이겼어요!',
+    image: 'badgeBoss',
+  },
 ];
 
 const BADGE_CHECKS: Record<string, (s: UserStats) => boolean> = {

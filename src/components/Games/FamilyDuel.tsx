@@ -7,6 +7,7 @@ import confetti from '../../utils/confetti';
 import { GAME_ASSETS } from '../../utils/gameAssets';
 import { generateProblem, TOPICS } from '../../utils/problemGenerators';
 import { KID_NAME } from '../../utils/profile';
+import { GameIcon } from '../GameIcon';
 import { MathText } from '../MathText';
 import { GameProblem } from './GameProblem';
 
@@ -180,7 +181,10 @@ export const FamilyDuel: React.FC = () => {
     const winner = scores[0] === scores[1] ? null : scores[0] > scores[1] ? 0 : 1;
     return (
       <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 text-center space-y-5">
-        <div className="text-6xl">{winner === null ? '🤝' : '🏆'}</div>
+        <GameIcon
+          name={winner === null ? 'resultDuelDraw' : 'resultDuelWin'}
+          className="h-28 w-28"
+        />
         <h3 className="text-2xl font-black text-slate-800">
           {winner === null ? '무승부! 둘 다 최고예요!' : `${displayName(winner)} 승리!`}
         </h3>

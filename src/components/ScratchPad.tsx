@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { sound } from '../utils/audio';
+import { GameIcon } from './GameIcon';
 
 interface ScratchPadProps {
   isOpen: boolean;
@@ -96,7 +97,7 @@ export const ScratchPad: React.FC<ScratchPadProps> = ({ isOpen, onClose }) => {
       {/* Header */}
       <div className="bg-indigo-600 text-white px-4 py-3 flex items-center justify-between select-none">
         <div className="flex items-center gap-2 font-bold text-sm">
-          <span>✏️</span>
+          <GameIcon name="uiPencil" />
           <span>수학 끄적끄적 연습장</span>
         </div>
         <div className="flex items-center gap-2">

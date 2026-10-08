@@ -10,6 +10,7 @@ import {
   recordWrongConquered,
   removeWrongNote,
 } from '../../utils/storage';
+import { GameIcon } from '../GameIcon';
 import { MathText } from '../MathText';
 
 type FeedbackTone = 'correct' | 'wrong' | 'notice';
@@ -87,7 +88,7 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-100 pb-4">
         <div className="flex items-center gap-3">
-          <span className="text-3xl">📝</span>
+          <GameIcon name="tabReview" className="h-10 w-10" />
           <div>
             <h3 className="text-xl font-bold text-slate-800">오답 복습 노트</h3>
             <p className="text-xs text-slate-500">
@@ -109,7 +110,7 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
 
       {notes.length === 0 ? (
         <div className="text-center py-12 space-y-3">
-          <div className="text-5xl">🌟</div>
+          <GameIcon name="resultReviewEmpty" className="h-24 w-24" />
           <h4 className="text-lg font-bold text-slate-700">오답 노트가 비어있어요!</h4>
           <p className="text-xs text-slate-500 max-w-sm mx-auto">
             문제를 풀다가 틀리면 이곳에 차곡차곡 쌓여요. 언제든 다시 풀어보며 복습할 수 있습니다!

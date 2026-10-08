@@ -11,6 +11,7 @@ import {
   SHOP_ITEMS,
 } from '../utils/storage';
 import { DailyMission } from './DailyMission';
+import { GameIcon } from './GameIcon';
 import { CharacterAvatar } from './Shop';
 
 interface RoadmapProps {
@@ -109,7 +110,7 @@ export const Roadmap: React.FC<RoadmapProps> = ({
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-xs font-bold tracking-wide">
-              <span>🚀</span> 초등 5~6학년 수학 마스터 로드맵
+              <GameIcon name="iconRocket" /> 초등 5~6학년 수학 마스터 로드맵
             </div>
             <div className="flex items-center gap-3 pt-2">
               <CharacterAvatar stats={stats} size="sm" />
@@ -233,7 +234,8 @@ export const Roadmap: React.FC<RoadmapProps> = ({
       {/* Badges Earned */}
       <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
         <h3 className="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
-          <span>🏆</span> 획득한 업적 뱃지 ({stats.badges.length}/{BADGE_DEFINITIONS.length})
+          <GameIcon name="iconTrophy" /> 획득한 업적 뱃지 ({stats.badges.length}/
+          {BADGE_DEFINITIONS.length})
         </h3>
         <div className="grid grid-cols-1 min-[420px]:grid-cols-2 lg:grid-cols-4 gap-3">
           {BADGE_DEFINITIONS.map((badge) => {
@@ -249,16 +251,7 @@ export const Roadmap: React.FC<RoadmapProps> = ({
                     : 'bg-slate-50 border-slate-200 text-slate-700'
                 }`}
               >
-                {unlocked && badge.image ? (
-                  <img
-                    src={GAME_ASSETS[badge.image]}
-                    alt=""
-                    className="h-9 w-9 shrink-0 object-contain"
-                    draggable={false}
-                  />
-                ) : (
-                  <span className="text-2xl">{unlocked ? badge.icon : '🔒'}</span>
-                )}
+                <GameIcon name={unlocked ? badge.image : 'badgeLocked'} className="h-9 w-9" />
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-bold">{badge.name}</div>
                   <div className={`text-xs ${unlocked ? 'text-amber-800' : 'text-slate-500'}`}>
@@ -296,7 +289,7 @@ export const Roadmap: React.FC<RoadmapProps> = ({
             }}
             className="self-start text-sm font-bold text-rose-700 bg-rose-50 hover:bg-rose-100 border border-rose-200 px-3 py-1.5 rounded-xl transition-colors flex items-center gap-1.5 sm:self-auto"
           >
-            <span>📝</span>
+            <GameIcon name="tabReview" />
             <span>오답 노트 보러가기</span>
           </button>
         </div>
@@ -339,7 +332,7 @@ export const Roadmap: React.FC<RoadmapProps> = ({
                     </div>
 
                     <div className="flex items-center gap-1 bg-amber-50 px-2.5 py-1 rounded-full border border-amber-200 text-amber-700 text-xs font-bold">
-                      <span>⭐</span>
+                      <GameIcon name="star" className="h-4 w-4" />
                       <span>{progress.stars}</span>
                     </div>
                   </div>
@@ -370,10 +363,10 @@ export const Roadmap: React.FC<RoadmapProps> = ({
           onClick={handleExport}
           className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700"
         >
-          💾 내보내기
+          <GameIcon name="iconExport" className="h-4 w-4" /> 내보내기
         </button>
         <label className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-700 cursor-pointer focus-within:ring-2 focus-within:ring-indigo-500">
-          📂 불러오기
+          <GameIcon name="iconImport" className="h-4 w-4" /> 불러오기
           <input
             type="file"
             accept="application/json,.json"

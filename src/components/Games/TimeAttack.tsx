@@ -8,6 +8,7 @@ import { GAME_ASSETS } from '../../utils/gameAssets';
 import { generateProblem, TOPICS } from '../../utils/problemGenerators';
 // Aliased: biome treats a `use`-prefixed call as a React hook (useHookAtTopLevel).
 import { consumePowerUp, type RewardResult, recordTimeAttack } from '../../utils/storage';
+import { GameIcon } from '../GameIcon';
 import { MathText } from '../MathText';
 import { GameProblem } from './GameProblem';
 import { PowerUpButton } from './PowerUpButton';
@@ -116,7 +117,7 @@ export const TimeAttack: React.FC<TimeAttackProps> = ({
           맞힌 문제 하나마다 ⭐ 1개를 받아요.
         </p>
         <div className="inline-block bg-amber-50 border border-amber-200 text-amber-800 font-bold px-4 py-2 rounded-full">
-          🏆 최고 기록: {best}문제
+          <GameIcon name="iconBest" /> 최고 기록: {best}문제
         </div>
         <div>
           <button
@@ -134,7 +135,10 @@ export const TimeAttack: React.FC<TimeAttackProps> = ({
   if (phase === 'done') {
     return (
       <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 text-center space-y-4">
-        <div className="text-6xl">{result?.isNewBest && correctCount > 0 ? '🏆' : '⏰'}</div>
+        <GameIcon
+          name={result?.isNewBest && correctCount > 0 ? 'resultBest' : 'resultTimeout'}
+          className="h-28 w-28"
+        />
         <h3 className="text-2xl font-black text-slate-800">시간 끝!</h3>
         {result?.isNewBest && correctCount > 0 && (
           <div className="text-xl font-black text-rose-700">🎉 신기록!</div>
@@ -164,7 +168,7 @@ export const TimeAttack: React.FC<TimeAttackProps> = ({
       <div className="space-y-2">
         <div className="flex flex-wrap items-center justify-between gap-2 text-sm font-bold">
           <span className={timeLeft <= 10 ? 'text-rose-700' : 'text-slate-700'}>
-            ⏱️ {Math.ceil(timeLeft)}초
+            <GameIcon name="iconTimer" /> {Math.ceil(timeLeft)}초
           </span>
           <PowerUpButton
             id="time_charge"
@@ -173,7 +177,9 @@ export const TimeAttack: React.FC<TimeAttackProps> = ({
             onUse={handleTimeCharge}
             disabled={timeLeft <= 0}
           />
-          <span className="text-indigo-600">✅ {correctCount}문제</span>
+          <span className="text-indigo-600">
+            <GameIcon name="iconCorrect" /> {correctCount}문제
+          </span>
         </div>
         <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
           <div

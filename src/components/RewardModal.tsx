@@ -4,6 +4,7 @@ import { sound } from '../utils/audio';
 import confetti from '../utils/confetti';
 import { GAME_ASSETS } from '../utils/gameAssets';
 import { BADGE_DEFINITIONS, DAILY_MISSION_BONUS, type RewardResult } from '../utils/storage';
+import { GameIcon } from './GameIcon';
 
 interface RewardModalProps {
   reward: RewardResult | null;
@@ -79,16 +80,7 @@ export const RewardModal: React.FC<RewardModalProps> = ({ reward, onClose }) => 
                 key={b.id}
                 className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-left"
               >
-                {b.image ? (
-                  <img
-                    src={GAME_ASSETS[b.image]}
-                    alt=""
-                    className="h-12 w-12 shrink-0 object-contain"
-                    draggable={false}
-                  />
-                ) : (
-                  <span className="text-4xl">{b.icon}</span>
-                )}
+                <GameIcon name={b.image} className="h-12 w-12" />
                 <div>
                   <div className="font-extrabold text-slate-800">{b.name}</div>
                   <div className="text-xs text-slate-600">{b.desc}</div>

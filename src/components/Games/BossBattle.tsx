@@ -4,7 +4,7 @@ import type { Problem, TopicId } from '../../types/math';
 import { formatAnswer } from '../../utils/answer';
 import { sound } from '../../utils/audio';
 import confetti from '../../utils/confetti';
-import { GAME_ASSETS } from '../../utils/gameAssets';
+import { GAME_ASSETS, type GameAssetKey } from '../../utils/gameAssets';
 import { generateProblem, TOPICS } from '../../utils/problemGenerators';
 // Aliased: biome treats a `use`-prefixed call as a React hook (useHookAtTopLevel).
 import {
@@ -13,6 +13,7 @@ import {
   type RewardResult,
   recordBossClear,
 } from '../../utils/storage';
+import { GameIcon } from '../GameIcon';
 import { MathText } from '../MathText';
 import { GameProblem } from './GameProblem';
 import { PowerUpButton } from './PowerUpButton';
@@ -21,12 +22,12 @@ const BOSS_HP = 5;
 const START_HEARTS = 3;
 const MAX_HEARTS = 5;
 
-const BOSSES: Record<TopicId, { icon: string; name: string }> = {
-  factors: { icon: '🐉', name: '약수 드래곤' },
-  fractions: { icon: '👹', name: '분수 도깨비' },
-  decimals: { icon: '🧟', name: '소수점 좀비' },
-  geometry: { icon: '🤖', name: '도형 로봇' },
-  ratios: { icon: '🦖', name: '비율 공룡' },
+const BOSSES: Record<TopicId, { image: GameAssetKey; name: string }> = {
+  factors: { image: 'bossDragon', name: '약수 드래곤' },
+  fractions: { image: 'bossOni', name: '분수 도깨비' },
+  decimals: { image: 'bossZombie', name: '소수점 좀비' },
+  geometry: { image: 'bossRobot', name: '도형 로봇' },
+  ratios: { image: 'bossDino', name: '비율 공룡' },
 };
 
 interface BossBattleProps {
@@ -129,7 +130,8 @@ export const BossBattle: React.FC<BossBattleProps> = ({
   const missedPanel = missed && (
     <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 space-y-2 text-left">
       <div className="font-extrabold text-rose-900">
-        {blocked ? '🛡️ 보호막이 막아 줘서 하트는 그대로예요!' : '💔 앗, 보스의 반격!'} 정답은{' '}
+        <GameIcon name={blocked ? 'iconBlock' : 'iconCounter'} />{' '}
+        {blocked ? '보호막이 막아 줘서 하트는 그대로예요!' : '앗, 보스의 반격!'} 정답은{' '}
         <strong>
           <MathText text={formatAnswer(missed)} />
         </strong>
@@ -174,7 +176,7 @@ export const BossBattle: React.FC<BossBattleProps> = ({
                   cleared ? 'bg-amber-50 border-amber-300' : 'bg-slate-50 border-slate-200'
                 }`}
               >
-                <span className="text-4xl">{BOSSES[t.id].icon}</span>
+                <GameIcon name={BOSSES[t.id].image} className="h-14 w-14" />
                 <span className="flex-1 min-w-0">
                   <span className="block font-extrabold text-slate-800">{BOSSES[t.id].name}</span>
                   <span className="flex items-center gap-1 text-xs text-slate-500">
@@ -187,7 +189,7 @@ export const BossBattle: React.FC<BossBattleProps> = ({
                     <span className="truncate">{t.title}</span>
                   </span>
                 </span>
-                {cleared && <span className="text-2xl">👑</span>}
+                {cleared && <GameIcon name="iconCrown" className="h-8 w-8" />}
               </button>
             );
           })}
@@ -199,7 +201,7 @@ export const BossBattle: React.FC<BossBattleProps> = ({
   if (phase === 'win') {
     return (
       <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 text-center space-y-4">
-        <div className="text-6xl">👑</div>
+        <GameIcon name="resultBossWin" className="h-28 w-28" />
         <h3 className="text-2xl font-black text-slate-800">{boss.name} 격파!</h3>
         <p className="text-sm text-slate-600">
           어려운 문제 {BOSS_HP}개를 모두 맞혀 보스를 물리쳤어요!
@@ -222,7 +224,7 @@ export const BossBattle: React.FC<BossBattleProps> = ({
   if (phase === 'lose') {
     return (
       <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 text-center space-y-4">
-        <div className="text-6xl">{boss.icon}</div>
+        <GameIcon name={boss.image} className="h-28 w-28" />
         <h3 className="text-2xl font-black text-slate-800">아쉽게 졌어요...</h3>
         <p className="text-sm text-slate-600">
           보스 체력을 {hits}/{BOSS_HP} 깎았어요. 풀이를 보고 다시 도전해 봐요!
@@ -283,14 +285,13 @@ export const BossBattle: React.FC<BossBattleProps> = ({
           </span>
         </div>
         <div className="text-center">
-          <span
-            key={hits}
-            className={`inline-block text-6xl sm:text-7xl ${lastHit ? 'animate-bounce' : ''}`}
-          >
-            {boss.icon}
+          <span key={hits} className={`inline-block ${lastHit ? 'animate-bounce' : ''}`}>
+            <GameIcon name={boss.image} className="h-32 w-32 sm:h-40 sm:w-40" />
           </span>
           {lastHit && !missed && (
-            <div className="text-sm font-bold text-amber-300">💥 공격 성공!</div>
+            <div className="text-sm font-bold text-amber-300">
+              <GameIcon name="iconHit" /> 공격 성공!
+            </div>
           )}
         </div>
         <div className="space-y-1">

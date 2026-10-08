@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { sound } from '../../utils/audio';
 import { GAME_ASSETS } from '../../utils/gameAssets';
 import { josa, lcm, simplifyFraction } from '../../utils/mathHelpers';
+import { GameIcon } from '../GameIcon';
 import { Fraction } from '../MathText';
 import { LabGuide } from './LabGuide';
 
@@ -58,26 +59,28 @@ export const FractionsLab: React.FC = () => {
               sound.playPop();
               setMode('addition');
             }}
-            className={`px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all ${
               mode === 'addition'
                 ? 'bg-white text-indigo-700 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            ➕ 통분과 덧셈
+            <GameIcon name="labFractionAdd" />
+            통분과 덧셈
           </button>
           <button
             onClick={() => {
               sound.playPop();
               setMode('multiplication');
             }}
-            className={`px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all ${
               mode === 'multiplication'
                 ? 'bg-white text-indigo-700 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            <span className="font-black">×</span> 곱셈 (면적 모델)
+            <GameIcon name="labFractionMul" />
+            곱셈 (면적 모델)
           </button>
         </div>
       </div>

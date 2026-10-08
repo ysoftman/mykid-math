@@ -4,6 +4,7 @@ import { sound } from '../../utils/audio';
 import { GAME_ASSETS } from '../../utils/gameAssets';
 import { TOPICS } from '../../utils/problemGenerators';
 import { getStats, type RewardResult } from '../../utils/storage';
+import { GameIcon } from '../GameIcon';
 import { BossBattle } from './BossBattle';
 import { FamilyDuel } from './FamilyDuel';
 import { TimeAttack } from './TimeAttack';
@@ -95,7 +96,10 @@ export const GameHub: React.FC<GameHubProps> = ({ onReward, onStatsChanged }) =>
   return (
     <div className="space-y-4">
       <div className="text-center space-y-1">
-        <h2 className="text-2xl sm:text-3xl font-black text-slate-800">🎮 수학 게임</h2>
+        <h2 className="flex items-center justify-center gap-2 text-2xl sm:text-3xl font-black text-slate-800">
+          <GameIcon name="tabGames" className="h-10 w-10" />
+          수학 게임
+        </h2>
         <p className="text-sm text-slate-600">재미있게 놀면서 실력을 키워요!</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -114,12 +118,13 @@ export const GameHub: React.FC<GameHubProps> = ({ onReward, onStatsChanged }) =>
             <span className="block mt-1 text-sm text-slate-700">{g.description}</span>
             {g.id === 'time' && (
               <span className="mt-3 inline-block bg-white/80 px-2.5 py-1 rounded-full text-xs font-bold">
-                🏆 최고 {stats.timeAttackBest}문제
+                <GameIcon name="iconBest" className="h-4 w-4" /> 최고 {stats.timeAttackBest}문제
               </span>
             )}
             {g.id === 'boss' && (
               <span className="mt-3 inline-block bg-white/80 px-2.5 py-1 rounded-full text-xs font-bold">
-                👑 {stats.bossCleared.length} / {TOPICS.length} 단원 격파
+                <GameIcon name="iconCrown" className="h-4 w-4" /> {stats.bossCleared.length} /{' '}
+                {TOPICS.length} 단원 격파
               </span>
             )}
           </button>

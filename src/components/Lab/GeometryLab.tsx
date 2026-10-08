@@ -2,6 +2,7 @@ import type React from 'react';
 import { useState } from 'react';
 import { sound } from '../../utils/audio';
 import { GAME_ASSETS } from '../../utils/gameAssets';
+import { GameIcon } from '../GameIcon';
 import { Fraction } from '../MathText';
 import { LabGuide } from './LabGuide';
 
@@ -66,39 +67,42 @@ export const GeometryLab: React.FC = () => {
               sound.playPop();
               setShape('triangle');
             }}
-            className={`px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all ${
               shape === 'triangle'
                 ? 'bg-white text-indigo-700 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            🔺 삼각형
+            <GameIcon name="labTriangle" />
+            삼각형
           </button>
           <button
             onClick={() => {
               sound.playPop();
               setShape('trapezoid');
             }}
-            className={`px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all ${
               shape === 'trapezoid'
                 ? 'bg-white text-indigo-700 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            ⏢ 사다리꼴
+            <GameIcon name="labTrapezoid" />
+            사다리꼴
           </button>
           <button
             onClick={() => {
               sound.playPop();
               setShape('circle');
             }}
-            className={`px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all ${
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all ${
               shape === 'circle'
                 ? 'bg-white text-indigo-700 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            ⭕ 원의 변형
+            <GameIcon name="labCircle" />
+            원의 변형
           </button>
         </div>
       </div>

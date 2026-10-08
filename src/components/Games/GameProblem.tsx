@@ -2,6 +2,7 @@ import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import type { Problem } from '../../types/math';
 import { checkAnswer, cleanAnswerInput } from '../../utils/answer';
+import { GameIcon } from '../GameIcon';
 import { MathText } from '../MathText';
 import { FractionInput } from '../Quiz/FractionInput';
 
@@ -54,7 +55,7 @@ export const GameProblem: React.FC<GameProblemProps> = ({
     <div className={compact ? 'space-y-3' : 'space-y-4'}>
       {problem.context && (
         <div className="inline-block bg-amber-50 text-amber-800 text-xs font-semibold px-2.5 py-1 rounded-lg border border-amber-200">
-          📖 {problem.context}
+          <GameIcon name="iconContext" className="h-4 w-4" /> {problem.context}
         </div>
       )}
       <h3

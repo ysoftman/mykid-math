@@ -2,7 +2,7 @@ import type React from 'react';
 import type { UserStats } from '../types/math';
 import { sound } from '../utils/audio';
 import confetti from '../utils/confetti';
-import { GAME_ASSETS } from '../utils/gameAssets';
+import { GAME_ASSETS, type GameAssetKey } from '../utils/gameAssets';
 import { KID_CALL } from '../utils/profile';
 import {
   buyItem,
@@ -15,13 +15,14 @@ import {
   SHOP_ITEMS,
   type ShopSlot,
 } from '../utils/storage';
+import { GameIcon } from './GameIcon';
 
-const SLOTS: { slot: ShopSlot; title: string; icon: string }[] = [
-  { slot: 'character', title: '캐릭터', icon: '🦸' },
-  { slot: 'hat', title: '모자', icon: '🎩' },
-  { slot: 'pet', title: '펫', icon: '🐾' },
-  { slot: 'prop', title: '소품', icon: '✏️' },
-  { slot: 'theme', title: '배너 테마', icon: '🎨' },
+const SLOTS: { slot: ShopSlot; title: string; icon: GameAssetKey }[] = [
+  { slot: 'character', title: '캐릭터', icon: 'slotCharacter' },
+  { slot: 'hat', title: '모자', icon: 'slotHat' },
+  { slot: 'pet', title: '펫', icon: 'slotPet' },
+  { slot: 'prop', title: '소품', icon: 'slotProp' },
+  { slot: 'theme', title: '배너 테마', icon: 'slotTheme' },
 ];
 
 const AVATAR_SIZES = {
@@ -152,7 +153,15 @@ export const Shop: React.FC<ShopProps> = ({ stats, onStatsChanged }) => {
       <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center gap-6">
         <CharacterAvatar stats={stats} size="lg" />
         <div className="flex-1 text-center sm:text-left space-y-1">
-          <h2 className="text-xl font-black text-slate-800">🛍️ {KID_CALL}의 별 상점</h2>
+          <h2 className="flex items-center justify-center gap-2 text-xl font-black text-slate-800 sm:justify-start">
+            {KID_CALL}의
+            <img
+              src={GAME_ASSETS.shopTitle}
+              alt="별 상점"
+              className="h-12 w-auto"
+              draggable={false}
+            />
+          </h2>
           <p className="text-xs text-slate-500">
             문제를 풀어 모은 별로 캐릭터, 모자, 펫, 소품, 배너 테마와 게임 아이템을 사 보세요! 별을
             써도 레벨은 그대로예요.
@@ -175,7 +184,7 @@ export const Shop: React.FC<ShopProps> = ({ stats, onStatsChanged }) => {
       {SLOTS.map(({ slot, title, icon }) => (
         <div key={slot} className="space-y-3">
           <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2">
-            <span>{icon}</span> {title}
+            <GameIcon name={icon} className="h-7 w-7" /> {title}
           </h3>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {SHOP_ITEMS.filter((item) => item.slot === slot).map((item) => {
@@ -191,20 +200,12 @@ export const Shop: React.FC<ShopProps> = ({ stats, onStatsChanged }) => {
                       : 'bg-white border-slate-200'
                   }`}
                 >
-                  {item.image ? (
-                    <img
-                      src={GAME_ASSETS[item.image]}
-                      alt=""
-                      className="w-24 h-24 object-contain"
-                      draggable={false}
-                    />
-                  ) : (
-                    <div
-                      className={`w-full h-12 rounded-xl bg-gradient-to-r ${item.gradient} flex items-center justify-center text-2xl`}
-                    >
-                      {item.icon}
-                    </div>
-                  )}
+                  <img
+                    src={GAME_ASSETS[item.image]}
+                    alt=""
+                    className="w-24 h-24 object-contain"
+                    draggable={false}
+                  />
                   <div className="text-sm font-bold text-slate-800">{item.name}</div>
 
                   {equipped ? (
@@ -245,7 +246,7 @@ export const Shop: React.FC<ShopProps> = ({ stats, onStatsChanged }) => {
       {/* Consumable power-ups for games and quizzes */}
       <div className="space-y-3">
         <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2">
-          <span>🎒</span> 게임 아이템
+          <GameIcon name="shopItems" className="h-7 w-7" /> 게임 아이템
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {POWER_UPS.map((p) => {

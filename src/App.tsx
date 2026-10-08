@@ -1,5 +1,6 @@
 import type React from 'react';
 import { useCallback, useEffect, useState } from 'react';
+import { GameIcon } from './components/GameIcon';
 import { GameHub } from './components/Games/GameHub';
 import { DecimalsLab } from './components/Lab/DecimalsLab';
 // Labs
@@ -135,7 +136,7 @@ export const App: React.FC = () => {
               >
                 <span className="hidden sm:inline">이 개념으로 문제 풀기</span>
                 <span className="sm:hidden">퀴즈 풀기</span>
-                <span>🎯</span>
+                <GameIcon name="tabQuiz" />
               </button>
             </div>
 
@@ -173,7 +174,7 @@ export const App: React.FC = () => {
                 }}
                 className="self-start text-sm font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-200 transition-colors flex items-center gap-1 sm:self-auto"
               >
-                <span>🧪</span>
+                <GameIcon name="tabLab" />
                 <span className="hidden sm:inline">원리가 헷갈리면? 실험실 보기</span>
                 <span className="sm:hidden">실험실 보기</span>
               </button>

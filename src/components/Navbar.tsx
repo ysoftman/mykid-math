@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { UserStats } from '../types/math';
 import { sound } from '../utils/audio';
 import { GAME_ASSETS } from '../utils/gameAssets';
+import { GameIcon } from './GameIcon';
 
 // Build time in KST, e.g. "2026.10.08 23:41"
 const VERSION = new Intl.DateTimeFormat('sv-SE', {
@@ -50,11 +51,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           }}
           className="flex items-center gap-2 cursor-pointer select-none group text-left"
         >
-          <span className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white text-xl shadow-md group-hover:scale-105 transition-transform">
-            📐
-          </span>
+          <GameIcon
+            name="appLogo"
+            className="h-10 w-10 group-hover:scale-105 transition-transform"
+          />
           <span className="block">
-            <span className="block font-black text-slate-800 text-sm sm:text-lg leading-tight tracking-tight">
+            <span className="block whitespace-nowrap font-black text-slate-800 text-sm sm:text-lg leading-tight tracking-tight">
               준영이의 수학공부
             </span>
             <span className="block text-[10px] leading-tight text-slate-500">버전 {VERSION}</span>
@@ -68,52 +70,56 @@ export const Navbar: React.FC<NavbarProps> = ({
               sound.playPop();
               onTabChange('roadmap');
             }}
-            className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all ${
+            className={`inline-flex items-center gap-1 whitespace-nowrap px-2 py-1.5 text-xs font-bold rounded-xl transition-all ${
               currentTab === 'roadmap'
                 ? 'bg-white text-indigo-700 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            🗺️ 로드맵
+            <GameIcon name="tabRoadmap" />
+            로드맵
           </button>
           <button
             onClick={() => {
               sound.playPop();
               onTabChange('lab');
             }}
-            className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all ${
+            className={`inline-flex items-center gap-1 whitespace-nowrap px-2 py-1.5 text-xs font-bold rounded-xl transition-all ${
               currentTab === 'lab'
                 ? 'bg-white text-indigo-700 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            🧪 개념 실험실
+            <GameIcon name="tabLab" />
+            개념 실험실
           </button>
           <button
             onClick={() => {
               sound.playPop();
               onTabChange('quiz');
             }}
-            className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all ${
+            className={`inline-flex items-center gap-1 whitespace-nowrap px-2 py-1.5 text-xs font-bold rounded-xl transition-all ${
               currentTab === 'quiz'
                 ? 'bg-white text-indigo-700 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            🎯 도전 퀴즈
+            <GameIcon name="tabQuiz" />
+            도전 퀴즈
           </button>
           <button
             onClick={() => {
               sound.playPop();
               onTabChange('review');
             }}
-            className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all relative ${
+            className={`inline-flex items-center gap-1 whitespace-nowrap px-2 py-1.5 text-xs font-bold rounded-xl transition-all relative ${
               currentTab === 'review'
                 ? 'bg-white text-rose-700 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            📝 오답 노트
+            <GameIcon name="tabReview" />
+            오답 노트
             {wrongCount > 0 && (
               <span className="ml-1 px-1.5 py-0.5 bg-rose-600 text-white rounded-full text-xs font-bold">
                 {wrongCount}
@@ -122,22 +128,23 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
           {(
             [
-              ['games', '🎮 게임'],
-              ['shop', '🛍️ 상점'],
+              ['games', 'tabGames', '게임'],
+              ['shop', 'tabShop', '상점'],
             ] as const
-          ).map(([tab, label]) => (
+          ).map(([tab, icon, label]) => (
             <button
               key={tab}
               onClick={() => {
                 sound.playPop();
                 onTabChange(tab);
               }}
-              className={`px-3.5 py-1.5 text-xs font-bold rounded-xl transition-all ${
+              className={`inline-flex items-center gap-1 whitespace-nowrap px-2 py-1.5 text-xs font-bold rounded-xl transition-all ${
                 currentTab === tab
                   ? 'bg-white text-indigo-700 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
+              <GameIcon name={icon} />
               {label}
             </button>
           ))}
@@ -152,9 +159,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               onOpenScratchPad();
             }}
             title="수학 연습장 / 칠판 열기"
-            className="flex items-center gap-1 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl transition-colors border border-slate-200"
+            className="flex items-center gap-1 whitespace-nowrap text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl transition-colors border border-slate-200"
           >
-            <span>✏️</span>
+            <GameIcon name="uiPencil" />
             <span className="hidden sm:inline">연습장</span>
           </button>
 
@@ -164,7 +171,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             title={soundOn ? '효과음 끄기' : '효과음 켜기'}
             className="w-11 h-11 rounded-xl bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-sm transition-colors border border-slate-200"
           >
-            {soundOn ? '🔊' : '🔇'}
+            <GameIcon name={soundOn ? 'uiSoundOn' : 'uiSoundOff'} className="h-7 w-7" />
           </button>
 
           {/* Level and Stars Badge */}
@@ -188,12 +195,12 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="grid grid-cols-6 md:hidden border-t border-slate-100 px-1 py-1 bg-slate-50 text-[12px] font-bold">
         {(
           [
-            ['roadmap', '🗺️', '로드맵'],
-            ['lab', '🧪', '실험실'],
-            ['quiz', '🎯', '퀴즈'],
-            ['review', '📝', `오답(${wrongCount})`],
-            ['games', '🎮', '게임'],
-            ['shop', '🛍️', '상점'],
+            ['roadmap', 'tabRoadmap', '로드맵'],
+            ['lab', 'tabLab', '실험실'],
+            ['quiz', 'tabQuiz', '퀴즈'],
+            ['review', 'tabReview', `오답(${wrongCount})`],
+            ['games', 'tabGames', '게임'],
+            ['shop', 'tabShop', '상점'],
           ] as const
         ).map(([tab, icon, label]) => (
           <button
@@ -208,7 +215,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 : 'text-slate-500'
             }`}
           >
-            <span className="text-base">{icon}</span>
+            <GameIcon name={icon} className="h-6 w-6" />
             <span>{label}</span>
           </button>
         ))}

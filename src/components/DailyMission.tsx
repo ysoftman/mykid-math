@@ -8,6 +8,7 @@ import {
   getAttendanceStreak,
   todayKey,
 } from '../utils/storage';
+import { GameIcon } from './GameIcon';
 
 export const DailyMission: React.FC<{ stats: UserStats }> = ({ stats }) => {
   const today = todayKey();
@@ -26,11 +27,11 @@ export const DailyMission: React.FC<{ stats: UserStats }> = ({ stats }) => {
     <div className="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200 shadow-sm space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2">
-          <span>🎯</span> 오늘의 미션: 도전 퀴즈 {DAILY_MISSION_GOAL}문제 풀기
+          <GameIcon name="iconMission" /> 오늘의 미션: 도전 퀴즈 {DAILY_MISSION_GOAL}문제 풀기
         </h3>
         {streak > 0 && (
-          <span className="text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
-            🔥 {streak}일 연속
+          <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-800 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded-full">
+            <GameIcon name="iconStreak" className="h-4 w-4" /> {streak}일 연속
           </span>
         )}
       </div>
@@ -69,8 +70,8 @@ export const DailyMission: React.FC<{ stats: UserStats }> = ({ stats }) => {
       <div>
         <div className="text-xs font-bold text-slate-700">출석 도장 (최근 2주)</div>
         <p className="text-xs text-slate-500 mt-0.5 mb-2">
-          도장 받는 법: 🎯 도전 퀴즈에서 하루 {DAILY_MISSION_GOAL}문제 풀기 (틀려도 괜찮아요).
-          게임과 오답 노트 문제는 세지 않아요.
+          도장 받는 법: <GameIcon name="tabQuiz" className="h-4 w-4" /> 도전 퀴즈에서 하루{' '}
+          {DAILY_MISSION_GOAL}문제 풀기 (틀려도 괜찮아요). 게임과 오답 노트 문제는 세지 않아요.
         </p>
         <div className="grid grid-cols-7 gap-1.5">
           {days.map((d) => {

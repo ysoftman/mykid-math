@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { sound } from '../../utils/audio';
 import { GAME_ASSETS } from '../../utils/gameAssets';
 import { gcd, getFactors, lcm } from '../../utils/mathHelpers';
+import { GameIcon } from '../GameIcon';
 import { LabGuide } from './LabGuide';
 
 export const FactorsLab: React.FC = () => {
@@ -64,26 +65,28 @@ export const FactorsLab: React.FC = () => {
               sound.playPop();
               setTab('rect');
             }}
-            className={`px-4 py-1.5 text-sm font-bold rounded-xl transition-all ${
+            className={`inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-bold rounded-xl transition-all ${
               tab === 'rect'
                 ? 'bg-white text-indigo-700 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            🧱 직사각형 타일 약수 탐색
+            <GameIcon name="labTiles" />
+            직사각형 타일 약수 탐색
           </button>
           <button
             onClick={() => {
               sound.playPop();
               setTab('gcd_lcm');
             }}
-            className={`px-4 py-1.5 text-sm font-bold rounded-xl transition-all ${
+            className={`inline-flex items-center gap-1.5 px-4 py-1.5 text-sm font-bold rounded-xl transition-all ${
               tab === 'gcd_lcm'
                 ? 'bg-white text-indigo-700 shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
-            🤝 최대공약수 & 최소공배수
+            <GameIcon name="labGcdLcm" />
+            최대공약수 & 최소공배수
           </button>
         </div>
       </div>
