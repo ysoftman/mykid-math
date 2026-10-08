@@ -1,5 +1,5 @@
 import type { Difficulty, Problem } from '../../types/math';
-import { gcd, pickOne, randomInt } from '../mathHelpers';
+import { gcd, josa, lcm, pickOne, randomInt, randomNumerator } from '../mathHelpers';
 import { KID_CALL } from '../profile';
 
 export function generateRatioProblem(difficulty: Difficulty): Problem {
@@ -11,6 +11,9 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
     'discount',
     'ratio_as_fraction',
     'speed',
+    'simplest_ratio',
+    'proportion_word',
+    'concentration',
   ]);
   const id = `rat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
@@ -72,6 +75,149 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
     };
   }
 
+  if (type === 'simplest_ratio') {
+    // Easy shows natural numbers, medium tenths, hard fractions; all become the natural-number ratio `whole` first
+    let shown: [string, string];
+    let whole: [number, number];
+    let toWhole = '';
+    if (difficulty === 'hard') {
+      const b = randomInt(2, 9);
+      let d = randomInt(2, 9);
+      while (d === b) d = randomInt(2, 9);
+      const a = randomNumerator(b);
+      const c = randomNumerator(d);
+      const l = lcm(b, d);
+      whole = [a * (l / b), c * (l / d)];
+      shown = [`${a}/${b}`, `${c}/${d}`];
+      toWhole = `두 분모 ${josa(b, '과')} ${d}의 최소공배수 ${josa(l, '을')} 전항과 후항에 곱하면 ${whole[0]} : ${whole[1]}입니다.`;
+    } else {
+      let x = randomInt(1, 9);
+      let y = randomInt(2, 9);
+      while (x === y || gcd(x, y) !== 1) {
+        x = randomInt(1, 9);
+        y = randomInt(2, 9);
+      }
+      let k = randomInt(difficulty === 'easy' ? 2 : 1, 9);
+      // Medium shows tenths, so neither term may be a whole number
+      while (difficulty === 'medium' && ((x * k) % 10 === 0 || (y * k) % 10 === 0)) {
+        k = randomInt(1, 9);
+      }
+      whole = [x * k, y * k];
+      const scale = difficulty === 'easy' ? 1 : 10;
+      shown = [`${(x * k) / scale}`, `${(y * k) / scale}`];
+      if (difficulty === 'medium') {
+        toWhole = `전항과 후항에 10을 곱하면 ${whole[0]} : ${whole[1]}입니다.`;
+      }
+    }
+    const g = gcd(whole[0], whole[1]);
+    const p = whole[0] / g;
+    const q = whole[1] / g;
+    const divide =
+      g > 1
+        ? `${josa(whole[0], '과')} ${whole[1]}의 최대공약수 ${josa(g, '으로')} 전항과 후항을 나누면 ${p} : ${q}입니다.`
+        : `${whole[0]} : ${josa(whole[1], '은')} 1 말고는 공약수가 없으므로 이미 가장 간단한 자연수의 비입니다.`;
+
+    return {
+      id,
+      topicId: 'ratios',
+      subtopic: '간단한 자연수의 비',
+      difficulty,
+      question: `${shown[0]} : ${josa(shown[1], '을')} 가장 간단한 자연수의 비로 나타내면 ${p} : □입니다. □에 알맞은 수를 구하세요.`,
+      hint: `비의 전항과 후항에 0이 아닌 같은 수를 곱하거나 나누어도 비율은 같아요. 자연수의 비로 만든 다음 최대공약수로 나누어 보세요.`,
+      answerType: 'number',
+      correctAnswer: q,
+      explanations: toWhole
+        ? [
+            { title: '1단계: 자연수의 비로 만들기', content: toWhole },
+            { title: '2단계: 최대공약수로 나누기', content: divide },
+          ]
+        : [{ title: '1단계: 최대공약수로 나누기', content: divide }],
+    };
+  }
+
+  if (type === 'proportion_word') {
+    let a: number;
+    let b: number;
+    let c: number;
+    let question: string;
+    if (Math.random() < 0.5) {
+      // a cookies need b grams of flour, so c cookies need c × (grams per cookie)
+      a = randomInt(2, difficulty === 'easy' ? 4 : 6);
+      const perCookie = randomInt(2, difficulty === 'hard' ? 12 : 6) * 5;
+      const maxCookies = difficulty === 'easy' ? 10 : difficulty === 'medium' ? 15 : 30;
+      c = randomInt(2, maxCookies);
+      while (c === a) c = randomInt(2, maxCookies);
+      b = a * perCookie;
+      question = `쿠키 ${a}개를 만드는 데 밀가루 ${b}g이 필요합니다. 같은 비율로 쿠키 ${c}개를 만들려면 밀가루는 몇 g 필요한가요?`;
+    } else {
+      a = randomInt(1, difficulty === 'easy' ? 4 : 9);
+      b = randomInt(2, difficulty === 'easy' ? 5 : 9);
+      while (a === b || gcd(a, b) !== 1) {
+        a = randomInt(1, difficulty === 'easy' ? 4 : 9);
+        b = randomInt(2, difficulty === 'easy' ? 5 : 9);
+      }
+      c = a * randomInt(2, difficulty === 'easy' ? 5 : difficulty === 'medium' ? 10 : 20);
+      question = `빨간 물감과 노란 물감을 ${a} : ${b}의 비로 섞어 주황색 물감을 만들려고 합니다. 빨간 물감을 ${c}mL 넣었다면 노란 물감은 몇 mL 넣어야 하나요?`;
+    }
+    const x = (b * c) / a;
+
+    return {
+      id,
+      topicId: 'ratios',
+      subtopic: '비례식 활용',
+      difficulty,
+      question,
+      hint: `구하려는 양을 □로 놓고 ${a} : ${b} = ${c} : □처럼 비례식을 세워 보세요.`,
+      answerType: 'number',
+      correctAnswer: x,
+      explanations: [
+        {
+          title: '1단계: 비례식 세우기',
+          content: `${a} : ${b} = ${c} : □`,
+        },
+        {
+          title: '2단계: 외항의 곱 = 내항의 곱',
+          content: `${a} × □ = ${b} × ${c} = ${b * c}, □ = ${b * c} ÷ ${a} = ${x}`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'concentration') {
+    const total = pickOne(
+      difficulty === 'easy'
+        ? [100, 200]
+        : difficulty === 'medium'
+          ? [200, 300, 400, 500]
+          : [150, 250, 300, 600],
+    );
+    let percent = randomInt(1, 12) * 5;
+    while ((total * percent) % 100 !== 0) percent = randomInt(1, 12) * 5;
+    const syrup = (total * percent) / 100;
+
+    return {
+      id,
+      topicId: 'ratios',
+      subtopic: '비율 활용 (진하기)',
+      difficulty,
+      context: '딸기 주스 만들기',
+      question: `딸기 시럽 ${syrup}mL와 탄산수 ${total - syrup}mL를 섞어 딸기 주스를 만들었습니다. 주스 양에 대한 딸기 시럽 양의 비율은 몇 %인가요?`,
+      hint: `기준량은 탄산수가 아니라 주스 전체의 양(시럽 + 탄산수)이에요!`,
+      answerType: 'number',
+      correctAnswer: percent,
+      explanations: [
+        {
+          title: '1단계: 기준량(주스 양) 구하기',
+          content: `${syrup} + ${total - syrup} = ${total}mL`,
+        },
+        {
+          title: '2단계: 백분율로 나타내기',
+          content: `(${syrup} ÷ ${total}) × 100 = ${percent}%`,
+        },
+      ],
+    };
+  }
+
   if (type === 'speed') {
     const hours = randomInt(2, difficulty === 'hard' ? 8 : 5);
     const speed = difficulty === 'easy' ? randomInt(3, 9) * 10 : randomInt(30, 120);
@@ -107,8 +253,11 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
         : difficulty === 'medium'
           ? pickOne([20, 25, 40, 50])
           : pickOne([30, 60, 80, 120]);
-    const part = difficulty === 'easy' ? randomInt(1, 9) * 10 : randomInt(3, total - 2);
-    const percent = Math.round((part / total) * 100);
+    // Only parts that give a whole-number percent, e.g. multiples of 3 out of 30
+    const step = total / gcd(total, 100);
+    const part =
+      difficulty === 'easy' ? randomInt(1, 9) * 10 : randomInt(1, total / step - 1) * step;
+    const percent = (part * 100) / total;
 
     return {
       id,
@@ -167,7 +316,7 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
       explanations: [
         {
           title: '방법 1: 전항과 후항의 배수 관계',
-          content: `${a}가 ${multiplier}배 되어 ${c}이 되었으므로, ${b}도 똑같이 ${multiplier}배 되어야 합니다: ${b} × ${multiplier} = ${x}`,
+          content: `${josa(a, '이')} ${multiplier}배 되어 ${josa(c, '이')} 되었으므로, ${b}도 똑같이 ${multiplier}배 되어야 합니다: ${b} × ${multiplier} = ${x}`,
         },
         {
           title: '방법 2: 외항의 곱 = 내항의 곱',
@@ -229,7 +378,7 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
     difficulty,
     context: '스티커 나누기',
     question: `스티커 ${total}장을 ${KID_CALL}와 ${friend}가 ${r1} : ${r2}의 비로 나누어 가지려고 합니다. ${targetName}가 갖게 될 스티커는 몇 장일까요?`,
-    hint: `전체를 총 (${r1} + ${r2} = ${r1 + r2})조각으로 나눈 다음, 그 중 ${isFirst ? r1 : r2}조각의 양을 구하면 돼요!`,
+    hint: `전체를 총 (${r1} + ${r2} = ${r1 + r2})조각으로 나눈 다음, 그중 ${isFirst ? r1 : r2}조각의 양을 구하면 돼요!`,
     answerType: 'number',
     correctAnswer: targetAns,
     explanations: [

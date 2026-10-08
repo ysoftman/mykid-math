@@ -14,6 +14,10 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
     'circumference',
     'cuboid_volume',
     'cube_surface_area',
+    'cuboid_surface_area',
+    'regular_polygon_perimeter',
+    'prism_parts',
+    'diameter_from_circumference',
   ]);
   const id = `geo_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
@@ -132,6 +136,155 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
           title: '2단계: 면 6개의 넓이 더하기',
           content: `${edge * edge} × 6 = ${area}cm²`,
         },
+      ],
+    };
+  }
+
+  if (shape === 'cuboid_surface_area') {
+    const max = difficulty === 'easy' ? 6 : difficulty === 'medium' ? 10 : 15;
+    const a = randomInt(2, max);
+    const b = randomInt(2, max);
+    const c = randomInt(2, max);
+    const faces = a * b + b * c + a * c;
+
+    return {
+      id,
+      topicId: 'geometry',
+      subtopic: '직육면체의 겉넓이',
+      difficulty,
+      question: `가로 ${a}cm, 세로 ${b}cm, 높이 ${c}cm인 직육면체의 겉넓이는 몇 cm²인가요?`,
+      hint: `직육면체는 마주 보는 두 면의 모양과 크기가 같아요. 서로 다른 세 면의 넓이를 더한 뒤 2배 해요!`,
+      answerType: 'number',
+      correctAnswer: faces * 2,
+      explanations: [
+        {
+          title: '1단계: 서로 다른 세 면의 넓이',
+          content: `${a} × ${b} = ${a * b}cm², ${b} × ${c} = ${b * c}cm², ${a} × ${c} = ${a * c}cm²`,
+        },
+        {
+          title: '2단계: 세 면의 넓이의 합 × 2',
+          content: `(${a * b} + ${b * c} + ${a * c}) × 2 = ${faces} × 2 = ${faces * 2}cm²`,
+        },
+      ],
+    };
+  }
+
+  if (shape === 'regular_polygon_perimeter') {
+    const polygons: [number, string][] = [
+      [3, '정삼각형'],
+      [4, '정사각형'],
+      [5, '정오각형'],
+      [6, '정육각형'],
+      [8, '정팔각형'],
+      [10, '정십각형'],
+    ];
+    const [sides, name] = pickOne(difficulty === 'easy' ? polygons.slice(0, 3) : polygons);
+    const side = randomInt(2, difficulty === 'easy' ? 9 : difficulty === 'medium' ? 15 : 25);
+    const perimeter = sides * side;
+    const askSide = difficulty !== 'easy' && Math.random() < 0.5;
+
+    return {
+      id,
+      topicId: 'geometry',
+      subtopic: '정다각형의 둘레',
+      difficulty,
+      question: askSide
+        ? `둘레가 ${perimeter}cm인 ${name}의 한 변은 몇 cm인가요?`
+        : `한 변이 ${side}cm인 ${name}의 둘레는 몇 cm인가요?`,
+      hint: `정다각형은 변의 길이가 모두 같아요. ${name}의 변은 몇 개인지 세어 보세요!`,
+      answerType: 'number',
+      correctAnswer: askSide ? side : perimeter,
+      explanations: [
+        {
+          title: '1단계: 변의 수 세기',
+          content: `${name}은 길이가 같은 변 ${sides}개로 이루어져 있어요.`,
+        },
+        {
+          title: askSide ? '2단계: 둘레를 변의 수로 나누기' : '2단계: 한 변에 변의 수 곱하기',
+          content: askSide
+            ? `한 변 = 둘레 ÷ 변의 수 = ${perimeter} ÷ ${sides} = ${side}cm`
+            : `둘레 = 한 변 × 변의 수 = ${side} × ${sides} = ${perimeter}cm`,
+        },
+      ],
+    };
+  }
+
+  if (shape === 'prism_parts') {
+    const KOREAN_COUNT = ['', '', '', '삼', '사', '오', '육', '칠', '팔', '구', '십'];
+    const n = randomInt(3, difficulty === 'easy' ? 6 : difficulty === 'medium' ? 8 : 10);
+    const isPrism = Math.random() < 0.5;
+    const part = pickOne(['면', '모서리', '꼭짓점'] as const);
+    const solid = `${KOREAN_COUNT[n]}각${isPrism ? '기둥' : '뿔'}`;
+    const counts = isPrism
+      ? { 면: n + 2, 모서리: n * 3, 꼭짓점: n * 2 }
+      : { 면: n + 1, 모서리: n * 2, 꼭짓점: n + 1 };
+    const reasons = isPrism
+      ? {
+          면: `밑면 2개 + 옆면 ${n}개 = ${n + 2}개`,
+          모서리: `두 밑면의 모서리 ${n}개씩 + 옆면끼리 만나는 모서리 ${n}개 = ${n * 3}개`,
+          꼭짓점: `두 밑면에 꼭짓점이 ${n}개씩이므로 ${n} × 2 = ${n * 2}개`,
+        }
+      : {
+          면: `밑면 1개 + 옆면 ${n}개 = ${n + 1}개`,
+          모서리: `밑면의 모서리 ${n}개 + 옆면끼리 만나는 모서리 ${n}개 = ${n * 2}개`,
+          꼭짓점: `밑면의 꼭짓점 ${n}개 + 각뿔의 꼭짓점 1개 = ${n + 1}개`,
+        };
+
+    return {
+      id,
+      topicId: 'geometry',
+      subtopic: isPrism ? '각기둥의 구성 요소' : '각뿔의 구성 요소',
+      difficulty,
+      question: `${solid}의 ${part === '모서리' ? '모서리는' : `${part}은`} 모두 몇 개인가요?`,
+      hint: isPrism
+        ? `각기둥은 서로 평행한 밑면이 2개이고, 옆면은 밑면의 변의 수만큼 있어요.`
+        : `각뿔은 밑면이 1개이고, 삼각형 모양의 옆면이 밑면의 변의 수만큼 있어요.`,
+      answerType: 'number',
+      correctAnswer: counts[part],
+      explanations: [
+        {
+          title: '1단계: 밑면 모양 살펴보기',
+          content: `${solid}의 밑면은 ${KOREAN_COUNT[n]}각형이므로 밑면 하나의 변과 꼭짓점이 각각 ${n}개입니다.`,
+        },
+        {
+          title: `2단계: ${part}의 수 세기`,
+          content: reasons[part],
+        },
+      ],
+    };
+  }
+
+  if (shape === 'diameter_from_circumference') {
+    const askRadius = difficulty === 'hard';
+    const diameter =
+      difficulty === 'easy'
+        ? randomInt(2, 10)
+        : difficulty === 'medium'
+          ? randomInt(5, 20)
+          : randomInt(3, 15) * 2;
+    const circumference = Math.round(diameter * 314) / 100;
+
+    return {
+      id,
+      topicId: 'geometry',
+      subtopic: '원주로 지름 구하기',
+      difficulty,
+      question: `원주가 ${circumference}cm인 원의 ${askRadius ? '반지름' : '지름'}은 몇 cm인가요? (단, 원주율은 3.14로 계산합니다)`,
+      hint: `원주 = 지름 × 원주율이므로 지름 = 원주 ÷ 원주율이에요!${askRadius ? ' 반지름은 지름의 절반이에요.' : ''}`,
+      answerType: 'number',
+      correctAnswer: askRadius ? diameter / 2 : diameter,
+      explanations: [
+        {
+          title: '1단계: 원주와 지름의 관계',
+          content: `원주 = 지름 × 원주율이므로 지름 = 원주 ÷ 원주율입니다.`,
+        },
+        {
+          title: '2단계: 지름 구하기',
+          content: `${circumference} ÷ 3.14 = ${diameter}cm`,
+        },
+        ...(askRadius
+          ? [{ title: '3단계: 반지름 구하기', content: `${diameter} ÷ 2 = ${diameter / 2}cm` }]
+          : []),
       ],
     };
   }
@@ -324,8 +477,8 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
     topicId: 'geometry',
     subtopic: '원의 넓이',
     difficulty,
-    question: `반지름이 ${radius}cm인 원의 넓이를 구하세요. (단, 원주율은 3.14로 계산합니다)`,
-    hint: `원을 무수히 잘게 잘라 이어붙이면 직사각형이 돼요! 공식: 반지름 × 반지름 × 원주율(3.14)`,
+    question: `반지름이 ${radius}cm인 원의 넓이는 몇 cm²인가요? (단, 원주율은 3.14로 계산합니다)`,
+    hint: `원을 아주 잘게 잘라 엇갈려 이어 붙이면 직사각형에 가까워져요! 공식: 반지름 × 반지름 × 원주율(3.14)`,
     answerType: 'number',
     correctAnswer: area,
     explanations: [

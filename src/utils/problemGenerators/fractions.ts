@@ -1,12 +1,12 @@
 import type { Difficulty, Problem } from '../../types/math';
 import {
   gcd,
+  josa,
   lcm,
   pickOne,
   randomInt,
   randomNumerator,
   simplifyFraction,
-  withGwa,
 } from '../mathHelpers';
 import { KID_CALL } from '../profile';
 
@@ -20,6 +20,10 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
     'simplify',
     'mixed_addition',
     'division_word',
+    'mixed_subtraction',
+    'fraction_times_natural',
+    'fraction_div_natural',
+    'whole_from_part',
   ]);
   const id = `frac_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
   const unlikeDenominators =
@@ -51,14 +55,14 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
       topicId: 'fractions',
       subtopic: '약분',
       difficulty,
-      question: `${sn * m}/${sd * m}을(를) 기약분수로 나타내세요.`,
+      question: `${josa(`${sn * m}/${sd * m}`, '을')} 기약분수로 나타내세요.`,
       hint: `분자와 분모의 최대공약수로 분자와 분모를 똑같이 나누어 보세요.`,
       answerType: 'fraction',
       correctAnswer: { num: sn, den: sd },
       explanations: [
         {
           title: '1단계: 최대공약수 구하기',
-          content: `${sn * m}과 ${sd * m}의 최대공약수는 ${m}입니다.`,
+          content: `${josa(sn * m, '과')} ${sd * m}의 최대공약수는 ${m}입니다.`,
         },
         {
           title: '2단계: 분자와 분모를 나누기',
@@ -68,36 +72,45 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
     };
   }
 
-  if (type === 'mixed_addition') {
+  if (type === 'mixed_addition' || type === 'mixed_subtraction') {
+    const isAdd = type === 'mixed_addition';
     const den1 = pickOne(unlikeDenominators);
     let den2 = pickOne(unlikeDenominators);
     while (den1 === den2) den2 = pickOne(unlikeDenominators);
-    const w1 = randomInt(1, difficulty === 'hard' ? 5 : 3);
-    const w2 = randomInt(1, difficulty === 'hard' ? 5 : 3);
+    const maxWhole = difficulty === 'hard' ? 5 : 3;
+    // For subtraction w1 > w2 keeps the result positive (fractional parts are below 1)
+    const w1 = isAdd ? randomInt(1, maxWhole) : randomInt(2, maxWhole + 1);
+    const w2 = randomInt(1, isAdd ? maxWhole : w1 - 1);
     const num1 = randomNumerator(den1);
     const num2 = randomNumerator(den2);
     const commonDen = lcm(den1, den2);
     const improper1 = (w1 * den1 + num1) * (commonDen / den1);
     const improper2 = (w2 * den2 + num2) * (commonDen / den2);
-    const simplified = simplifyFraction(improper1 + improper2, commonDen);
+    const resultNum = isAdd ? improper1 + improper2 : improper1 - improper2;
+    const simplified = simplifyFraction(resultNum, commonDen);
+    const mixed1 = `${josa(w1, '과')} ${num1}/${den1}`;
+    const mixed2 = `${josa(w2, '과')} ${num2}/${den2}`;
+    const op = isAdd ? '+' : '-';
 
     return {
       id,
       topicId: 'fractions',
-      subtopic: '대분수의 덧셈',
+      subtopic: isAdd ? '대분수의 덧셈' : '대분수의 뺄셈',
       difficulty,
-      question: `다음 대분수의 덧셈을 계산하여 기약분수인 가분수로 나타내세요:  ${withGwa(w1)} ${num1}/${den1} + ${withGwa(w2)} ${num2}/${den2}`,
-      hint: `대분수를 가분수로 바꾼 다음 통분해서 더해요. 예: 2와 1/3 = 7/3`,
+      question: isAdd
+        ? `다음 대분수의 덧셈을 계산하여 기약분수인 가분수로 나타내세요:  ${mixed1} + ${mixed2}`
+        : `다음 대분수의 뺄셈을 계산하여 기약분수로 나타내세요(1보다 크면 가분수로):  ${mixed1} - ${mixed2}`,
+      hint: `대분수를 가분수로 바꾼 다음 통분해서 ${isAdd ? '더해요' : '빼요'}. 예: 2와 1/3 = 7/3`,
       answerType: 'fraction',
       correctAnswer: { num: simplified.num, den: simplified.den },
       explanations: [
         {
           title: '1단계: 가분수로 바꾸기',
-          content: `${withGwa(w1)} ${num1}/${den1} = ${w1 * den1 + num1}/${den1},  ${withGwa(w2)} ${num2}/${den2} = ${w2 * den2 + num2}/${den2}`,
+          content: `${mixed1} = ${w1 * den1 + num1}/${den1},  ${mixed2} = ${w2 * den2 + num2}/${den2}`,
         },
         {
-          title: '2단계: 통분하여 더하기',
-          content: `${improper1}/${commonDen} + ${improper2}/${commonDen} = ${improper1 + improper2}/${commonDen}`,
+          title: `2단계: 통분하여 ${isAdd ? '더하기' : '빼기'}`,
+          content: `${improper1}/${commonDen} ${op} ${improper2}/${commonDen} = ${resultNum}/${commonDen}`,
         },
         {
           title: '3단계: 약분하기',
@@ -143,6 +156,107 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
     };
   }
 
+  if (type === 'fraction_times_natural') {
+    const den = pickOne(unlikeDenominators);
+    const num = randomNumerator(den);
+    const n = randomInt(2, difficulty === 'easy' ? 6 : difficulty === 'medium' ? 10 : 15);
+    const naturalFirst = Math.random() < 0.5;
+    const expr = naturalFirst ? `${n} × ${num}/${den}` : `${num}/${den} × ${n}`;
+    const product = simplifyFraction(num * n, den);
+
+    return {
+      id,
+      topicId: 'fractions',
+      subtopic: naturalFirst ? '자연수 × 분수' : '분수 × 자연수',
+      difficulty,
+      question: `다음 곱셈을 계산하여 기약분수로 나타내세요:  ${expr}`,
+      hint: `자연수는 분자에만 곱해요. 곱하기 전에 자연수와 분모를 먼저 약분하면 계산이 쉬워요!`,
+      answerType: 'fraction',
+      correctAnswer: product,
+      explanations: [
+        {
+          title: '1단계: 자연수를 분자에 곱하기',
+          content: `${expr} = (${naturalFirst ? `${n} × ${num}` : `${num} × ${n}`})/${den} = ${num * n}/${den}`,
+        },
+        {
+          title: '2단계: 약분하기',
+          content:
+            product.den === 1
+              ? `${num * n}/${den} = ${num * n} ÷ ${den} = ${product.num} (자연수)`
+              : `기약분수로 나타내면 ${product.num}/${product.den} 입니다.`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'fraction_div_natural') {
+    const den = pickOne(unlikeDenominators);
+    const num = randomNumerator(den);
+    const n = randomInt(2, difficulty === 'easy' ? 4 : difficulty === 'medium' ? 6 : 9);
+    const quotient = simplifyFraction(num, den * n);
+
+    return {
+      id,
+      topicId: 'fractions',
+      subtopic: '분수 ÷ 자연수',
+      difficulty,
+      question: `다음 나눗셈을 계산하여 기약분수로 나타내세요:  ${num}/${den} ÷ ${n}`,
+      hint: `÷ ${josa(n, '은')} × 1/${n}과 같아요. 분모에 자연수를 곱해 보세요!`,
+      answerType: 'fraction',
+      correctAnswer: quotient,
+      explanations: [
+        {
+          title: '1단계: 곱셈으로 바꾸기',
+          content: `${num}/${den} ÷ ${n} = ${num}/${den} × 1/${n}`,
+        },
+        {
+          title: '2단계: 계산하기',
+          content: `${num}/${den} × 1/${n} = ${num}/${den * n}${quotient.den === den * n ? '' : ` = ${quotient.num}/${quotient.den}`}`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'whole_from_part') {
+    const den = pickOne(
+      difficulty === 'easy'
+        ? [3, 4, 5]
+        : difficulty === 'medium'
+          ? [3, 4, 5, 6, 8]
+          : [5, 6, 7, 8, 9, 10],
+    );
+    const num = randomNumerator(den, 2);
+    const unit = randomInt(2, difficulty === 'easy' ? 6 : difficulty === 'medium' ? 10 : 15);
+    const part = num * unit;
+    const whole = den * unit;
+    const frac = `${num}/${den}`;
+
+    return {
+      id,
+      topicId: 'fractions',
+      subtopic: '어떤 수 구하기',
+      difficulty,
+      question: `어떤 수의 ${josa(frac, '은')} ${part}입니다. 어떤 수는 얼마인가요?`,
+      hint: `${josa(frac, '이')} ${part}이면 1/${den}은 얼마일지 먼저 생각해 보세요!`,
+      answerType: 'number',
+      correctAnswer: whole,
+      explanations: [
+        {
+          title: '1단계: 단위분수만큼의 크기 구하기',
+          content: `${josa(frac, '이')} ${part}이므로 1/${den}은 ${part} ÷ ${num} = ${unit}입니다.`,
+        },
+        {
+          title: '2단계: 전체 구하기',
+          content: `어떤 수는 1/${den}의 ${den}배이므로 ${unit} × ${den} = ${whole}입니다.`,
+        },
+        {
+          title: '다른 방법: 분수의 나눗셈',
+          content: `어떤 수 = ${part} ÷ ${frac} = ${part} × ${den}/${num} = ${whole}`,
+        },
+      ],
+    };
+  }
+
   if (type === 'addition') {
     // Unlike denominator addition
     const den1 = pickOne(unlikeDenominators);
@@ -173,7 +287,7 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
       explanations: [
         {
           title: '1단계: 공통분모(통분) 구하기',
-          content: `분모 ${den1}과 ${den2}의 최소공배수는 ${commonDen}입니다.`,
+          content: `분모 ${josa(den1, '과')} ${den2}의 최소공배수는 ${commonDen}입니다.`,
         },
         {
           title: '2단계: 크기가 같은 분수로 통분하기',
@@ -181,14 +295,13 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
         },
         {
           title: '3단계: 분자끼리 더하고 약분하기',
-          content: `${newNum1}/${commonDen} + ${newNum2}/${commonDen} = ${totalNum}/${commonDen} = ${simplified.num}/${simplified.den}`,
+          content: `${newNum1}/${commonDen} + ${newNum2}/${commonDen} = ${totalNum}/${commonDen}${simplified.den === commonDen ? '' : ` = ${simplified.num}/${simplified.den}`}`,
         },
       ],
     };
   }
 
   if (type === 'subtraction') {
-    // Make sure frac1 > frac2
     const subtractionDenominators = unlikeDenominators.filter((den) => den > 2);
     let den1 = pickOne(unlikeDenominators);
     let den2 = pickOne(subtractionDenominators);
@@ -197,18 +310,9 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
     let num1 = randomNumerator(den1);
     let num2 = randomNumerator(den2);
 
-    if (num1 / den1 <= num2 / den2) {
-      // Swap or adjust
-      const tempN = num1;
-      const tempD = den1;
-      num1 = num2;
-      den1 = den2;
-      num2 = tempN;
-      den2 = tempD;
-      if (num1 / den1 <= num2 / den2) {
-        num1 = den1 - 1;
-        num2 = 1;
-      }
+    // Put the larger fraction first; two reduced fractions with different denominators are never equal
+    if (num1 / den1 < num2 / den2) {
+      [num1, den1, num2, den2] = [num2, den2, num1, den1];
     }
 
     const commonDen = lcm(den1, den2);
@@ -231,7 +335,7 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
       explanations: [
         {
           title: '1단계: 통분하기',
-          content: `분모 ${den1}과 ${den2}를 공통분모 ${commonDen}으로 통분합니다: ${newNum1}/${commonDen} - ${newNum2}/${commonDen}`,
+          content: `분모 ${josa(den1, '과')} ${josa(den2, '을')} 공통분모 ${josa(commonDen, '으로')} 통분합니다: ${newNum1}/${commonDen} - ${newNum2}/${commonDen}`,
         },
         {
           title: '2단계: 분자끼리 빼기',
@@ -277,7 +381,10 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
         },
         {
           title: '2단계: 기약분수로 약분하기',
-          content: `${multNum}/${multDen} = ${simplified.num}/${simplified.den}`,
+          content:
+            simplified.den === multDen
+              ? `${josa(`${multNum}/${multDen}`, '은')} 더 이상 약분되지 않는 기약분수예요.`
+              : `${multNum}/${multDen} = ${simplified.num}/${simplified.den}`,
         },
       ],
     };

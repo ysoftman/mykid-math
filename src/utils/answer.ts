@@ -2,6 +2,9 @@ import type { Problem } from '../types/math';
 
 export type AnswerResult = 'empty' | 'correct' | 'unreduced' | 'wrong';
 
+// Longest answer box entry. Real answers have at most 6 digits, and the cap keeps fraction checks within exact integers.
+export const MAX_ANSWER_LENGTH = 10;
+
 // Fraction input is "num/den"; a bare "3" or "3/" means the whole number 3 (= 3/1).
 export function checkAnswer(problem: Problem, input: string): AnswerResult {
   const raw = input.trim();

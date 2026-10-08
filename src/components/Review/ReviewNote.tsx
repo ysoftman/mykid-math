@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import type { WrongNoteItem } from '../../types/math';
-import { checkAnswer, formatAnswer } from '../../utils/answer';
+import { checkAnswer, formatAnswer, MAX_ANSWER_LENGTH } from '../../utils/answer';
 import { sound } from '../../utils/audio';
 import confetti from '../../utils/confetti';
 import {
@@ -154,7 +154,7 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
                 <div className="flex flex-wrap items-center gap-4 text-xs bg-white p-3 rounded-xl border border-slate-200">
                   <div>
                     <span className="text-slate-600">내가 적은 오답: </span>
-                    <strong className="text-rose-700 font-mono">
+                    <strong className="text-rose-700 font-mono break-all">
                       <MathText text={item.userAnswer || '미입력'} />
                     </strong>
                   </div>
@@ -195,6 +195,7 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
                       <input
                         type="text"
                         value={retryInput}
+                        maxLength={MAX_ANSWER_LENGTH * 2 + 1}
                         placeholder={
                           item.problem.answerType === 'fraction' ? '예: 3/4' : '정답 입력'
                         }

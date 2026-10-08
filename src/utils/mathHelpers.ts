@@ -52,9 +52,15 @@ export function shuffle<T>(array: T[]): T[] {
   return copy;
 }
 
-// Korean particle 과/와 after a number, based on how its last digit is read (일, 삼, 육, 칠, 팔, 십 end in a consonant)
-export function withGwa(n: number): string {
-  return `${n}${[0, 1, 3, 6, 7, 8].includes(n % 10) ? '과' : '와'}`;
+const VOWEL_FORM = { 과: '와', 을: '를', 이: '가', 은: '는', 으로: '로' } as const;
+
+// Korean particle after a number, based on how its last digit is read (일, 삼, 육, 칠, 팔, 십/백/천/영 end in a consonant).
+// A fraction "a/b" is read "b분의 a", so its numerator decides. 일·칠·팔 end in ㄹ, which takes 로 instead of 으로.
+export function josa(n: number | string, particle: keyof typeof VOWEL_FORM): string {
+  const last = Number(String(n).split('/')[0].slice(-1));
+  const consonant =
+    [0, 1, 3, 6, 7, 8].includes(last) && !(particle === '으로' && [1, 7, 8].includes(last));
+  return `${n}${consonant ? particle : VOWEL_FORM[particle]}`;
 }
 
 // Numerator in [min, den - 1] that is coprime with den, so the fraction is already in lowest terms

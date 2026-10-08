@@ -1,12 +1,12 @@
 import type React from 'react';
 import { useState } from 'react';
 import { sound } from '../../utils/audio';
-import { lcm, simplifyFraction } from '../../utils/mathHelpers';
+import { josa, lcm, simplifyFraction } from '../../utils/mathHelpers';
 import { Fraction } from '../MathText';
 import { LabGuide } from './LabGuide';
 
 export const FractionsLab: React.FC = () => {
-  const [mode, setMode] = useState<'addition' | 'multiplication' | 'division'>('addition');
+  const [mode, setMode] = useState<'addition' | 'multiplication'>('addition');
 
   // Addition mode state
   const [den1, setDen1] = useState<number>(2);
@@ -233,7 +233,9 @@ export const FractionsLab: React.FC = () => {
                 }}
                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-sm active:scale-95 transition-all"
               >
-                {isUnified ? '↩️ 원래 분수로 보기' : `✨ 공통분모 ${commonDen}으로 통분하기!`}
+                {isUnified
+                  ? '↩️ 원래 분수로 보기'
+                  : `✨ 공통분모 ${josa(commonDen, '으로')} 통분하기!`}
               </button>
 
               <div className="text-sm font-bold text-slate-800 bg-white px-4 py-2 rounded-xl border border-slate-200">
@@ -242,17 +244,16 @@ export const FractionsLab: React.FC = () => {
                   <Fraction num={num1} den={den1} /> + <Fraction num={num2} den={den2} /> ={' '}
                 </span>
                 <span className="text-indigo-700 font-extrabold text-base">
-                  <Fraction num={simplifiedSum.num} den={simplifiedSum.den} />
+                  {simplifiedSum.den === 1 ? (
+                    simplifiedSum.num
+                  ) : (
+                    <Fraction num={simplifiedSum.num} den={simplifiedSum.den} />
+                  )}
                 </span>
-                {simplifiedSum.num >= simplifiedSum.den && (
+                {simplifiedSum.den > 1 && simplifiedSum.num > simplifiedSum.den && (
                   <span className="text-xs text-slate-500 ml-1">
                     (대분수: {Math.floor(simplifiedSum.num / simplifiedSum.den)}
-                    {simplifiedSum.num % simplifiedSum.den > 0 && (
-                      <Fraction
-                        num={simplifiedSum.num % simplifiedSum.den}
-                        den={simplifiedSum.den}
-                      />
-                    )}
+                    <Fraction num={simplifiedSum.num % simplifiedSum.den} den={simplifiedSum.den} />
                     )
                   </span>
                 )}

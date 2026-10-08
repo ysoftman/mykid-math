@@ -1,6 +1,15 @@
 import type { Difficulty, Problem } from '../../types/math';
-import { pickOne, randomInt, simplifyFraction } from '../mathHelpers';
+import { josa, pickOne, randomInt, simplifyFraction } from '../mathHelpers';
 import { KID_CALL } from '../profile';
+
+// Random integer in [min, max] whose last digit is not 0, so n / 10^k shows every decimal place (no 2.0 or 1.10)
+function randomScaled(min: number, max: number): number {
+  let n = randomInt(min, max);
+  while (n % 10 === 0) n = randomInt(min, max);
+  return n;
+}
+
+const PLACE_NAMES: Record<number, string> = { 10: '십', 100: '백', 1000: '천', 10000: '만' };
 
 export function generateDecimalProblem(difficulty: Difficulty): Problem {
   const type = pickOne([
@@ -11,6 +20,10 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
     'place_shift',
     'to_fraction',
     'rounding',
+    'decimal_div_natural',
+    'quotient_rounding',
+    'decimal_remainder',
+    'round_up_down',
   ]);
   const id = `dec_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
@@ -24,7 +37,7 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
     // ×: two decimal places, ÷10: one decimal place, ÷100: whole number, so the answer has at most 2 decimals
     const valueText =
       op[0] === '×'
-        ? String(randomInt(101, 9999) / 100)
+        ? String(randomScaled(101, 9999) / 100)
         : factor === 10
           ? String(randomInt(11, 999) / 10)
           : String(randomInt(12, 999));
@@ -66,7 +79,7 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
       topicId: 'decimals',
       subtopic: '소수를 분수로',
       difficulty,
-      question: `${decimalText}을(를) 기약분수로 나타내세요.`,
+      question: `${josa(decimalText, '을')} 기약분수로 나타내세요.`,
       hint: `소수 첫째 자리는 분모가 10, 소수 둘째 자리는 분모가 100인 분수예요. 그다음 약분해요!`,
       answerType: 'fraction',
       correctAnswer: { num: simplified.num, den: simplified.den },
@@ -85,41 +98,44 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
 
   if (type === 'rounding') {
     const places = difficulty === 'easy' ? 1 : 2;
-    const raw = randomInt(1001, 99999) / 1000;
-    const scale = 10 ** places;
-    const answer = Math.round(raw * scale) / scale;
-    const rawText = raw.toFixed(3);
+    const n = randomInt(1001, 99999); // the number is n / 1000
+    // n / 10 and n / 100 are exact at .5, so Math.round rounds halves up (n / 1000 * 100 can land just below)
+    const answer = Math.round(n / 10 ** (3 - places)) / 10 ** places;
+    const rawText = (n / 1000).toFixed(3);
     const placeName = places === 1 ? '첫째' : '둘째';
+    const nextName = places === 1 ? '둘째' : '셋째';
+    const digit = Number(rawText[rawText.indexOf('.') + places + 1]);
 
     return {
       id,
       topicId: 'decimals',
       subtopic: '어림하기 (반올림)',
       difficulty,
-      question: `${rawText}을(를) 반올림하여 소수 ${placeName} 자리까지 나타내세요.`,
-      hint: `소수 ${places === 1 ? '둘째' : '셋째'} 자리 숫자가 5 이상이면 올리고, 4 이하이면 버려요.`,
+      question: `${josa(rawText, '을')} 반올림하여 소수 ${placeName} 자리까지 나타내세요.`,
+      hint: `소수 ${nextName} 자리 숫자가 5 이상이면 올리고, 4 이하이면 버려요.`,
       answerType: 'number',
       correctAnswer: answer,
       explanations: [
         {
           title: '1단계: 바로 아래 자리 숫자 확인',
-          content: `소수 ${places === 1 ? '둘째' : '셋째'} 자리 숫자는 ${rawText[rawText.indexOf('.') + places + 1]}입니다.`,
+          content: `소수 ${nextName} 자리 숫자는 ${digit}입니다.`,
         },
         {
           title: '2단계: 올림 또는 버림',
-          content: `반올림하면 ${answer.toFixed(places)} 입니다.`,
+          content: `${digit >= 5 ? '5 이상이므로 올려서' : '4 이하이므로 버려서'} ${answer.toFixed(places)}입니다.`,
         },
       ],
     };
   }
 
   if (type === 'multiplication') {
-    const isDoubleDecimal = difficulty !== 'easy';
-    if (!isDoubleDecimal) {
+    if (difficulty === 'easy') {
       // Decimal x Integer
-      const dec = (randomInt(11, 49) / 10).toFixed(1);
+      const decInt = randomScaled(11, 49);
+      const dec = decInt / 10;
       const intVal = randomInt(2, 6);
-      const ans = Math.round(parseFloat(dec) * intVal * 10) / 10;
+      const product = decInt * intVal;
+      const ans = product / 10;
 
       return {
         id,
@@ -133,43 +149,44 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
         explanations: [
           {
             title: '1단계: 자연수처럼 곱하기',
-            content: `${Math.round(parseFloat(dec) * 10)} × ${intVal} = ${Math.round(parseFloat(dec) * 10) * intVal}`,
+            content: `${decInt} × ${intVal} = ${product}`,
           },
           {
             title: '2단계: 소수점 위치 맞추기',
-            content: `${dec}은 소수점 아래 한 자리이므로, 결과도 소수점 아래 한 자리가 되도록 점을 찍습니다: ${ans}`,
-          },
-        ],
-      };
-    } else {
-      // Multiply decimals, using hundredths for the hardest level.
-      const aPlaces = difficulty === 'hard' ? 2 : 1;
-      const aScale = 10 ** aPlaces;
-      const a = randomInt(aScale + 1, 9 * aScale) / aScale;
-      const b = randomInt(2, 9) / 10;
-      const ans = Math.round(a * b * 10 ** (aPlaces + 1)) / 10 ** (aPlaces + 1);
-
-      return {
-        id,
-        topicId: 'decimals',
-        subtopic: '소수 × 소수',
-        difficulty,
-        question: `다음 식을 계산하세요:  ${a.toFixed(aPlaces)} × ${b.toFixed(1)}`,
-        hint: `두 소수의 소수점 아래 자릿수를 합치면 총 몇 자리인가요? 자연수 곱셈 결과에서 그만큼 왼쪽으로 점을 옮겨요!`,
-        answerType: 'number',
-        correctAnswer: ans,
-        explanations: [
-          {
-            title: '1단계: 자연수의 곱 구하기',
-            content: `${Math.round(a * aScale)} × ${Math.round(b * 10)} = ${Math.round(a * aScale) * Math.round(b * 10)}`,
-          },
-          {
-            title: '2단계: 소수점 자릿수 합산',
-            content: `소수점 아래 자릿수를 합쳐 결과에 점을 찍으면 ${ans}가 됩니다.`,
+            content: `${josa(dec, '은')} 소수점 아래 한 자리이므로, ${product}에서 소수점을 왼쪽으로 한 칸 옮기면 ${ans}입니다.`,
           },
         ],
       };
     }
+
+    // Multiply decimals, using hundredths for the hardest level.
+    const aPlaces = difficulty === 'hard' ? 2 : 1;
+    const aScale = 10 ** aPlaces;
+    const aInt = randomScaled(aScale + 1, 9 * aScale);
+    const bInt = randomInt(2, 9);
+    const product = aInt * bInt;
+    const ans = product / 10 ** (aPlaces + 1);
+
+    return {
+      id,
+      topicId: 'decimals',
+      subtopic: '소수 × 소수',
+      difficulty,
+      question: `다음 식을 계산하세요:  ${aInt / aScale} × ${bInt / 10}`,
+      hint: `두 소수의 소수점 아래 자릿수를 합치면 총 몇 자리인가요? 자연수 곱셈 결과에서 그만큼 왼쪽으로 점을 옮겨요!`,
+      answerType: 'number',
+      correctAnswer: ans,
+      explanations: [
+        {
+          title: '1단계: 자연수의 곱 구하기',
+          content: `${aInt} × ${bInt} = ${product}`,
+        },
+        {
+          title: '2단계: 소수점 자릿수 합산',
+          content: `소수점 아래 자릿수가 ${aPlaces} + 1 = ${aPlaces + 1}자리이므로, ${product}에서 소수점을 왼쪽으로 ${aPlaces + 1}칸 옮기면 ${ans}입니다.`,
+        },
+      ],
+    };
   }
 
   if (type === 'division') {
@@ -182,27 +199,191 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
           : randomInt(5, 20);
     const places = difficulty === 'hard' ? 2 : 1;
     const scale = 10 ** places;
-    const maxDivisor = places === 2 ? 55 : difficulty === 'easy' ? 6 : 8;
-    const divisor = randomInt(places === 2 ? 12 : 2, maxDivisor) / scale;
-    const dividend = Math.round(divisor * quotient * scale) / scale;
+    const divisorInt =
+      places === 2 ? randomScaled(12, 55) : randomInt(2, difficulty === 'easy' ? 6 : 8);
+    const dividendInt = divisorInt * quotient;
 
     return {
       id,
       topicId: 'decimals',
       subtopic: '소수의 나눗셈',
       difficulty,
-      question: `다음 나눗셈을 계산하세요:  ${dividend.toFixed(places)} ÷ ${divisor.toFixed(places)}`,
-      hint: `나누는 수와 나누어지는 수에 똑같이 10을 곱해서 자연수의 나눗셈으로 바꾸어 풀어보세요!`,
+      question: `다음 나눗셈을 계산하세요:  ${dividendInt / scale} ÷ ${divisorInt / scale}`,
+      hint: `나누는 수가 자연수가 되도록 나누는 수와 나누어지는 수에 똑같이 ${josa(scale, '을')} 곱해서 자연수의 나눗셈으로 바꾸어 풀어보세요!`,
       answerType: 'number',
       correctAnswer: quotient,
       explanations: [
         {
-          title: '1단계: 소수점 이동하기 (10배)',
-          content: `나누는 수와 나누어지는 수에 똑같이 ${scale}을 곱합니다: ${Math.round(dividend * scale)} ÷ ${Math.round(divisor * scale)}`,
+          title: `1단계: 소수점 이동하기 (${scale}배)`,
+          content: `나누는 수와 나누어지는 수에 똑같이 ${josa(scale, '을')} 곱합니다: ${dividendInt} ÷ ${divisorInt}`,
         },
         {
           title: '2단계: 자연수의 나눗셈 계산',
-          content: `${Math.round(dividend * scale)} ÷ ${Math.round(divisor * scale)} = ${quotient}`,
+          content: `${dividendInt} ÷ ${divisorInt} = ${quotient}`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'decimal_div_natural') {
+    const places = difficulty === 'hard' ? 2 : 1;
+    const scale = 10 ** places;
+    const n = randomInt(2, difficulty === 'easy' ? 5 : 9);
+    const maxQuotient = (difficulty === 'easy' ? 5 : 9) * scale;
+    let q = randomScaled(scale + 1, maxQuotient);
+    // Keep the dividend a decimal as well (e.g. not 2.5 × 4 = 10)
+    while ((q * n) % 10 === 0) q = randomScaled(scale + 1, maxQuotient);
+    const dividendInt = q * n;
+    const dividend = dividendInt / scale;
+    const quotient = q / scale;
+
+    return {
+      id,
+      topicId: 'decimals',
+      subtopic: '소수 ÷ 자연수',
+      difficulty,
+      question: `다음 나눗셈을 계산하세요:  ${dividend} ÷ ${n}`,
+      hint: `자연수의 나눗셈처럼 계산한 다음, 나누어지는 수의 소수점 위치에 맞추어 몫에 소수점을 찍어요.`,
+      answerType: 'number',
+      correctAnswer: quotient,
+      explanations: [
+        {
+          title: '1단계: 자연수의 나눗셈으로 계산하기',
+          content: `${dividendInt} ÷ ${n} = ${q}`,
+        },
+        {
+          title: '2단계: 몫에 소수점 찍기',
+          content: `${josa(dividend, '은')} ${dividendInt}의 1/${scale}이므로, 몫도 ${q}의 1/${scale}인 ${quotient}입니다.`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'quotient_rounding') {
+    const places = difficulty === 'hard' ? 2 : 1;
+    const b = pickOne([3, 6, 7, 9, 11, 12]);
+    const maxA = difficulty === 'easy' ? 30 : difficulty === 'medium' ? 60 : 100;
+    let a = randomInt(b + 1, maxA);
+    // The quotient must go past the asked place, or there is nothing to round
+    while ((a * 10 ** places) % b === 0) a = randomInt(b + 1, maxA);
+    const scaled = a * 10 ** (places + 1);
+    const digits = (scaled - (scaled % b)) / b; // quotient cut after places + 1 decimals, as an integer
+    const lastDigit = digits % 10;
+    // digits / 10 is exact at .5, so Math.round rounds halves up
+    const answer = Math.round(digits / 10) / 10 ** places;
+    const placeName = places === 1 ? '첫째' : '둘째';
+    const nextName = places === 1 ? '둘째' : '셋째';
+
+    return {
+      id,
+      topicId: 'decimals',
+      subtopic: '몫을 반올림하여 나타내기',
+      difficulty,
+      question: `${a} ÷ ${b}의 몫을 반올림하여 소수 ${placeName} 자리까지 나타내세요.`,
+      hint: `몫을 소수 ${nextName} 자리까지 구한 다음, 소수 ${nextName} 자리에서 반올림해요.`,
+      answerType: 'number',
+      correctAnswer: answer,
+      explanations: [
+        {
+          title: `1단계: 몫을 소수 ${nextName} 자리까지 구하기`,
+          content: `${a} ÷ ${b} = ${(digits / 10 ** (places + 1)).toFixed(places + 1)}${scaled % b ? '...' : ''}`,
+        },
+        {
+          title: '2단계: 반올림하기',
+          content: `소수 ${nextName} 자리 숫자가 ${lastDigit}이므로 ${lastDigit >= 5 ? '올려서' : '버려서'} ${answer.toFixed(places)}입니다.`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'decimal_remainder') {
+    const each = randomInt(2, difficulty === 'easy' ? 4 : difficulty === 'medium' ? 6 : 9);
+    const groups = randomInt(3, difficulty === 'easy' ? 6 : difficulty === 'medium' ? 9 : 12);
+    const restInt = randomScaled(1, each * 10 - 1); // in tenths, less than one share
+    const total = (each * 10 * groups + restInt) / 10;
+    const rest = restInt / 10;
+
+    return {
+      id,
+      topicId: 'decimals',
+      subtopic: '나누어 주고 남는 양',
+      difficulty,
+      context: '주스 나누기',
+      question: `주스 ${total}L를 한 모둠에 ${each}L씩 나누어 주려고 합니다. 최대한 많은 모둠에 나누어 주면 남는 주스는 몇 L인가요?`,
+      hint: `${total} ÷ ${each}의 몫을 자연수까지만 구한 다음, 나누어 준 양을 전체에서 빼 보세요.`,
+      answerType: 'number',
+      correctAnswer: rest,
+      explanations: [
+        {
+          title: '1단계: 나누어 줄 수 있는 모둠 수',
+          content: `${total} ÷ ${each}의 몫을 자연수까지 구하면 ${groups}이므로 ${groups}모둠에 나누어 줄 수 있어요.`,
+        },
+        {
+          title: '2단계: 남는 양 구하기',
+          content: `${total} - ${each} × ${groups} = ${total} - ${each * groups} = ${rest}L`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'round_up_down') {
+    if (Math.random() < 0.5) {
+      // 올림: leftover marbles still need one more box
+      const unit = difficulty === 'hard' ? 100 : 10;
+      const maxCount = unit * (difficulty === 'easy' ? 9 : 30);
+      let n = randomInt(unit * 2, maxCount);
+      while (n % unit === 0) n = randomInt(unit * 2, maxCount);
+      const boxes = Math.ceil(n / unit);
+
+      return {
+        id,
+        topicId: 'decimals',
+        subtopic: '어림하기 (올림)',
+        difficulty,
+        context: '구슬 포장하기',
+        question: `구슬 ${n}개를 한 상자에 ${unit}개씩 모두 담으려고 합니다. 상자는 적어도 몇 개 필요한가요?`,
+        hint: `${unit}개를 채우지 못한 나머지 구슬도 담으려면 상자가 하나 더 필요해요. 올림을 떠올려 보세요!`,
+        answerType: 'number',
+        correctAnswer: boxes,
+        explanations: [
+          {
+            title: '1단계: 남는 구슬 확인하기',
+            content: `${unit}개씩 ${boxes - 1}상자에 담으면 ${n % unit}개가 남아요. 남은 구슬도 담아야 하므로 상자가 1개 더 필요해요.`,
+          },
+          {
+            title: '2단계: 올림하기',
+            content: `${josa(n, '을')} 올림하여 ${PLACE_NAMES[unit]}의 자리까지 나타내면 ${boxes * unit}이므로 상자는 적어도 ${boxes}개입니다.`,
+          },
+        ],
+      };
+    }
+
+    // 버림: coins below one bill cannot be exchanged
+    const unit = difficulty === 'hard' ? 10000 : 1000;
+    const maxTens = (unit / 10) * (difficulty === 'easy' ? 9 : 20);
+    let tens = randomInt(unit / 5, maxTens);
+    while (tens % (unit / 10) === 0) tens = randomInt(unit / 5, maxTens);
+    const money = tens * 10;
+    const exchanged = Math.floor(money / unit) * unit;
+
+    return {
+      id,
+      topicId: 'decimals',
+      subtopic: '어림하기 (버림)',
+      difficulty,
+      context: '저금통 동전 바꾸기',
+      question: `저금통에 모은 동전 ${money}원을 ${unit}원짜리 지폐로 바꾸려고 합니다. 지폐로 최대 몇 원까지 바꿀 수 있나요?`,
+      hint: `${unit}원이 안 되는 나머지 돈은 지폐로 바꿀 수 없어요. 버림을 떠올려 보세요!`,
+      answerType: 'number',
+      correctAnswer: exchanged,
+      explanations: [
+        {
+          title: '1단계: 바꿀 수 없는 돈 확인하기',
+          content: `${money}원 중 ${unit}원이 안 되는 ${money % unit}원은 지폐로 바꿀 수 없어요.`,
+        },
+        {
+          title: '2단계: 버림하기',
+          content: `${josa(money, '을')} 버림하여 ${PLACE_NAMES[unit]}의 자리까지 나타내면 ${exchanged}이므로 최대 ${exchanged}원까지 바꿀 수 있어요.`,
         },
       ],
     };
@@ -236,7 +417,7 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
       explanations: [
         {
           title: '1단계: 소수점 자리 맞추기',
-          content: `${first}와 ${second}의 소수점을 같은 위치에 맞춥니다.`,
+          content: `${josa(first, '과')} ${second}의 소수점을 같은 위치에 맞춥니다.`,
         },
         {
           title: '2단계: 같은 자리끼리 계산하기',
@@ -251,22 +432,23 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
   const lengthScale = 10 ** lengthPlaces;
   const maxLength = difficulty === 'easy' ? 25 : difficulty === 'medium' ? 40 : 250;
   const minLength = difficulty === 'hard' ? 101 : 12;
-  const length = (randomInt(minLength, maxLength) / lengthScale).toFixed(lengthPlaces);
+  const lengthInt = randomScaled(minLength, maxLength);
+  const length = lengthInt / lengthScale;
   const count =
     difficulty === 'easy'
       ? randomInt(2, 4)
       : difficulty === 'medium'
         ? randomInt(3, 6)
         : randomInt(4, 8);
-  const total = Math.round(parseFloat(length) * count * lengthScale) / lengthScale;
+  const total = (lengthInt * count) / lengthScale;
 
   return {
     id,
     topicId: 'decimals',
     subtopic: '소수 실생활 문제',
     difficulty,
-    context: '리본 끈 자르기',
-    question: `${KID_CALL}에게 길이가 ${length}m인 리본 끈이 ${count}개 있습니다. ${KID_CALL}가 이 리본 끈들을 모두 이어 붙이면 총 몇 m가 될까요?`,
+    context: '리본 끈 이어 붙이기',
+    question: `${KID_CALL}에게 길이가 ${length}m인 리본 끈이 ${count}개 있습니다. ${KID_CALL}가 이 리본 끈들을 겹치지 않게 모두 이어 붙이면 총 몇 m가 될까요?`,
     hint: `한 개의 길이 × 개수로 식을 세워보세요!`,
     answerType: 'number',
     correctAnswer: total,

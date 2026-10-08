@@ -10,6 +10,8 @@ export const RatiosLab: React.FC = () => {
 
   const total = syrup + water;
   const ratioVal = Math.round((syrup / total) * 100);
+  // 2 ÷ 7 × 100 = 28.57…, so show ≈ instead of = when the percent is not a whole number
+  const approx = (syrup * 100) % total === 0 ? '=' : '≈';
   // Red color opacity/intensity based on syrup ratio
   const juiceOpacity = Math.min(1, Math.max(0.15, syrup / total));
 
@@ -85,7 +87,8 @@ export const RatiosLab: React.FC = () => {
               }}
             >
               <span className="bg-black/40 px-2 py-0.5 rounded-full text-xs text-white">
-                농도 {ratioVal}%
+                농도 {approx === '≈' && '약 '}
+                {ratioVal}%
               </span>
             </div>
           </div>
@@ -102,18 +105,25 @@ export const RatiosLab: React.FC = () => {
           </div>
 
           <div className="bg-slate-800/90 p-4 rounded-xl border border-slate-700 space-y-2">
-            <div className="text-xs text-slate-200">전체 주스에 대한 시럽의 비율</div>
+            <div className="text-xs text-slate-200">
+              전체 주스에 대한 시럽의 비율 (시럽 : 전체 = {syrup} : {total})
+            </div>
             <div className="text-xl font-bold text-white flex items-center gap-2">
               <Fraction num={syrup} den={total} />
-              <span className="text-xs text-slate-200">≈ {(syrup / total).toFixed(2)}</span>
+              <span className="text-xs text-slate-200">
+                {approx} {(syrup / total).toFixed(2)}
+              </span>
             </div>
           </div>
 
           <div className="bg-rose-600 p-4 rounded-xl text-white shadow-md">
             <div className="text-xs font-semibold text-rose-100">백분율 (퍼센트 %)</div>
-            <div className="text-3xl font-black mt-1">{ratioVal}%</div>
+            <div className="text-3xl font-black mt-1">
+              {approx === '≈' && '약 '}
+              {ratioVal}%
+            </div>
             <div className="text-xs text-rose-100 mt-1">
-              (비교하는 양 {syrup} ÷ 기준량 {total}) × 100 = {ratioVal}%
+              (비교하는 양 {syrup} ÷ 기준량 {total}) × 100 {approx} {ratioVal}%
             </div>
           </div>
         </div>

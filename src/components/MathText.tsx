@@ -1,7 +1,8 @@
 import type React from 'react';
 
-// "2와 1/3" (mixed number), "1/3", or "(5 - 3) / 15" (expression over a number)
-const FRACTION = /(\d+)[와과] (\d+)\/(\d+)|(\d+)\/(\d+)|\((\d+ [-+×] \d+)\) ?\/ ?(\d+)/g;
+// "2와 1/3" (mixed number), "1/3", or "(5 - 3) / 15" and "(2 × 3) / (3 × 4)" (expressions)
+const FRACTION =
+  /(\d+)[와과] (\d+)\/(\d+)|(\d+)\/(\d+)|\((\d+ [-+×] \d+)\) ?\/ ?(?:\((\d+ [-+×] \d+)\)|(\d+))/g;
 
 export const Fraction: React.FC<{ num: React.ReactNode; den: React.ReactNode }> = ({
   num,
@@ -36,7 +37,7 @@ export const MathText: React.FC<{ text: string }> = ({ text }) => {
       ) : m[4] ? (
         <Fraction key={m.index} num={m[4]} den={m[5]} />
       ) : (
-        <Fraction key={m.index} num={m[6]} den={m[7]} />
+        <Fraction key={m.index} num={m[6]} den={m[7] ?? m[8]} />
       ),
     );
     last = m.index + m[0].length;

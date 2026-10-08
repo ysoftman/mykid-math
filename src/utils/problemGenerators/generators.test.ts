@@ -1,7 +1,7 @@
 import { expect, test } from 'bun:test';
 import type { Difficulty, TopicId } from '../../types/math';
 import { checkAnswer, formatAnswer } from '../answer';
-import { gcd } from '../mathHelpers';
+import { gcd, josa } from '../mathHelpers';
 import { generateProblem, TOPICS } from '.';
 
 const DIFFICULTIES: Difficulty[] = ['easy', 'medium', 'hard'];
@@ -21,6 +21,49 @@ test.each(TOPICS.map((t) => t.id as TopicId))('%s generates valid problems', (to
       }
       // The displayed answer must be accepted as correct
       expect(checkAnswer(p, formatAnswer(p))).toBe('correct');
+    }
+  }
+});
+
+test('particles after numbers match how the number is read', () => {
+  const base = { 와: '과', 를: '을', 가: '이', 는: '은', 로: '으로' } as Record<string, string>;
+  // "12와", "3/4을", "2.5는" before a space or punctuation; copulas such as "4이므로" are not checked
+  const particle = /((?:\d+\/)?\d+(?:\.\d+)?)(과|와|을|를|이|가|은|는|으로|로)(?=[\s,.!?:)]|$)/g;
+  for (const topic of TOPICS) {
+    for (const difficulty of DIFFICULTIES) {
+      for (let i = 0; i < 300; i++) {
+        const p = generateProblem(topic.id, difficulty);
+        for (const text of [p.question, p.hint, ...p.explanations.map((e) => e.content)]) {
+          for (const [, n, word] of text.matchAll(particle)) {
+            expect(`${n}${word}`).toBe(josa(n, (base[word] ?? word) as Parameters<typeof josa>[1]));
+          }
+        }
+      }
+    }
+  }
+});
+
+test('rounded and percent answers are exact', () => {
+  for (const topicId of ['decimals', 'ratios'] as TopicId[]) {
+    for (const difficulty of DIFFICULTIES) {
+      for (let i = 0; i < 5000; i++) {
+        const p = generateProblem(topicId, difficulty);
+        const nums = (p.question.match(/\d+(?:\.\d+)?/g) ?? []).map(Number);
+        const places = p.question.includes('첫째') ? 1 : 2;
+        const answer = Number(p.correctAnswer);
+        if (p.subtopic === '백분율 (%)') {
+          const [total, part] = nums;
+          expect(answer * total).toBe(part * 100);
+        } else if (p.subtopic === '어림하기 (반올림)') {
+          const thousandths = Math.round(nums[0] * 1000);
+          const div = 10 ** (3 - places);
+          expect(answer).toBe(Math.floor((thousandths + div / 2) / div) / 10 ** places);
+        } else if (p.subtopic === '몫을 반올림하여 나타내기') {
+          const [a, b] = nums;
+          const cut = Math.floor((a * 10 ** (places + 1)) / b);
+          expect(answer).toBe(Math.floor((cut + 5) / 10) / 10 ** places);
+        }
+      }
     }
   }
 });

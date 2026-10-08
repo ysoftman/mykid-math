@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import type { Difficulty, Problem, TopicId } from '../../types/math';
-import { checkAnswer, formatAnswer } from '../../utils/answer';
+import { checkAnswer, formatAnswer, MAX_ANSWER_LENGTH } from '../../utils/answer';
 import { sound } from '../../utils/audio';
 import confetti from '../../utils/confetti';
 import { GAME_ASSETS } from '../../utils/gameAssets';
@@ -285,7 +285,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
                 step="any"
                 value={numAnswer}
                 disabled={isAnswered}
-                onChange={(e) => setNumAnswer(e.target.value)}
+                onChange={(e) => setNumAnswer(e.target.value.slice(0, MAX_ANSWER_LENGTH))}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleCheckAnswer();
                 }}
