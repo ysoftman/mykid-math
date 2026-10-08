@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useCallback, useState } from 'react';
 import { sound } from '../../utils/audio';
+import { GAME_ASSETS } from '../../utils/gameAssets';
 import { TOPICS } from '../../utils/problemGenerators';
 import { getStats, type RewardResult } from '../../utils/storage';
 import { BossBattle } from './BossBattle';
@@ -9,24 +10,24 @@ import { TimeAttack } from './TimeAttack';
 
 type GameId = 'time' | 'boss' | 'duel';
 
-const GAMES: { id: GameId; icon: string; title: string; description: string; tint: string }[] = [
+const GAMES: { id: GameId; image: string; title: string; description: string; tint: string }[] = [
   {
     id: 'time',
-    icon: '⏱️',
+    image: GAME_ASSETS.gameTime,
     title: '60초 타임어택',
     description: '60초 안에 최대한 많이! 맞힐 때마다 ⭐ 1개',
     tint: 'bg-rose-50 border-rose-200 text-rose-900',
   },
   {
     id: 'boss',
-    icon: '⚔️',
+    image: GAME_ASSETS.gameBoss,
     title: '단원 보스전',
     description: '어려운 문제로 보스를 물리치고 👑 왕관을!',
     tint: 'bg-violet-50 border-violet-200 text-violet-900',
   },
   {
     id: 'duel',
-    icon: '👨‍👩‍👧',
+    image: GAME_ASSETS.gameDuel,
     title: '가족 대결',
     description: '번갈아 풀며 누가 더 많이 맞히나 겨뤄요',
     tint: 'bg-sky-50 border-sky-200 text-sky-900',
@@ -108,7 +109,7 @@ export const GameHub: React.FC<GameHubProps> = ({ onReward, onStatsChanged }) =>
             }}
             className={`${g.tint} flex flex-col items-start justify-start rounded-2xl border p-5 text-left shadow-sm hover:shadow-md hover:-translate-y-0.5 active:scale-95 transition-all`}
           >
-            <span className="block text-5xl">{g.icon}</span>
+            <img src={g.image} alt="" className="h-20 w-20 object-contain" draggable={false} />
             <span className="block mt-3 text-xl font-black">{g.title}</span>
             <span className="block mt-1 text-sm text-slate-700">{g.description}</span>
             {g.id === 'time' && (

@@ -149,7 +149,13 @@ export const BossBattle: React.FC<BossBattleProps> = ({
     return (
       <div className="bg-white rounded-2xl p-5 sm:p-8 shadow-sm border border-slate-200 space-y-4">
         <div className="text-center space-y-1">
-          <h3 className="text-2xl font-black text-slate-800">⚔️ 단원 보스전</h3>
+          <img
+            src={GAME_ASSETS.gameBoss}
+            alt=""
+            className="mx-auto h-20 w-20 object-contain"
+            draggable={false}
+          />
+          <h3 className="text-2xl font-black text-slate-800">단원 보스전</h3>
           <p className="text-sm text-slate-600">
             어려운(상) 문제 {BOSS_HP}개를 맞혀 보스를 물리치세요! 하트는 {START_HEARTS}개예요.
             <br />

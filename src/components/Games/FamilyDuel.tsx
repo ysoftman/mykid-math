@@ -4,6 +4,7 @@ import type { Difficulty, Problem, TopicId } from '../../types/math';
 import { formatAnswer } from '../../utils/answer';
 import { sound } from '../../utils/audio';
 import confetti from '../../utils/confetti';
+import { GAME_ASSETS } from '../../utils/gameAssets';
 import { generateProblem, TOPICS } from '../../utils/problemGenerators';
 import { KID_NAME } from '../../utils/profile';
 import { MathText } from '../MathText';
@@ -86,7 +87,13 @@ export const FamilyDuel: React.FC = () => {
     return (
       <div className="bg-white rounded-2xl p-5 sm:p-8 shadow-sm border border-slate-200 space-y-5">
         <div className="text-center space-y-1">
-          <h3 className="text-2xl font-black text-slate-800">👨‍👩‍👧 가족 대결</h3>
+          <img
+            src={GAME_ASSETS.gameDuel}
+            alt=""
+            className="mx-auto h-20 w-20 object-contain"
+            draggable={false}
+          />
+          <h3 className="text-2xl font-black text-slate-800">가족 대결</h3>
           <p className="text-sm text-slate-600">
             번갈아 가며 {TURNS_PER_PLAYER}문제씩 풀어요. 더 많이 맞힌 사람이 승리!
           </p>

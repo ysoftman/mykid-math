@@ -4,6 +4,7 @@ import type { Difficulty, Problem } from '../../types/math';
 import { formatAnswer } from '../../utils/answer';
 import { sound } from '../../utils/audio';
 import confetti from '../../utils/confetti';
+import { GAME_ASSETS } from '../../utils/gameAssets';
 import { generateProblem, TOPICS } from '../../utils/problemGenerators';
 // Aliased: biome treats a `use`-prefixed call as a React hook (useHookAtTopLevel).
 import { consumePowerUp, type RewardResult, recordTimeAttack } from '../../utils/storage';
@@ -102,7 +103,12 @@ export const TimeAttack: React.FC<TimeAttackProps> = ({
   if (phase === 'ready') {
     return (
       <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 text-center space-y-4">
-        <div className="text-6xl">⏱️</div>
+        <img
+          src={GAME_ASSETS.gameTime}
+          alt=""
+          className="mx-auto h-24 w-24 object-contain"
+          draggable={false}
+        />
         <h3 className="text-2xl font-black text-slate-800">60초 타임어택</h3>
         <p className="text-sm text-slate-600">
           60초 동안 여러 단원의 문제를 최대한 많이 맞혀 보세요!

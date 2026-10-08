@@ -1,6 +1,10 @@
-// Images cut from "Math Heroes Game Asset Sheet.png" and "Korean-Style Hats and Pet Icons.png" (transparent WebP)
+// Images cut from "Math Heroes Game Asset Sheet.png", "Korean-Style Hats and Pet Icons.png"
+// and "Chibi Game Achievement Icons.png" (transparent WebP)
 import coinChest from '../assets/game/coin-chest.webp';
 import explorer from '../assets/game/explorer.webp';
+import gameBoss from '../assets/game/game-boss.webp';
+import gameDuel from '../assets/game/game-duel.webp';
+import gameTime from '../assets/game/game-time.webp';
 import gemChest from '../assets/game/gem-chest.webp';
 import gift from '../assets/game/gift.webp';
 import hatBeanie from '../assets/game/hat-beanie.webp';
@@ -57,6 +61,9 @@ export const GAME_ASSETS = {
   heart,
   time,
   xpBooster,
+  gameTime,
+  gameBoss,
+  gameDuel,
   hatCap,
   hatCaptain,
   hatWizard,
