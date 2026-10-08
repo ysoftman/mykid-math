@@ -1,5 +1,6 @@
 import type React from 'react';
 import type { UserStats } from '../types/math';
+import { GAME_ASSETS } from '../utils/gameAssets';
 import {
   DAILY_MISSION_BONUS,
   DAILY_MISSION_GOAL,
@@ -97,10 +98,21 @@ export const DailyMission: React.FC<{ stats: UserStats }> = ({ stats }) => {
                 >
                   {d.getMonth() + 1}/{d.getDate()}
                 </span>
-                <span
-                  className={`leading-none mt-0.5 ${stamped ? 'text-lg' : isToday ? 'text-[11px] font-black text-indigo-700' : 'text-lg'}`}
-                >
-                  {stamped ? '✅' : isToday ? '오늘' : '·'}
+                <span className="mt-0.5 flex h-7 items-center justify-center">
+                  {stamped ? (
+                    <img
+                      src={GAME_ASSETS.gemChest}
+                      alt=""
+                      className="h-7 w-7 object-contain"
+                      draggable={false}
+                    />
+                  ) : (
+                    <span
+                      className={`leading-none ${isToday ? 'text-[11px] font-black text-indigo-700' : 'text-lg'}`}
+                    >
+                      {isToday ? '오늘' : '·'}
+                    </span>
+                  )}
                 </span>
               </div>
             );
