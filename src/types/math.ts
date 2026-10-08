@@ -4,7 +4,7 @@ export interface TopicInfo {
   id: TopicId;
   title: string;
   grade: string;
-  icon: string;
+  image: string; // chapter badge art
   badge: string;
   description: string;
   color: string;

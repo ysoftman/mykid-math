@@ -128,13 +128,14 @@ export const FamilyDuel: React.FC = () => {
                   setTopicId(t.id);
                 }}
                 aria-pressed={topicId === t.id}
-                className={`px-3 py-2 rounded-xl border text-sm font-bold transition-all ${
+                className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-bold transition-all ${
                   topicId === t.id
                     ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm'
                     : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                 }`}
               >
-                {t.icon} {t.title}
+                <img src={t.image} alt="" className="h-6 w-6 object-contain" draggable={false} />
+                {t.title}
               </button>
             ))}
           </div>

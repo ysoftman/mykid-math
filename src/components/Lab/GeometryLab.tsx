@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import { sound } from '../../utils/audio';
+import { GAME_ASSETS } from '../../utils/gameAssets';
 import { Fraction } from '../MathText';
 import { LabGuide } from './LabGuide';
 
@@ -46,7 +47,13 @@ export const GeometryLab: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
         <div>
           <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span>📐</span> 도형과 원의 넓이 실험실
+            <img
+              src={GAME_ASSETS.topicGeometry}
+              alt=""
+              className="h-9 w-9 object-contain"
+              draggable={false}
+            />{' '}
+            도형과 원의 넓이 실험실
           </h3>
           <p className="text-sm text-slate-500 mt-1">
             도형을 자르고 이어붙여 왜 이런 넓이 공식이 나왔는지 직접 체험해요.

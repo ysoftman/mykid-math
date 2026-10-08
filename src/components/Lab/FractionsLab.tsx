@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import { sound } from '../../utils/audio';
+import { GAME_ASSETS } from '../../utils/gameAssets';
 import { josa, lcm, simplifyFraction } from '../../utils/mathHelpers';
 import { Fraction } from '../MathText';
 import { LabGuide } from './LabGuide';
@@ -38,7 +39,13 @@ export const FractionsLab: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
         <div>
           <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span>🍕</span> 분수 시각화 실험실
+            <img
+              src={GAME_ASSETS.topicFractions}
+              alt=""
+              className="h-9 w-9 object-contain"
+              draggable={false}
+            />{' '}
+            분수 시각화 실험실
           </h3>
           <p className="text-sm text-slate-500 mt-1">
             분수를 눈으로 쪼개고 맞춰보며 통분과 곱셈의 원리를 발견해요.

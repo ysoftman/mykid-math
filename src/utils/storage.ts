@@ -144,37 +144,48 @@ const defaultStats: UserStats = {
   boostRemaining: 0,
 };
 
-export const BADGE_DEFINITIONS = [
+export const BADGE_DEFINITIONS: {
+  id: string;
+  name: string;
+  desc: string;
+  icon: string;
+  image?: GameAssetKey; // shown instead of icon when set
+}[] = [
   { id: 'first_step', name: '첫 걸음', desc: '첫 문제를 맞혔어요!', icon: '🌱' },
   {
     id: 'factor_pro',
     name: '약수 탐정',
     desc: '약수와 배수 문제를 5개 이상 맞혔어요!',
     icon: '🔍',
+    image: 'topicFactors',
   },
   {
     id: 'fraction_master',
     name: '분수 연금술사',
     desc: '분수 연산 문제를 5개 이상 맞혔어요!',
     icon: '🍕',
+    image: 'topicFractions',
   },
   {
     id: 'decimal_wiz',
     name: '소수 마법사',
     desc: '소수 연산 문제를 5개 이상 맞혔어요!',
     icon: '✨',
+    image: 'topicDecimals',
   },
   {
     id: 'geometry_architect',
     name: '도형 건축가',
     desc: '도형 넓이 문제를 5개 이상 맞혔어요!',
     icon: '📐',
+    image: 'topicGeometry',
   },
   {
     id: 'ratio_master',
     name: '비율의 달인',
     desc: '비와 비율 문제를 5개 이상 맞혔어요!',
     icon: '⚖️',
+    image: 'topicRatios',
   },
   { id: 'star_collector', name: '별자리 수집가', desc: '별을 20개 이상 모았어요!', icon: '⭐' },
   { id: 'math_hero', name: '수학 슈퍼히어로', desc: '레벨 5에 도달했어요!', icon: '👑' },

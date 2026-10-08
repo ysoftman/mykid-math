@@ -249,7 +249,16 @@ export const Roadmap: React.FC<RoadmapProps> = ({
                     : 'bg-slate-50 border-slate-200 text-slate-700'
                 }`}
               >
-                <span className="text-2xl">{unlocked ? badge.icon : '🔒'}</span>
+                {unlocked && badge.image ? (
+                  <img
+                    src={GAME_ASSETS[badge.image]}
+                    alt=""
+                    className="h-9 w-9 shrink-0 object-contain"
+                    draggable={false}
+                  />
+                ) : (
+                  <span className="text-2xl">{unlocked ? badge.icon : '🔒'}</span>
+                )}
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-bold">{badge.name}</div>
                   <div className={`text-xs ${unlocked ? 'text-amber-800' : 'text-slate-500'}`}>
@@ -313,9 +322,12 @@ export const Roadmap: React.FC<RoadmapProps> = ({
                 <div className="space-y-3 w-full">
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                        {topic.icon}
-                      </div>
+                      <img
+                        src={topic.image}
+                        alt=""
+                        className="h-14 w-14 shrink-0 object-contain group-hover:scale-110 transition-transform"
+                        draggable={false}
+                      />
                       <div>
                         <span className="text-xs font-bold text-slate-500">
                           단원 {index + 1} · {topic.grade}

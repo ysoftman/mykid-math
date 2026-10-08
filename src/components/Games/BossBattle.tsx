@@ -177,8 +177,14 @@ export const BossBattle: React.FC<BossBattleProps> = ({
                 <span className="text-4xl">{BOSSES[t.id].icon}</span>
                 <span className="flex-1 min-w-0">
                   <span className="block font-extrabold text-slate-800">{BOSSES[t.id].name}</span>
-                  <span className="block text-xs text-slate-500 truncate">
-                    {t.icon} {t.title}
+                  <span className="flex items-center gap-1 text-xs text-slate-500">
+                    <img
+                      src={t.image}
+                      alt=""
+                      className="h-5 w-5 shrink-0 object-contain"
+                      draggable={false}
+                    />
+                    <span className="truncate">{t.title}</span>
                   </span>
                 </span>
                 {cleared && <span className="text-2xl">👑</span>}

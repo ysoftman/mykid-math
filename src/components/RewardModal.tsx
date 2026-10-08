@@ -79,7 +79,16 @@ export const RewardModal: React.FC<RewardModalProps> = ({ reward, onClose }) => 
                 key={b.id}
                 className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-3 text-left"
               >
-                <span className="text-4xl">{b.icon}</span>
+                {b.image ? (
+                  <img
+                    src={GAME_ASSETS[b.image]}
+                    alt=""
+                    className="h-12 w-12 shrink-0 object-contain"
+                    draggable={false}
+                  />
+                ) : (
+                  <span className="text-4xl">{b.icon}</span>
+                )}
                 <div>
                   <div className="font-extrabold text-slate-800">{b.name}</div>
                   <div className="text-xs text-slate-600">{b.desc}</div>

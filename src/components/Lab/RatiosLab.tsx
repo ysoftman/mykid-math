@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import { sound } from '../../utils/audio';
+import { GAME_ASSETS } from '../../utils/gameAssets';
 import { Fraction } from '../MathText';
 import { LabGuide } from './LabGuide';
 
@@ -20,7 +21,13 @@ export const RatiosLab: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
         <div>
           <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span>⚖️</span> 비와 비율 실험실
+            <img
+              src={GAME_ASSETS.topicRatios}
+              alt=""
+              className="h-9 w-9 object-contain"
+              draggable={false}
+            />{' '}
+            비와 비율 실험실
           </h3>
           <p className="text-sm text-slate-500 mt-1">
             맛있는 딸기 주스를 만들며 비, 비율, 백분율(%)의 개념을 마스터해요.

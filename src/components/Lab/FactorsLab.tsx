@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import { sound } from '../../utils/audio';
+import { GAME_ASSETS } from '../../utils/gameAssets';
 import { gcd, getFactors, lcm } from '../../utils/mathHelpers';
 import { LabGuide } from './LabGuide';
 
@@ -44,7 +45,13 @@ export const FactorsLab: React.FC = () => {
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4">
         <div>
           <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span>🔍</span> 약수와 배수 시각화 실험실
+            <img
+              src={GAME_ASSETS.topicFactors}
+              alt=""
+              className="h-9 w-9 object-contain"
+              draggable={false}
+            />{' '}
+            약수와 배수 시각화 실험실
           </h3>
           <p className="text-sm text-slate-500 mt-1">
             타일을 모아 직사각형을 만들어보며 약수의 원리를 눈으로 확인해요.

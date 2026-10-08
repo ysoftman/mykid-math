@@ -80,7 +80,12 @@ export const App: React.FC = () => {
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
-                    <span>{topic.icon}</span>
+                    <img
+                      src={topic.image}
+                      alt=""
+                      className="h-6 w-6 object-contain"
+                      draggable={false}
+                    />
                     <span>{topic.title}</span>
                   </button>
                 );
@@ -109,8 +114,14 @@ export const App: React.FC = () => {
                 <span className="text-xs font-bold text-indigo-700 bg-white px-2 py-0.5 rounded border border-indigo-200">
                   {currentTopic.grade}
                 </span>
-                <h2 className="text-lg font-black text-slate-800 mt-1">
-                  {currentTopic.icon} {currentTopic.title}
+                <h2 className="mt-1 flex items-center gap-2 text-lg font-black text-slate-800">
+                  <img
+                    src={currentTopic.image}
+                    alt=""
+                    className="h-10 w-10 object-contain"
+                    draggable={false}
+                  />
+                  {currentTopic.title}
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">{currentTopic.description}</p>
               </div>
@@ -141,7 +152,12 @@ export const App: React.FC = () => {
           <div className="space-y-6">
             <div className="flex flex-col gap-3 bg-white border border-slate-200 p-4 rounded-2xl sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-3">
-                <span className="text-2xl">{currentTopic.icon}</span>
+                <img
+                  src={currentTopic.image}
+                  alt=""
+                  className="h-12 w-12 shrink-0 object-contain"
+                  draggable={false}
+                />
                 <div>
                   <h2 className="text-base font-black text-slate-800">
                     {currentTopic.title} 도전 퀴즈
