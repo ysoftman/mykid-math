@@ -80,10 +80,10 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
   }
 
   if (shape === 'cuboid_volume') {
-    const max = difficulty === 'easy' ? 5 : difficulty === 'medium' ? 10 : 15;
-    const a = randomInt(2, max);
-    const b = randomInt(2, max);
-    const c = randomInt(2, max);
+    const max = difficulty === 'easy' ? 4 : difficulty === 'medium' ? 5 : 6;
+    const pick = () => [randomInt(2, max), randomInt(2, max), randomInt(2, max)];
+    let [a, b, c] = pick();
+    while (a * b * c > 200) [a, b, c] = pick();
     const volume = a * b * c;
 
     return {
@@ -112,10 +112,10 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
   if (shape === 'cube_surface_area') {
     const edge =
       difficulty === 'easy'
-        ? randomInt(2, 6)
+        ? randomInt(2, 3)
         : difficulty === 'medium'
-          ? randomInt(4, 10)
-          : randomInt(8, 15);
+          ? randomInt(2, 4)
+          : randomInt(3, 5);
     const area = 6 * edge * edge;
 
     return {
@@ -141,10 +141,10 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
   }
 
   if (shape === 'cuboid_surface_area') {
-    const max = difficulty === 'easy' ? 6 : difficulty === 'medium' ? 10 : 15;
-    const a = randomInt(2, max);
-    const b = randomInt(2, max);
-    const c = randomInt(2, max);
+    const max = difficulty === 'easy' ? 4 : difficulty === 'medium' ? 5 : 6;
+    const pick = () => [randomInt(2, max), randomInt(2, max), randomInt(2, max)];
+    let [a, b, c] = pick();
+    while (2 * (a * b + b * c + a * c) > 200) [a, b, c] = pick();
     const faces = a * b + b * c + a * c;
 
     return {
@@ -179,7 +179,7 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
       [10, '정십각형'],
     ];
     const [sides, name] = pickOne(difficulty === 'easy' ? polygons.slice(0, 3) : polygons);
-    const side = randomInt(2, difficulty === 'easy' ? 9 : difficulty === 'medium' ? 15 : 25);
+    const side = randomInt(2, difficulty === 'easy' ? 9 : difficulty === 'medium' ? 12 : 15);
     const perimeter = sides * side;
     const askSide = difficulty !== 'easy' && Math.random() < 0.5;
 
@@ -295,9 +295,9 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
         ? randomInt(3, 8)
         : difficulty === 'medium'
           ? randomInt(5, 14)
-          : randomInt(10, 24);
+          : randomInt(6, 16);
     // Make either base or height even so area is integer
-    const heightMax = difficulty === 'easy' ? 8 : difficulty === 'medium' ? 12 : 20;
+    const heightMax = difficulty === 'easy' ? 8 : difficulty === 'medium' ? 12 : 14;
     const height =
       base % 2 === 0 ? randomInt(3, heightMax) : randomInt(2, Math.floor(heightMax / 2)) * 2;
     const area = (base * height) / 2;
@@ -330,13 +330,13 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
         ? randomInt(3, 8)
         : difficulty === 'medium'
           ? randomInt(5, 15)
-          : randomInt(10, 24);
+          : randomInt(6, 14);
     const height =
       difficulty === 'easy'
         ? randomInt(2, 8)
         : difficulty === 'medium'
           ? randomInt(3, 12)
-          : randomInt(8, 20);
+          : randomInt(5, 12);
     const area = base * height;
 
     return {
@@ -367,16 +367,16 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
         ? randomInt(2, 6)
         : difficulty === 'medium'
           ? randomInt(3, 8)
-          : randomInt(6, 14);
+          : randomInt(4, 10);
     const bottom =
       difficulty === 'easy'
         ? randomInt(top + 1, 9)
         : difficulty === 'medium'
           ? randomInt(top + 1, 12)
-          : randomInt(top + 1, 20);
+          : randomInt(top + 1, 16);
     // Make sum or height even
     const sum = top + bottom;
-    const heightMax = difficulty === 'easy' ? 8 : difficulty === 'medium' ? 10 : 18;
+    const heightMax = difficulty === 'easy' ? 8 : difficulty === 'medium' ? 10 : 12;
     const height =
       sum % 2 === 0 ? randomInt(2, heightMax) : randomInt(1, Math.floor(heightMax / 2)) * 2;
     const area = (sum * height) / 2;
@@ -404,7 +404,7 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
   }
 
   if (shape === 'rhombus') {
-    const dMax = difficulty === 'easy' ? 8 : difficulty === 'medium' ? 12 : 24;
+    const dMax = difficulty === 'easy' ? 8 : difficulty === 'medium' ? 12 : 16;
     const d1 = randomInt(4, dMax);
     const d2 = d1 % 2 === 0 ? randomInt(3, dMax) : randomInt(2, Math.floor(dMax / 2)) * 2;
     const area = (d1 * d2) / 2;
@@ -437,8 +437,8 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
         ? randomInt(2, 8)
         : difficulty === 'medium'
           ? randomInt(4, 12)
-          : randomInt(6, 18);
-    const height = difficulty === 'hard' ? randomInt(7, 20) : randomInt(3, 12);
+          : randomInt(6, 12);
+    const height = difficulty === 'hard' ? randomInt(5, 12) : randomInt(3, 12);
     const area = base * height;
 
     return {
@@ -469,7 +469,7 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
       ? randomInt(2, 4)
       : difficulty === 'medium'
         ? randomInt(3, 7)
-        : randomInt(6, 12);
+        : randomInt(4, 8);
   const area = Math.round(radius * radius * 3.14 * 100) / 100;
 
   return {

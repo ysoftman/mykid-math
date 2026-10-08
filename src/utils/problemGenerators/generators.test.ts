@@ -73,3 +73,35 @@ test('does not repeat a recent question', () => {
   for (let i = 0; i < 30; i++) recent.push(generateProblem('factors', 'easy').question);
   expect(new Set(recent.slice(-10)).size).toBe(10);
 });
+
+test('numbers stay small enough for mental math', () => {
+  // Money stays in round thousands, a few place-value types read 3-digit numbers
+  const limits: Record<string, number> = {
+    할인율: 10000,
+    '비례 관계와 가격': 10000,
+    '어림하기 (버림)': 10000,
+    '소수점의 이동': 1000, // "× 1000" itself
+    '길이·무게·들이 단위 바꾸기': 999,
+    '소수의 크기 (0.1, 0.01의 개수)': 399,
+    '원의 넓이': 201, // 8 × 8 × 3.14 = 200.96
+  };
+  for (const topic of TOPICS) {
+    for (const difficulty of DIFFICULTIES) {
+      for (let i = 0; i < 2000; i++) {
+        const p = generateProblem(topic.id, difficulty);
+        const answer =
+          p.answerType === 'fraction'
+            ? Math.max(
+                (p.correctAnswer as { num: number; den: number }).num,
+                (p.correctAnswer as { num: number; den: number }).den,
+              )
+            : Number(p.correctAnswer);
+        const nums = (p.question.match(/\d+(?:\.\d+)?/g) ?? []).map(Number);
+        const largest = Math.max(answer, ...nums);
+        if (largest > (limits[p.subtopic] ?? 200)) {
+          throw new Error(`${p.subtopic} (${difficulty}): ${largest} in "${p.question}"`);
+        }
+      }
+    }
+  }
+});

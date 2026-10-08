@@ -74,10 +74,15 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
 
   if (type === 'mixed_addition' || type === 'mixed_subtraction') {
     const isAdd = type === 'mixed_addition';
-    const den1 = pickOne(unlikeDenominators);
+    // A small common denominator keeps the improper fractions (and the answer) small
+    const maxCommon = difficulty === 'easy' ? 12 : difficulty === 'medium' ? 20 : 24;
+    let den1 = pickOne(unlikeDenominators);
     let den2 = pickOne(unlikeDenominators);
-    while (den1 === den2) den2 = pickOne(unlikeDenominators);
-    const maxWhole = difficulty === 'hard' ? 5 : 3;
+    while (den1 === den2 || lcm(den1, den2) > maxCommon) {
+      den1 = pickOne(unlikeDenominators);
+      den2 = pickOne(unlikeDenominators);
+    }
+    const maxWhole = 3;
     // For subtraction w1 > w2 keeps the result positive (fractional parts are below 1)
     const w1 = isAdd ? randomInt(1, maxWhole) : randomInt(2, maxWhole + 1);
     const w2 = randomInt(1, isAdd ? maxWhole : w1 - 1);

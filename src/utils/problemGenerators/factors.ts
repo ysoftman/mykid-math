@@ -3,10 +3,11 @@ import { gcd, getFactors, josa, lcm, pickOne, randomInt } from '../mathHelpers';
 import { KID_CALL } from '../profile';
 
 // Two different numbers in [2, max] where neither divides the other, so the LCM is a new number
-function pickLcmPair(max: number): [number, number] {
+// (at most maxLcm, which keeps answers small)
+function pickLcmPair(max: number, maxLcm = Number.POSITIVE_INFINITY): [number, number] {
   let a = randomInt(2, max);
   let b = randomInt(2, max);
-  while (a === b || lcm(a, b) === Math.max(a, b)) {
+  while (a === b || lcm(a, b) === Math.max(a, b) || lcm(a, b) > maxLcm) {
     a = randomInt(2, max);
     b = randomInt(2, max);
   }
@@ -52,13 +53,13 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
         ? randomInt(2, 5)
         : difficulty === 'medium'
           ? randomInt(4, 9)
-          : randomInt(7, 15);
+          : randomInt(6, 12);
     const limit =
       difficulty === 'easy'
         ? randomInt(20, 50)
         : difficulty === 'medium'
           ? randomInt(50, 100)
-          : randomInt(100, 300);
+          : randomInt(80, 150);
     const count = Math.floor(limit / k);
     const rest = limit % k;
 
@@ -85,10 +86,11 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
   }
 
   if (type === 'common_multiples_count') {
-    const maxPair = difficulty === 'easy' ? 6 : difficulty === 'medium' ? 10 : 15;
-    const maxLimit = difficulty === 'easy' ? 60 : difficulty === 'medium' ? 150 : 300;
-    let [a, b] = pickLcmPair(maxPair);
-    while (lcm(a, b) * 2 > maxLimit) [a, b] = pickLcmPair(maxPair);
+    const maxLimit = difficulty === 'easy' ? 60 : difficulty === 'medium' ? 100 : 150;
+    const [a, b] = pickLcmPair(
+      difficulty === 'easy' ? 6 : difficulty === 'medium' ? 8 : 10,
+      maxLimit / 2,
+    );
     const l = lcm(a, b);
     const limit = randomInt(l * 2, maxLimit);
     const count = Math.floor(limit / l);
@@ -117,7 +119,7 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
   }
 
   if (type === 'lcm_word') {
-    const [a, b] = pickLcmPair(difficulty === 'easy' ? 6 : difficulty === 'medium' ? 12 : 20);
+    const [a, b] = pickLcmPair(difficulty === 'easy' ? 6 : difficulty === 'medium' ? 10 : 15, 120);
     const both = lcm(a, b);
 
     return {
@@ -181,7 +183,7 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
   }
 
   if (type === 'square_from_cards') {
-    const [a, b] = pickLcmPair(difficulty === 'easy' ? 6 : difficulty === 'medium' ? 10 : 15);
+    const [a, b] = pickLcmPair(difficulty === 'easy' ? 6 : difficulty === 'medium' ? 8 : 10, 60);
     const side = lcm(a, b);
     const count = (side / a) * (side / b);
     const askCount = difficulty === 'hard';
@@ -283,9 +285,9 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
       difficulty === 'easy'
         ? randomInt(2, 6)
         : difficulty === 'medium'
-          ? randomInt(5, 15)
-          : randomInt(10, 30);
-    const maxMultiplier = difficulty === 'easy' ? 4 : difficulty === 'medium' ? 6 : 9;
+          ? randomInt(4, 12)
+          : randomInt(6, 15);
+    const maxMultiplier = difficulty === 'easy' ? 4 : difficulty === 'medium' ? 6 : 7;
     const m1 = randomInt(2, maxMultiplier);
     let m2 = randomInt(2, maxMultiplier);
     while (gcd(m1, m2) !== 1) {
@@ -325,8 +327,8 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
       difficulty === 'easy'
         ? randomInt(2, 5)
         : difficulty === 'medium'
-          ? randomInt(3, 8)
-          : randomInt(6, 12);
+          ? randomInt(3, 6)
+          : randomInt(4, 8);
     const m1 = pickOne([2, 3, 4]);
     const m2 = m1 === 2 ? pickOne([3, 5]) : m1 === 3 ? pickOne([2, 4, 5]) : pickOne([3, 5]);
     const a = g * m1;
@@ -360,8 +362,8 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
       difficulty === 'easy'
         ? randomInt(2, 8)
         : difficulty === 'medium'
-          ? randomInt(6, 18)
-          : randomInt(12, 30);
+          ? randomInt(4, 12)
+          : randomInt(10, 18);
     const [m1, m2] = pickOne([
       [2, 3],
       [3, 4],

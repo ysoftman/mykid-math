@@ -18,7 +18,7 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
   const id = `rat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
   if (type === 'discount') {
-    const price = (difficulty === 'easy' ? randomInt(2, 10) : randomInt(5, 50)) * 1000;
+    const price = randomInt(2, 10) * 1000;
     const rate = pickOne(difficulty === 'easy' ? [10, 20, 50] : [10, 15, 20, 25, 30, 40]);
     const discount = (price * rate) / 100;
     const sale = price - discount;
@@ -143,8 +143,8 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
     if (Math.random() < 0.5) {
       // a cookies need b grams of flour, so c cookies need c × (grams per cookie)
       a = randomInt(2, difficulty === 'easy' ? 4 : 6);
-      const perCookie = randomInt(2, difficulty === 'hard' ? 12 : 6) * 5;
-      const maxCookies = difficulty === 'easy' ? 10 : difficulty === 'medium' ? 15 : 30;
+      const perCookie = randomInt(1, 4) * 5;
+      const maxCookies = 10;
       c = randomInt(2, maxCookies);
       while (c === a) c = randomInt(2, maxCookies);
       b = a * perCookie;
@@ -185,11 +185,7 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
 
   if (type === 'concentration') {
     const total = pickOne(
-      difficulty === 'easy'
-        ? [100, 200]
-        : difficulty === 'medium'
-          ? [200, 300, 400, 500]
-          : [150, 250, 300, 600],
+      difficulty === 'easy' ? [100] : difficulty === 'medium' ? [100, 200] : [150, 200],
     );
     let percent = randomInt(1, 12) * 5;
     while ((total * percent) % 100 !== 0) percent = randomInt(1, 12) * 5;
@@ -219,8 +215,13 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
   }
 
   if (type === 'speed') {
-    const hours = randomInt(2, difficulty === 'hard' ? 8 : 5);
-    const speed = difficulty === 'easy' ? randomInt(3, 9) * 10 : randomInt(30, 120);
+    // Distance stays within 200km: easy uses tens, others multiples of 5
+    let hours = randomInt(2, difficulty === 'easy' ? 3 : 4);
+    let speed = difficulty === 'easy' ? randomInt(3, 6) * 10 : randomInt(6, 18) * 5;
+    while (speed * hours > 200) {
+      hours = randomInt(2, 4);
+      speed = randomInt(6, 18) * 5;
+    }
     const distance = speed * hours;
 
     return {
@@ -327,8 +328,8 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
   }
 
   if (type === 'unit_price') {
-    const unitPrice = difficulty === 'easy' ? randomInt(2, 8) * 100 : randomInt(5, 30) * 100;
-    const unitCount = difficulty === 'hard' ? randomInt(4, 12) : randomInt(2, 8);
+    const unitPrice = randomInt(2, difficulty === 'easy' ? 8 : 15) * 100;
+    const unitCount = randomInt(2, difficulty === 'hard' ? 6 : 5);
     const totalPrice = unitPrice * unitCount;
 
     return {
@@ -355,15 +356,15 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
   }
 
   // Proportional distribution
-  const maxRatio = difficulty === 'easy' ? 3 : difficulty === 'medium' ? 5 : 9;
+  const maxRatio = difficulty === 'easy' ? 3 : difficulty === 'medium' ? 5 : 6;
   const r1 = randomInt(1, maxRatio);
   const r2 = randomInt(2, maxRatio);
   const unit =
     difficulty === 'easy'
       ? randomInt(2, 6)
       : difficulty === 'medium'
-        ? randomInt(3, 10)
-        : randomInt(8, 20);
+        ? randomInt(3, 8)
+        : randomInt(4, 10);
   const total = (r1 + r2) * unit;
   // Names in their particle-ready form (서연 → 서연이) so '가/와/의' reads naturally
   const friend = pickOne(['민수', '지우', '태호', '서연이']);

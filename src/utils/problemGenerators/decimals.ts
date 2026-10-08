@@ -34,10 +34,10 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
         : ['× 10', '× 100', '× 1000', '÷ 10', '÷ 100'],
     );
     const factor = Number(op.slice(2));
-    // ×: two decimal places, ÷10: one decimal place, ÷100: whole number, so the answer has at most 2 decimals
+    // ×: results stay below 1000; ÷10: one decimal place, ÷100: whole number, so answers have at most 2 decimals
     const valueText =
       op[0] === '×'
-        ? String(randomScaled(101, 9999) / 100)
+        ? String(randomScaled(11, 999) / (factor === 1000 ? 1000 : 100))
         : factor === 10
           ? String(randomInt(11, 999) / 10)
           : String(randomInt(12, 999));
@@ -329,8 +329,8 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
   if (type === 'round_up_down') {
     if (Math.random() < 0.5) {
       // 올림: leftover marbles still need one more box
-      const unit = difficulty === 'hard' ? 100 : 10;
-      const maxCount = unit * (difficulty === 'easy' ? 9 : 30);
+      const unit = 10;
+      const maxCount = unit * (difficulty === 'easy' ? 9 : 20);
       let n = randomInt(unit * 2, maxCount);
       while (n % unit === 0) n = randomInt(unit * 2, maxCount);
       const boxes = Math.ceil(n / unit);
@@ -359,8 +359,8 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
     }
 
     // 버림: coins below one bill cannot be exchanged
-    const unit = difficulty === 'hard' ? 10000 : 1000;
-    const maxTens = (unit / 10) * (difficulty === 'easy' ? 9 : 20);
+    const unit = 1000;
+    const maxTens = (unit / 10) * (difficulty === 'easy' ? 5 : 10);
     let tens = randomInt(unit / 5, maxTens);
     while (tens % (unit / 10) === 0) tens = randomInt(unit / 5, maxTens);
     const money = tens * 10;
