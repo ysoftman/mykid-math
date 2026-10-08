@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, expect, setSystemTime, test } from 'bun:test';
+import { unlockEverything } from './devUnlock';
 import {
+  BADGE_DEFINITIONS,
   BOSS_CLEAR_STARS,
   buyItem,
   buyPowerUp,
@@ -10,11 +12,14 @@ import {
   getAttendanceStreak,
   getEquippedCharacter,
   getStats,
+  getWrongNotes,
   POWER_UP_MAX,
+  POWER_UPS,
   recordBossClear,
   recordProblemResult,
   recordTimeAttack,
   recordWrongConquered,
+  SHOP_ITEMS,
   saveStats,
   todayKey,
 } from './storage';
@@ -275,4 +280,17 @@ test('xp booster gives +2 per correct answer for 5 recorded answers', () => {
   const after = recordProblemResult('factors', true, 4);
   expect(after.bonusStars).toBe(0);
   expect(after.updatedStats.boostRemaining).toBe(0);
+});
+
+test('dev unlock opens everything and leaves today one problem short', () => {
+  unlockEverything();
+  const s = getStats();
+  expect(s.badges).toHaveLength(BADGE_DEFINITIONS.length);
+  expect(s.ownedItems).toHaveLength(SHOP_ITEMS.length);
+  expect(Object.values(s.inventory)).toEqual(POWER_UPS.map(() => POWER_UP_MAX));
+  expect(getAttendanceStreak(s)).toBe(7);
+  expect(getWrongNotes()).toHaveLength(5);
+  const r = recordProblemResult('factors', false);
+  expect(r.missionCompleted).toBe(true);
+  expect(getAttendanceStreak(r.updatedStats)).toBe(8);
 });

@@ -1,6 +1,7 @@
 import type React from 'react';
 import type { TopicId, UserStats } from '../types/math';
 import { sound } from '../utils/audio';
+import { unlockEverything } from '../utils/devUnlock';
 import { GAME_ASSETS } from '../utils/gameAssets';
 import { TOPICS } from '../utils/problemGenerators';
 import {
@@ -358,6 +359,19 @@ export const Roadmap: React.FC<RoadmapProps> = ({
       {/* Backup */}
       <div className="flex flex-wrap items-center justify-end gap-2 text-xs font-bold">
         <span className="text-slate-500 mr-auto">기록 백업 (다른 기기로 옮기기)</span>
+        {import.meta.env.DEV && (
+          <button
+            type="button"
+            onClick={() => {
+              if (!window.confirm('테스트용으로 모든 뱃지·아이템·파워업을 해제할까요?')) return;
+              unlockEverything();
+              onDataImported();
+            }}
+            className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-200 text-rose-700"
+          >
+            테스트용 전체 해제
+          </button>
+        )}
         <button
           type="button"
           onClick={handleExport}
