@@ -44,6 +44,9 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
     'square_tiles',
     'square_from_cards',
     'common_multiples_count',
+    'nth_multiple',
+    'multiples_between',
+    'gcd_lcm_other',
   ]);
   const id = `fac_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
@@ -392,6 +395,116 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
         {
           title: '2단계: 공약수 세기',
           content: `${common}의 약수는 ${commonFactors.join(', ')}이므로 공약수는 모두 ${commonFactors.length}개입니다.`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'nth_multiple') {
+    const k =
+      difficulty === 'easy'
+        ? randomInt(2, 5)
+        : difficulty === 'medium'
+          ? randomInt(3, 9)
+          : randomInt(6, 12);
+    const n = difficulty === 'easy' ? randomInt(3, 6) : randomInt(4, 9);
+
+    return {
+      id,
+      topicId: 'factors',
+      subtopic: '배수 찾기',
+      difficulty,
+      question: `${k}의 배수를 작은 수부터 차례로 쓸 때, ${n}번째 수는 무엇인가요?`,
+      hint: `${k}의 배수는 ${k} × 1, ${k} × 2, ${k} × 3, ... 이에요.`,
+      answerType: 'number',
+      correctAnswer: k * n,
+      explanations: [
+        {
+          title: '1단계: 배수를 차례로 쓰기',
+          content: `${k}의 배수: ${k}, ${k * 2}, ${k * 3}, ...`,
+        },
+        {
+          title: '2단계: 몇 번째인지 곱하기',
+          content: `${n}번째 수는 ${k} × ${n} = ${k * n}입니다.`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'multiples_between') {
+    const k =
+      difficulty === 'easy'
+        ? randomInt(3, 5)
+        : difficulty === 'medium'
+          ? randomInt(4, 9)
+          : randomInt(6, 12);
+    const from = randomInt(10, 30);
+    const to = Math.min(100, from + k * randomInt(3, 7));
+    const first = Math.ceil(from / k) * k;
+    const multiples: number[] = [];
+    for (let m = first; m <= to; m += k) multiples.push(m);
+
+    return {
+      id,
+      topicId: 'factors',
+      subtopic: '범위 안의 배수',
+      difficulty,
+      question: `${from}부터 ${to}까지의 자연수 중에서 ${k}의 배수는 모두 몇 개인가요?`,
+      hint: `${from} 이상인 첫 번째 ${k}의 배수를 찾은 다음, ${k}씩 더해 가며 세어 보세요.`,
+      answerType: 'number',
+      correctAnswer: multiples.length,
+      explanations: [
+        {
+          title: '1단계: 첫 번째 배수 찾기',
+          content: `${from} 이상인 첫 번째 ${k}의 배수는 ${first}입니다.`,
+        },
+        {
+          title: `2단계: ${k}씩 더하며 세기`,
+          content: `${multiples.join(', ')} → 모두 ${multiples.length}개입니다.`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'gcd_lcm_other') {
+    const g = difficulty === 'easy' ? randomInt(2, 3) : randomInt(2, 5);
+    const [m1, m2] = pickOne([
+      [2, 3],
+      [3, 2],
+      [2, 5],
+      [5, 2],
+      [3, 4],
+      [4, 3],
+      [3, 5],
+      [5, 3],
+      [4, 5],
+      [5, 4],
+    ]);
+    const a = g * m1;
+    const b = g * m2;
+    const l = g * m1 * m2;
+
+    return {
+      id,
+      topicId: 'factors',
+      subtopic: '최대공약수와 최소공배수의 관계',
+      difficulty,
+      question: `두 수의 최대공약수는 ${g}, 최소공배수는 ${l}입니다. 한 수가 ${a}일 때, 다른 한 수는 얼마인가요?`,
+      hint: `최소공배수 = 최대공약수 × (한 수의 몫) × (다른 수의 몫)이에요. ${josa(a, '을')} ${josa(g, '으로')} 나눈 몫부터 구해 보세요.`,
+      answerType: 'number',
+      correctAnswer: b,
+      explanations: [
+        {
+          title: '1단계: 아는 수를 최대공약수로 나누기',
+          content: `${a} ÷ ${g} = ${m1}이므로 ${a} = ${g} × ${m1}입니다.`,
+        },
+        {
+          title: '2단계: 다른 수의 몫 찾기',
+          content: `최소공배수 ${l} = ${g} × ${m1} × □이므로 □ = ${l} ÷ ${g * m1} = ${m2}입니다.`,
+        },
+        {
+          title: '3단계: 다른 한 수 구하기',
+          content: `다른 한 수는 ${g} × ${m2} = ${b}입니다.`,
         },
       ],
     };

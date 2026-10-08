@@ -14,6 +14,9 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
     'simplest_ratio',
     'proportion_word',
     'concentration',
+    'percent_of_number',
+    'ratio_to_percent',
+    'percent_remaining',
   ]);
   const id = `rat_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
@@ -350,6 +353,117 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
         {
           title: '2단계: 나누어 계산하기',
           content: `${totalPrice} ÷ ${unitCount} = ${unitPrice}원`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'percent_of_number') {
+    const percent = pickOne(
+      difficulty === 'easy'
+        ? [10, 50]
+        : difficulty === 'medium'
+          ? [10, 20, 25, 50, 75]
+          : [5, 15, 30, 40, 60, 80],
+    );
+    const step = 100 / gcd(percent, 100); // smallest total that gives a whole-number answer
+    const maxTotal = difficulty === 'hard' ? 200 : 100;
+    const total = step * randomInt(Math.ceil(10 / step), Math.floor(maxTotal / step));
+    const answer = (total * percent) / 100;
+    const g = gcd(percent, 100); // 75% = 3/4, so divide by 4 and multiply by 3
+    const story = difficulty !== 'easy' && Math.random() < 0.5;
+
+    return {
+      id,
+      topicId: 'ratios',
+      subtopic: '백분율만큼 구하기',
+      difficulty,
+      question: story
+        ? `사탕 ${total}개 중 ${percent}%를 친구에게 나누어 주었습니다. 친구에게 준 사탕은 몇 개인가요?`
+        : `${total}의 ${percent}%는 얼마인가요?`,
+      hint: `${percent}%는 ${josa(`${percent}/100`, '과')} 같아요. 전체에 곱해 보세요.`,
+      answerType: 'number',
+      correctAnswer: answer,
+      explanations: [
+        {
+          title: '1단계: 백분율을 기약분수로',
+          content: `${percent}% = ${percent}/100${g > 1 ? ` = ${percent / g}/${100 / g}` : ''}`,
+        },
+        {
+          title: '2단계: 나누고 곱하기',
+          content:
+            percent === g
+              ? `${total} ÷ ${100 / g} = ${answer}`
+              : `${total} ÷ ${100 / g} × ${percent / g} = ${total / (100 / g)} × ${percent / g} = ${answer}`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'ratio_to_percent') {
+    const den = pickOne(
+      difficulty === 'easy'
+        ? [2, 4, 5, 10]
+        : difficulty === 'medium'
+          ? [4, 5, 10, 20, 25]
+          : [20, 25, 50],
+    );
+    const num = randomNumerator(den);
+    const percent = (num * 100) / den;
+    const asDecimal = difficulty !== 'easy' && Math.random() < 0.4;
+    const shown = asDecimal ? `${percent / 100}` : `${num}/${den}`;
+
+    return {
+      id,
+      topicId: 'ratios',
+      subtopic: '비율을 백분율로',
+      difficulty,
+      question: `비율 ${josa(shown, '을')} 백분율로 나타내면 몇 %인가요?`,
+      hint: asDecimal
+        ? `소수로 나타낸 비율에 100을 곱하면 백분율이에요.`
+        : `분모가 100인 분수로 바꾸면 분자가 바로 백분율이에요.`,
+      answerType: 'number',
+      correctAnswer: percent,
+      explanations: asDecimal
+        ? [
+            { title: '1단계: 100 곱하기', content: `${shown} × 100 = ${percent}` },
+            { title: '2단계: % 붙이기', content: `따라서 ${percent}%입니다.` },
+          ]
+        : [
+            {
+              title: '1단계: 분모를 100으로 만들기',
+              content: `분모 ${den}에 ${josa(100 / den, '을')} 곱하면 100이 되므로 분자에도 곱해요: ${num}/${den} = ${percent}/100`,
+            },
+            { title: '2단계: % 붙이기', content: `${percent}/100 = ${percent}%` },
+          ],
+    };
+  }
+
+  if (type === 'percent_remaining') {
+    const unit = difficulty === 'easy' ? 10 : 5;
+    const two = difficulty === 'hard';
+    const p1 = randomInt(1, two ? 9 : 100 / unit - 1) * unit;
+    const p2 = two ? randomInt(1, (90 - p1) / 5) * 5 : 0;
+    const rest = 100 - p1 - p2;
+
+    return {
+      id,
+      topicId: 'ratios',
+      subtopic: '남은 비율 (백분율)',
+      difficulty,
+      question: two
+        ? `${KID_CALL}가 공부한 시간 중 ${p1}%는 수학, ${p2}%는 국어였습니다. 나머지 과목을 공부한 시간은 전체의 몇 %인가요?`
+        : `피자 한 판의 ${p1}%를 먹었습니다. 남은 피자는 전체의 몇 %인가요?`,
+      hint: `전체는 100%예요.`,
+      answerType: 'number',
+      correctAnswer: rest,
+      explanations: [
+        { title: '1단계: 전체는 100%', content: `전체를 100%로 생각해요.` },
+        {
+          title: '2단계: 빼기',
+          content: two
+            ? `100 - ${p1} - ${p2} = ${rest}이므로 ${rest}%입니다.`
+            : `100 - ${p1} = ${rest}이므로 ${rest}%입니다.`,
         },
       ],
     };

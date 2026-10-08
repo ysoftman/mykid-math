@@ -24,6 +24,9 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
     'quotient_rounding',
     'decimal_remainder',
     'round_up_down',
+    'unit_conversion',
+    'decimal_units_count',
+    'make_whole',
   ]);
   const id = `dec_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
@@ -422,6 +425,147 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
         {
           title: '2단계: 같은 자리끼리 계산하기',
           content: `${first} ${operation} ${second} = ${answer.toFixed(places)}`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'unit_conversion') {
+    // small: value in the smaller unit; values stay in the hundreds so both answers are easy to read
+    const conversions = [
+      {
+        big: 'm',
+        bigSubject: '는',
+        small: 'cm',
+        smallSubject: '는',
+        factor: 100,
+        min: 10,
+        max: 390,
+      },
+      {
+        big: 'cm',
+        bigSubject: '는',
+        small: 'mm',
+        smallSubject: '는',
+        factor: 10,
+        min: 12,
+        max: 99,
+      },
+      {
+        big: 'kg',
+        bigSubject: '은',
+        small: 'g',
+        smallSubject: '은',
+        factor: 1000,
+        min: 100,
+        max: 900,
+      },
+      {
+        big: 'L',
+        bigSubject: '는',
+        small: 'mL',
+        smallSubject: '는',
+        factor: 1000,
+        min: 100,
+        max: 900,
+      },
+    ];
+    const c = pickOne(conversions);
+    // Keep the big-unit value a decimal: one decimal place, or two on hard (2.35m, 0.25kg)
+    const step = c.factor === 10 ? 1 : difficulty === 'hard' ? c.factor / 100 : c.factor / 10;
+    let smallValue = randomInt(c.min / step, c.max / step) * step;
+    while (smallValue % c.factor === 0) {
+      smallValue = randomInt(c.min / step, c.max / step) * step;
+    }
+    const bigValue = smallValue / c.factor;
+    const toSmall = Math.random() < 0.5;
+
+    return {
+      id,
+      topicId: 'decimals',
+      subtopic: '길이·무게·들이 단위 바꾸기',
+      difficulty,
+      question: toSmall
+        ? `${bigValue}${c.big}${c.bigSubject} 몇 ${c.small}인가요?`
+        : `${smallValue}${c.small}${c.smallSubject} 몇 ${c.big}인가요?`,
+      hint: `1${c.big} = ${c.factor}${c.small}입니다. ${toSmall ? `${josa(c.factor, '을')} 곱해요.` : `${josa(c.factor, '으로')} 나눠요.`}`,
+      answerType: 'number',
+      correctAnswer: toSmall ? smallValue : bigValue,
+      explanations: [
+        {
+          title: '1단계: 단위 사이의 관계',
+          content: `1${c.big} = ${c.factor}${c.small}입니다.`,
+        },
+        {
+          title: '2단계: 소수점 옮기기',
+          content: toSmall
+            ? `${bigValue} × ${c.factor} = ${smallValue}이므로 ${smallValue}${c.small}입니다.`
+            : `${smallValue} ÷ ${c.factor} = ${bigValue}이므로 ${bigValue}${c.big}입니다.`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'decimal_units_count') {
+    const hundredths = difficulty === 'hard';
+    const unitText = hundredths ? '0.01' : '0.1';
+    const scale = hundredths ? 100 : 10;
+    const count = hundredths
+      ? randomScaled(101, 399)
+      : randomScaled(11, difficulty === 'easy' ? 49 : 99);
+    const value = count / scale;
+    const askValue = Math.random() < 0.5;
+
+    return {
+      id,
+      topicId: 'decimals',
+      subtopic: '소수의 크기 (0.1, 0.01의 개수)',
+      difficulty,
+      question: askValue
+        ? `${unitText}이 ${count}개인 수는 얼마인가요?`
+        : `${josa(value, '은')} ${unitText}이 몇 개인 수인가요?`,
+      hint: `${unitText}이 ${scale}개이면 1이에요.`,
+      answerType: 'number',
+      correctAnswer: askValue ? value : count,
+      explanations: [
+        {
+          title: '1단계: 1을 만드는 개수',
+          content: `${unitText}이 ${scale}개이면 1입니다.`,
+        },
+        {
+          title: '2단계: 개수와 소수 연결하기',
+          content: `${unitText}이 ${count}개이면 ${value}이고, 거꾸로 ${value}에는 ${unitText}이 ${count}개 들어 있어요.`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'make_whole') {
+    const places = difficulty === 'hard' ? 2 : 1;
+    const scale = 10 ** places;
+    const unitText = places === 2 ? '0.01' : '0.1';
+    const target = difficulty === 'easy' ? 1 : randomInt(1, difficulty === 'medium' ? 3 : 5);
+    const aInt = randomScaled(1, target * scale - 1);
+    const a = aInt / scale;
+    const answer = (target * scale - aInt) / scale;
+
+    return {
+      id,
+      topicId: 'decimals',
+      subtopic: '더해서 자연수 만들기',
+      difficulty,
+      question: `□에 알맞은 소수를 구하세요:  ${a} + □ = ${target}`,
+      hint: `${target}에서 ${josa(a, '을')} 빼면 돼요.`,
+      answerType: 'number',
+      correctAnswer: answer,
+      explanations: [
+        {
+          title: `1단계: ${unitText}의 개수로 생각하기`,
+          content: `${josa(target, '은')} ${unitText}이 ${target * scale}개, ${josa(a, '은')} ${unitText}이 ${aInt}개입니다.`,
+        },
+        {
+          title: '2단계: 모자란 만큼 구하기',
+          content: `${target * scale} - ${aInt} = ${target * scale - aInt}이므로 □는 ${unitText}이 ${target * scale - aInt}개인 ${answer}입니다.`,
         },
       ],
     };

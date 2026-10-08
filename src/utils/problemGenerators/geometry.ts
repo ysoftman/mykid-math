@@ -1,5 +1,5 @@
 import type { Difficulty, Problem } from '../../types/math';
-import { pickOne, randomInt } from '../mathHelpers';
+import { josa, pickOne, randomInt } from '../mathHelpers';
 import { KID_CALL } from '../profile';
 
 export function generateGeometryProblem(difficulty: Difficulty): Problem {
@@ -18,6 +18,8 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
     'regular_polygon_perimeter',
     'prism_parts',
     'diameter_from_circumference',
+    'square_rect_area',
+    'cube_volume',
   ]);
   const id = `geo_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
@@ -460,6 +462,99 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
           content: `${area} ÷ ${base} = ${height}, 따라서 높이는 ${height}cm입니다.`,
         },
       ],
+    };
+  }
+
+  if (shape === 'square_rect_area') {
+    const max = difficulty === 'easy' ? 9 : difficulty === 'medium' ? 10 : 12;
+    const variant = pickOne([
+      'rect_area',
+      'rect_side',
+      'square_from_perimeter',
+      'square_from_area',
+    ] as const);
+    const w = randomInt(2, max);
+    const h = randomInt(2, max);
+    const s = randomInt(2, max);
+    const isRect = variant === 'rect_area' || variant === 'rect_side';
+    const content = {
+      rect_area: {
+        question: `가로 ${w}cm, 세로 ${h}cm인 직사각형의 넓이는 몇 cm²인가요?`,
+        answer: w * h,
+        steps: [`직사각형의 넓이 = 가로 × 세로`, `${w} × ${h} = ${w * h}cm²`],
+      },
+      rect_side: {
+        question: `넓이가 ${w * h}cm²이고 가로가 ${w}cm인 직사각형의 세로는 몇 cm인가요?`,
+        answer: h,
+        steps: [
+          `가로 × 세로 = 넓이이므로 ${w} × □ = ${w * h}입니다.`,
+          `□ = ${w * h} ÷ ${w} = ${h}cm`,
+        ],
+      },
+      square_from_perimeter: {
+        question: `둘레가 ${s * 4}cm인 정사각형의 넓이는 몇 cm²인가요?`,
+        answer: s * s,
+        steps: [
+          `정사각형은 네 변의 길이가 같으므로 한 변은 ${s * 4} ÷ 4 = ${s}cm입니다.`,
+          `넓이 = ${s} × ${s} = ${s * s}cm²`,
+        ],
+      },
+      square_from_area: {
+        question: `넓이가 ${s * s}cm²인 정사각형의 둘레는 몇 cm인가요?`,
+        answer: s * 4,
+        steps: [
+          `같은 수를 두 번 곱해 ${josa(s * s, '이')} 되는 수는 ${s}이므로 한 변은 ${s}cm입니다.`,
+          `둘레 = ${s} × 4 = ${s * 4}cm`,
+        ],
+      },
+    }[variant];
+
+    return {
+      id,
+      topicId: 'geometry',
+      subtopic: isRect ? '직사각형의 넓이' : '정사각형의 넓이와 둘레',
+      difficulty,
+      question: content.question,
+      hint: isRect
+        ? `직사각형의 넓이 = 가로 × 세로예요.`
+        : `정사각형은 네 변의 길이가 모두 같아요. 넓이 = 한 변 × 한 변`,
+      answerType: 'number',
+      correctAnswer: content.answer,
+      explanations: content.steps.map((step, i) => ({
+        title: i === 0 ? '1단계: 식 세우기' : '2단계: 계산하기',
+        content: step,
+      })),
+    };
+  }
+
+  if (shape === 'cube_volume') {
+    const edge = randomInt(2, difficulty === 'easy' ? 4 : 5);
+    const volume = edge * edge * edge;
+    const askEdge = difficulty !== 'easy' && Math.random() < 0.5;
+
+    return {
+      id,
+      topicId: 'geometry',
+      subtopic: '정육면체의 부피',
+      difficulty,
+      question: askEdge
+        ? `부피가 ${volume}cm³인 정육면체의 한 모서리는 몇 cm인가요?`
+        : `한 모서리가 ${edge}cm인 정육면체의 부피는 몇 cm³인가요?`,
+      hint: `정육면체의 부피 = 한 모서리 × 한 모서리 × 한 모서리`,
+      answerType: 'number',
+      correctAnswer: askEdge ? edge : volume,
+      explanations: askEdge
+        ? [
+            {
+              title: '1단계: 세 번 곱해 보기',
+              content: `같은 수를 세 번 곱해 ${josa(volume, '이')} 되는 수를 찾아요: ${edge} × ${edge} × ${edge} = ${volume}`,
+            },
+            { title: '2단계: 한 모서리', content: `한 모서리는 ${edge}cm입니다.` },
+          ]
+        : [
+            { title: '1단계: 밑면의 넓이', content: `${edge} × ${edge} = ${edge * edge}cm²` },
+            { title: '2단계: 높이만큼 곱하기', content: `${edge * edge} × ${edge} = ${volume}cm³` },
+          ],
     };
   }
 

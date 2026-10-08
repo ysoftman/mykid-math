@@ -24,6 +24,10 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
     'fraction_times_natural',
     'fraction_div_natural',
     'whole_from_part',
+    'equivalent_fraction',
+    'same_den_add_sub',
+    'fraction_of_unit',
+    'mixed_improper',
   ]);
   const id = `frac_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
   const unlikeDenominators =
@@ -431,6 +435,180 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
           content: `${unit} × ${num} = ${answer}, 따라서 ${num}/${den}만큼은 ${answer}개입니다.`,
         },
       ],
+    };
+  }
+
+  if (type === 'equivalent_fraction') {
+    const den = pickOne(
+      difficulty === 'easy'
+        ? [2, 3, 4, 5]
+        : difficulty === 'medium'
+          ? [3, 4, 5, 6, 8]
+          : [4, 5, 6, 7, 8, 9],
+    );
+    const num = randomNumerator(den);
+    const k = randomInt(2, difficulty === 'hard' ? 6 : 4);
+    const askNum = Math.random() < 0.5;
+
+    return {
+      id,
+      topicId: 'fractions',
+      subtopic: '크기가 같은 분수',
+      difficulty,
+      question: `□에 알맞은 수를 구하세요:  ${num}/${den} = ${askNum ? `□/${den * k}` : `${num * k}/□`}`,
+      hint: `분모와 분자에 0이 아닌 같은 수를 곱하면 크기가 같은 분수가 돼요.`,
+      answerType: 'number',
+      correctAnswer: askNum ? num * k : den * k,
+      explanations: [
+        {
+          title: '1단계: 몇 배 했는지 찾기',
+          content: askNum
+            ? `분모 ${den}에 ${josa(k, '을')} 곱해서 ${josa(den * k, '이')} 되었어요.`
+            : `분자 ${num}에 ${josa(k, '을')} 곱해서 ${josa(num * k, '이')} 되었어요.`,
+        },
+        {
+          title: '2단계: 똑같이 곱하기',
+          content: askNum
+            ? `분자에도 ${josa(k, '을')} 곱하면 ${num} × ${k} = ${num * k}입니다.`
+            : `분모에도 ${josa(k, '을')} 곱하면 ${den} × ${k} = ${den * k}입니다.`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'same_den_add_sub') {
+    const den = randomInt(
+      difficulty === 'easy' ? 3 : 4,
+      difficulty === 'easy' ? 6 : difficulty === 'medium' ? 9 : 12,
+    );
+    const mode = pickOne(['add', 'sub', 'one'] as const);
+    const n1 = mode === 'sub' ? randomInt(2, den - 1) : randomInt(1, den - 1);
+    const n2 = mode === 'add' ? randomInt(1, den - n1) : mode === 'sub' ? randomInt(1, n1 - 1) : 0;
+    const resultNum = mode === 'add' ? n1 + n2 : mode === 'sub' ? n1 - n2 : den - n1;
+    const result = simplifyFraction(resultNum, den);
+    const resultText = result.den === 1 ? `${result.num}` : `${result.num}/${result.den}`;
+    const expr =
+      mode === 'one'
+        ? `1 - ${n1}/${den}`
+        : `${n1}/${den} ${mode === 'add' ? '+' : '-'} ${n2}/${den}`;
+
+    return {
+      id,
+      topicId: 'fractions',
+      subtopic: '분모가 같은 분수의 계산',
+      difficulty,
+      question: `다음을 계산하여 기약분수로 나타내세요:  ${expr}`,
+      hint:
+        mode === 'one'
+          ? `1을 분모가 ${den}인 분수로 바꾸면 ${den}/${den}입니다.`
+          : `분모가 같으면 분모는 그대로 두고 분자끼리 계산해요.`,
+      answerType: 'fraction',
+      correctAnswer: result,
+      explanations: [
+        {
+          title: '1단계: 분자끼리 계산하기',
+          content:
+            mode === 'one'
+              ? `1 = ${den}/${den}이므로 ${den}/${den} - ${n1}/${den} = ${resultNum}/${den}`
+              : `(${n1} ${mode === 'add' ? '+' : '-'} ${n2})/${den} = ${resultNum}/${den}`,
+        },
+        {
+          title: '2단계: 기약분수로 나타내기',
+          content:
+            result.den === den
+              ? `${josa(`${resultNum}/${den}`, '은')} 더 이상 약분되지 않아요.`
+              : `${resultNum}/${den} = ${resultText}`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'fraction_of_unit') {
+    const units = [
+      { whole: '1시간', subject: '1시간이', value: 60, unit: '분', dens: [2, 3, 4, 5, 6, 10, 12] },
+      { whole: '1m', subject: '1m가', value: 100, unit: 'cm', dens: [2, 4, 5, 10, 20, 25] },
+      { whole: '하루', subject: '하루가', value: 24, unit: '시간', dens: [2, 3, 4, 6, 8, 12] },
+      { whole: '1년', subject: '1년이', value: 12, unit: '개월', dens: [2, 3, 4, 6] },
+    ];
+    const u = pickOne(units);
+    const maxDen = difficulty === 'easy' ? 5 : difficulty === 'medium' ? 10 : 25;
+    const den = pickOne(u.dens.filter((d) => d <= maxDen));
+    const num = randomNumerator(den);
+    const part = u.value / den;
+    const frac = `${num}/${den}`;
+
+    return {
+      id,
+      topicId: 'fractions',
+      subtopic: '단위의 분수만큼 구하기',
+      difficulty,
+      question: `${u.whole}의 ${josa(frac, '은')} 몇 ${u.unit}인가요?`,
+      hint: `먼저 ${u.subject} 몇 ${u.unit}인지 떠올린 다음, 분모만큼 똑같이 나누고 분자만큼 모아 보세요.`,
+      answerType: 'number',
+      correctAnswer: part * num,
+      explanations: [
+        {
+          title: '1단계: 작은 단위로 바꾸기',
+          content: `${u.whole} = ${u.value}${u.unit}입니다.`,
+        },
+        {
+          title: '2단계: 1/분모만큼 구하기',
+          content: `${u.value}${u.unit}의 1/${den}은 ${u.value} ÷ ${den} = ${part}${u.unit}입니다.`,
+        },
+        ...(num > 1
+          ? [
+              {
+                title: '3단계: 분자만큼 모으기',
+                content: `${josa(frac, '은')} 그 ${num}배이므로 ${part} × ${num} = ${part * num}${u.unit}입니다.`,
+              },
+            ]
+          : []),
+      ],
+    };
+  }
+
+  if (type === 'mixed_improper') {
+    const den = randomInt(2, difficulty === 'easy' ? 5 : difficulty === 'medium' ? 8 : 9);
+    const num = randomNumerator(den);
+    const whole = randomInt(1, difficulty === 'easy' ? 3 : difficulty === 'medium' ? 5 : 9);
+    const improper = whole * den + num;
+    const toImproper = Math.random() < 0.5;
+    const mixed = `${josa(whole, '과')} ${num}/${den}`;
+
+    return {
+      id,
+      topicId: 'fractions',
+      subtopic: toImproper ? '대분수를 가분수로' : '가분수를 대분수로',
+      difficulty,
+      question: toImproper
+        ? `${josa(whole, '과')} ${josa(`${num}/${den}`, '을')} 가분수로 나타내세요.`
+        : `${josa(`${improper}/${den}`, '을')} 대분수로 나타내면 □와 ${num}/${den}입니다. □에 알맞은 수를 구하세요.`,
+      hint: toImproper
+        ? `자연수 ${josa(whole, '을')} 분모가 ${den}인 분수로 바꾸면 ${whole * den}/${den}입니다.`
+        : `${improper} 안에 ${josa(den, '이')} 몇 번 들어가는지 생각해 보세요.`,
+      answerType: toImproper ? 'fraction' : 'number',
+      correctAnswer: toImproper ? { num: improper, den } : whole,
+      explanations: toImproper
+        ? [
+            {
+              title: '1단계: 자연수를 분수로 바꾸기',
+              content: `${whole} = ${whole * den}/${den}`,
+            },
+            {
+              title: '2단계: 분수 부분과 더하기',
+              content: `${whole * den}/${den} + ${num}/${den} = ${improper}/${den}`,
+            },
+          ]
+        : [
+            {
+              title: '1단계: 분자를 분모로 나누기',
+              content: `${improper} ÷ ${den} = ${whole} ... ${num}`,
+            },
+            {
+              title: '2단계: 몫은 자연수, 나머지는 분자',
+              content: `몫 ${josa(whole, '은')} 자연수 부분, 나머지 ${josa(num, '은')} 분자가 되어 ${mixed}입니다.`,
+            },
+          ],
     };
   }
 
