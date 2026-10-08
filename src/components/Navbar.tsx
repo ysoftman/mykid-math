@@ -64,7 +64,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </button>
 
         {/* Navigation Tabs */}
-        <nav className="hidden md:flex items-center bg-slate-100 p-1 rounded-2xl gap-1">
+        <nav className="hidden lg:flex items-center bg-slate-100 p-1 rounded-2xl gap-1">
           <button
             onClick={() => {
               sound.playPop();
@@ -192,7 +192,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* Mobile Sub Navigation */}
-      <div className="grid grid-cols-6 md:hidden border-t border-slate-100 px-1 py-1 bg-slate-50 text-[12px] font-bold">
+      <div className="grid grid-cols-6 lg:hidden border-t border-slate-100 px-1 py-1 bg-slate-50 text-[12px] font-bold">
         {(
           [
             ['roadmap', 'tabRoadmap', '로드맵'],
