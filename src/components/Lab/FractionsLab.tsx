@@ -353,10 +353,10 @@ export const FractionsLab: React.FC = () => {
             </div>
 
             <div
-              className="grid max-w-full gap-1 overflow-hidden bg-slate-800 p-3 rounded-xl border border-slate-700"
+              className="grid max-w-full gap-1 overflow-hidden bg-slate-800 p-2 rounded-xl border-2 border-slate-300"
               style={{
-                gridTemplateColumns: `repeat(${mDen1}, minmax(0, 42px))`,
-                gridTemplateRows: `repeat(${mDen2}, minmax(32px, 42px))`,
+                gridTemplateColumns: `repeat(${mDen1}, minmax(0, 56px))`,
+                gridTemplateRows: `repeat(${mDen2}, minmax(40px, 56px))`,
               }}
             >
               {Array.from({ length: mDen2 }).map((_, r) =>
@@ -372,10 +372,10 @@ export const FractionsLab: React.FC = () => {
                         isOverlap
                           ? 'bg-amber-400 border-amber-300 text-amber-950 shadow-md ring-2 ring-amber-300'
                           : isHoriz
-                            ? 'bg-blue-600/40 border-blue-500/40 text-blue-200'
+                            ? 'bg-sky-400/60 border-sky-200'
                             : isVert
-                              ? 'bg-indigo-600/40 border-indigo-500/40 text-indigo-200'
-                              : 'bg-slate-800 border-slate-700 text-slate-600'
+                              ? 'bg-violet-400/60 border-violet-200'
+                              : 'bg-white/10 border-white/40'
                       }`}
                     >
                       {isOverlap ? '★' : ''}

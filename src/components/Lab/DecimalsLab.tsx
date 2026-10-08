@@ -72,7 +72,7 @@ export const DecimalsLab: React.FC = () => {
       <div className="bg-slate-900 rounded-2xl p-6 flex flex-col items-center justify-center text-white">
         <div className="text-xs text-slate-200 mb-4">전체 1개 큰 정사각형 = 100칸 (1칸 = 0.01)</div>
 
-        <div className="grid grid-cols-10 gap-0.5 sm:gap-1 bg-slate-800 p-2 sm:p-3 rounded-xl border border-slate-700">
+        <div className="grid grid-cols-10 gap-0.5 sm:gap-1 bg-slate-800 p-1.5 sm:p-2 rounded-xl border-2 border-slate-300">
           {Array.from({ length: 10 }).map((_, r) =>
             Array.from({ length: 10 }).map((_, c) => {
               const inRow = r < cellsB;
@@ -86,10 +86,10 @@ export const DecimalsLab: React.FC = () => {
                     isOverlap
                       ? 'bg-emerald-400 border-emerald-300 text-emerald-950 font-bold shadow'
                       : inCol
-                        ? 'bg-emerald-800/40 border-emerald-700/40'
+                        ? 'bg-emerald-400/50 border-emerald-200/70'
                         : inRow
-                          ? 'bg-teal-800/40 border-teal-700/40'
-                          : 'bg-slate-800 border-slate-700'
+                          ? 'bg-sky-400/50 border-sky-200/70'
+                          : 'bg-white/10 border-white/40'
                   }`}
                 >
                   {isOverlap ? '•' : ''}
