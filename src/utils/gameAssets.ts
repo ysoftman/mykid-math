@@ -19,7 +19,6 @@ import bossZombie from '../assets/game/boss-zombie.webp';
 import coinChest from '../assets/game/coin-chest.webp';
 import explorer from '../assets/game/explorer.webp';
 import gameBoss from '../assets/game/game-boss.webp';
-import gameDuel from '../assets/game/game-duel.webp';
 import gameTime from '../assets/game/game-time.webp';
 import gemChest from '../assets/game/gem-chest.webp';
 import gift from '../assets/game/gift.webp';
@@ -138,7 +137,6 @@ export const GAME_ASSETS = {
   xpBooster,
   gameTime,
   gameBoss,
-  gameDuel,
   topicFactors,
   topicFractions,
   topicDecimals,

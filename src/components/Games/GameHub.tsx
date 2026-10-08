@@ -6,7 +6,7 @@ import { TOPICS } from '../../utils/problemGenerators';
 import { getStats, type RewardResult } from '../../utils/storage';
 import { GameIcon } from '../GameIcon';
 import { BossBattle } from './BossBattle';
-import { FamilyDuel } from './FamilyDuel';
+import { FriendDuel } from './FriendDuel';
 import { TimeAttack } from './TimeAttack';
 
 type GameId = 'time' | 'boss' | 'duel';
@@ -28,8 +28,8 @@ const GAMES: { id: GameId; image: string; title: string; description: string; ti
   },
   {
     id: 'duel',
-    image: GAME_ASSETS.gameDuel,
-    title: '가족 대결',
+    image: GAME_ASSETS.resultDuelDraw,
+    title: '친구 대결',
     description: '번갈아 풀며 누가 더 많이 맞히나 겨뤄요',
     tint: 'bg-sky-50 border-sky-200 text-sky-900',
   },
@@ -88,7 +88,7 @@ export const GameHub: React.FC<GameHubProps> = ({ onReward, onStatsChanged }) =>
             onStatsChanged={handleStatsChanged}
           />
         )}
-        {game === 'duel' && <FamilyDuel />}
+        {game === 'duel' && <FriendDuel />}
       </div>
     );
   }

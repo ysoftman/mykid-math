@@ -22,9 +22,9 @@ const DIFFICULTY_LABELS: Record<Difficulty, string> = { easy: '하', medium: '�
 type Phase = 'setup' | 'play' | 'done';
 type TurnResult = { correct: boolean; answer: string };
 
-export const FamilyDuel: React.FC = () => {
+export const FriendDuel: React.FC = () => {
   const [phase, setPhase] = useState<Phase>('setup');
-  const [names, setNames] = useState<[string, string]>([KID_NAME, '엄마']);
+  const [names, setNames] = useState<[string, string]>([KID_NAME, '친구']);
   const [topicId, setTopicId] = useState<TopicId>('fractions');
   const [difficulty, setDifficulty] = useState<Difficulty>('medium');
   const [turn, setTurn] = useState(0);
@@ -89,12 +89,12 @@ export const FamilyDuel: React.FC = () => {
       <div className="bg-white rounded-2xl p-5 sm:p-8 shadow-sm border border-slate-200 space-y-5">
         <div className="text-center space-y-1">
           <img
-            src={GAME_ASSETS.gameDuel}
+            src={GAME_ASSETS.resultDuelDraw}
             alt=""
             className="mx-auto h-20 w-20 object-contain"
             draggable={false}
           />
-          <h3 className="text-2xl font-black text-slate-800">가족 대결</h3>
+          <h3 className="text-2xl font-black text-slate-800">친구 대결</h3>
           <p className="text-sm text-slate-600">
             번갈아 가며 {TURNS_PER_PLAYER}문제씩 풀어요. 더 많이 맞힌 사람이 승리!
           </p>

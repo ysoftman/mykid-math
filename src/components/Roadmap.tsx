@@ -227,7 +227,7 @@ export const Roadmap: React.FC<RoadmapProps> = ({
           />
           <span>
             <span className="block text-sm font-black text-indigo-900">수학 게임</span>
-            <span className="block text-xs text-indigo-700">타임어택 · 보스전 · 가족 대결</span>
+            <span className="block text-xs text-indigo-700">타임어택 · 보스전 · 친구 대결</span>
           </span>
         </button>
       </div>
