@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import type { Difficulty, Problem, TopicId } from '../../types/math';
-import { checkAnswer, formatAnswer, MAX_ANSWER_LENGTH } from '../../utils/answer';
+import { checkAnswer, cleanAnswerInput, formatAnswer } from '../../utils/answer';
 import { sound } from '../../utils/audio';
 import confetti from '../../utils/confetti';
 import { GAME_ASSETS } from '../../utils/gameAssets';
@@ -281,11 +281,11 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
           ) : (
             <div className="flex items-center gap-2 w-full sm:w-auto">
               <input
-                type="number"
-                step="any"
+                type="text"
+                inputMode="decimal"
                 value={numAnswer}
                 disabled={isAnswered}
-                onChange={(e) => setNumAnswer(e.target.value.slice(0, MAX_ANSWER_LENGTH))}
+                onChange={(e) => setNumAnswer(cleanAnswerInput(e.target.value, '.'))}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleCheckAnswer();
                 }}

@@ -1,5 +1,5 @@
 import type React from 'react';
-import { MAX_ANSWER_LENGTH } from '../../utils/answer';
+import { cleanAnswerInput } from '../../utils/answer';
 
 interface FractionInputProps {
   numerator: string;
@@ -19,20 +19,22 @@ export const FractionInput: React.FC<FractionInputProps> = ({
   return (
     <div className="inline-flex flex-col items-center justify-center p-2 bg-slate-50 border border-slate-300 rounded-xl">
       <input
-        type="number"
+        type="text"
+        inputMode="numeric"
         value={numerator}
         placeholder="분자"
         disabled={disabled}
-        onChange={(e) => onChangeNumerator(e.target.value.slice(0, MAX_ANSWER_LENGTH))}
+        onChange={(e) => onChangeNumerator(cleanAnswerInput(e.target.value))}
         className="w-20 text-center text-lg font-bold py-1 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-100"
       />
       <div className="w-16 h-0.5 bg-slate-400 my-1 rounded-full" />
       <input
-        type="number"
+        type="text"
+        inputMode="numeric"
         value={denominator}
         placeholder="분모"
         disabled={disabled}
-        onChange={(e) => onChangeDenominator(e.target.value.slice(0, MAX_ANSWER_LENGTH))}
+        onChange={(e) => onChangeDenominator(cleanAnswerInput(e.target.value))}
         className="w-20 text-center text-lg font-bold py-1 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-100"
       />
     </div>

@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import type { WrongNoteItem } from '../../types/math';
-import { checkAnswer, formatAnswer, MAX_ANSWER_LENGTH } from '../../utils/answer';
+import { checkAnswer, cleanAnswerInput, formatAnswer } from '../../utils/answer';
 import { sound } from '../../utils/audio';
 import confetti from '../../utils/confetti';
 import {
@@ -194,12 +194,19 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
+                        inputMode={item.problem.answerType === 'fraction' ? undefined : 'decimal'}
                         value={retryInput}
-                        maxLength={MAX_ANSWER_LENGTH * 2 + 1}
                         placeholder={
                           item.problem.answerType === 'fraction' ? '예: 3/4' : '정답 입력'
                         }
-                        onChange={(e) => setRetryInput(e.target.value)}
+                        onChange={(e) =>
+                          setRetryInput(
+                            cleanAnswerInput(
+                              e.target.value,
+                              item.problem.answerType === 'fraction' ? '/' : '.',
+                            ),
+                          )
+                        }
                         onKeyDown={(e) => {
                           if (e.key === 'Enter') handleRetrySubmit(item);
                         }}

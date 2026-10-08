@@ -1,7 +1,7 @@
 import type React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import type { Problem } from '../../types/math';
-import { checkAnswer, MAX_ANSWER_LENGTH } from '../../utils/answer';
+import { checkAnswer, cleanAnswerInput } from '../../utils/answer';
 import { MathText } from '../MathText';
 import { FractionInput } from '../Quiz/FractionInput';
 
@@ -80,11 +80,11 @@ export const GameProblem: React.FC<GameProblemProps> = ({
           />
         ) : (
           <input
-            type="number"
-            step="any"
+            type="text"
+            inputMode="decimal"
             value={numAnswer}
             disabled={disabled}
-            onChange={(e) => setNumAnswer(e.target.value.slice(0, MAX_ANSWER_LENGTH))}
+            onChange={(e) => setNumAnswer(cleanAnswerInput(e.target.value, '.'))}
             placeholder="정답 입력"
             className="w-40 sm:w-48 text-xl font-bold px-4 py-2 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-slate-100"
           />
