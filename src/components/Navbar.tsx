@@ -4,9 +4,14 @@ import type { UserStats } from '../types/math';
 import { sound } from '../utils/audio';
 import { GAME_ASSETS } from '../utils/gameAssets';
 
-const BUILD_DATE = new Intl.DateTimeFormat('sv-SE', {
+// Build time in KST, e.g. "2026.10.08 23:41"
+const VERSION = new Intl.DateTimeFormat('sv-SE', {
   timeZone: 'Asia/Seoul',
-}).format(new Date(__APP_BUILD_TIME__));
+  dateStyle: 'short',
+  timeStyle: 'short',
+})
+  .format(new Date(__APP_BUILD_TIME__))
+  .replaceAll('-', '.');
 
 export type Tab = 'roadmap' | 'lab' | 'quiz' | 'review' | 'shop' | 'games';
 
@@ -52,9 +57,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <span className="block font-black text-slate-800 text-sm sm:text-lg leading-tight tracking-tight">
               준영이의 수학공부
             </span>
-            <span className="block text-[10px] leading-tight text-slate-500">
-              빌드 날짜 {BUILD_DATE.replaceAll('-', '.')}
-            </span>
+            <span className="block text-[10px] leading-tight text-slate-500">버전 {VERSION}</span>
           </span>
         </button>
 
