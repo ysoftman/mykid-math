@@ -123,24 +123,48 @@ export const Roadmap: React.FC<RoadmapProps> = ({
             </div>
             <div className="flex items-center gap-3 pt-2">
               <CharacterAvatar stats={stats} size="sm" />
-              <h2 className="text-2xl sm:text-3xl font-black leading-tight">
-                Lv. {currentLevel} 수학 탐험가
-              </h2>
+              {/* Subtitle sits beside the avatar so it adds no row height */}
+              <div className="space-y-1">
+                <h2 className="text-2xl sm:text-3xl font-black leading-tight">
+                  Lv. {currentLevel} 수학 탐험가
+                </h2>
+                <p className="text-white/90 text-xs sm:text-sm break-keep">
+                  문제를 맞히면 별(⭐)을 모아 레벨업해요!
+                </p>
+              </div>
             </div>
-            <p className="text-white/90 text-xs sm:text-sm max-w-md">
-              문제를 맞히면 별(⭐)을 모아 레벨업해요!
-            </p>
-            {/* Inverted primary: an indigo-600 button would disappear on the indigo banner */}
-            <button
-              type="button"
-              onClick={() => {
-                sound.playPop();
-                onStartQuiz();
-              }}
-              className="px-6 py-3 rounded-xl bg-white hover:bg-indigo-50 text-indigo-700 text-base font-black shadow-md transition-colors"
-            >
-              오늘의 퀴즈 풀기 ▶
-            </button>
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+              {/* Inverted primary: an indigo-600 button would disappear on the indigo banner */}
+              <button
+                type="button"
+                onClick={() => {
+                  sound.playPop();
+                  onStartQuiz();
+                }}
+                className="px-6 py-3 rounded-xl bg-white hover:bg-indigo-50 text-indigo-700 text-base font-black shadow-md transition-colors"
+              >
+                오늘의 퀴즈 풀기 ▶
+              </button>
+              {/* Quick Stats Summary */}
+              <div className="grid grid-cols-3 gap-4 text-center whitespace-nowrap">
+                <div>
+                  <div className="text-xl font-black">{stats.totalSolved}</div>
+                  <div className="text-xs text-white/90">총 푼 문제</div>
+                </div>
+                <div>
+                  <div className="text-xl font-black">{stats.totalCorrect}</div>
+                  <div className="text-xs text-white/90">맞힌 문제</div>
+                </div>
+                <div>
+                  <div className="text-xl font-black">
+                    {stats.totalSolved > 0
+                      ? `${Math.round((stats.totalCorrect / stats.totalSolved) * 100)}%`
+                      : '0%'}
+                  </div>
+                  <div className="text-xs text-white/90">정답률</div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="bg-white/10 p-4 rounded-2xl border border-white/20 flex flex-col items-center min-w-[200px]">
@@ -170,26 +194,6 @@ export const Roadmap: React.FC<RoadmapProps> = ({
             <div className="text-xs text-white/90 mt-1 font-semibold">
               다음 레벨까지 별 {Math.max(0, nextLevelStars - currentStars)}개 남음
             </div>
-          </div>
-        </div>
-
-        {/* Quick Stats Summary */}
-        <div className="mt-6 pt-6 border-t border-white/15 grid grid-cols-3 gap-2 text-center">
-          <div>
-            <div className="text-xl sm:text-2xl font-black">{stats.totalSolved}</div>
-            <div className="text-xs text-white/90">총 푼 문제</div>
-          </div>
-          <div>
-            <div className="text-xl sm:text-2xl font-black">{stats.totalCorrect}</div>
-            <div className="text-xs text-white/90">정답 맞힌 문제</div>
-          </div>
-          <div>
-            <div className="text-xl sm:text-2xl font-black">
-              {stats.totalSolved > 0
-                ? `${Math.round((stats.totalCorrect / stats.totalSolved) * 100)}%`
-                : '0%'}
-            </div>
-            <div className="text-xs text-white/90">정답률</div>
           </div>
         </div>
       </div>
