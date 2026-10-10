@@ -1,5 +1,5 @@
 // Images cut from "Math Heroes Game Asset Sheet.png", "Korean-Style Hats and Pet Icons.png",
-// "Chibi Game Achievement Icons.png", "Colorful Math Chapter Badges.png"
+// "Chibi Game Achievement Icons.png", "Colorful Korean Math Unit Badge Set.png"
 // and "Colorful Korean Game UI Asset Sheet.png" (transparent WebP)
 import appLogo from '../assets/game/app-logo.webp';
 import badgeAttendance from '../assets/game/badge-attendance.webp';
