@@ -9,6 +9,7 @@ const WRONG_NOTES_KEY = 'mykid_math_wrong_notes';
 export const DAILY_MISSION_GOAL = 5;
 export const DAILY_MISSION_BONUS = 3;
 export const BOSS_CLEAR_STARS = 10;
+export const SHOPPING_STARS = 2; // per correct shopping answer
 export const POWER_UP_MAX = 9; // max count per power-up in inventory
 export const XP_BOOST_PROBLEMS = 5;
 export const XP_BOOST_STARS = 2; // extra stars per correct answer while boosted
@@ -362,6 +363,12 @@ export function recordBossClear(topicId: TopicId): RewardResult {
   const stats = getStats();
   if (!stats.bossCleared.includes(topicId)) stats.bossCleared.push(topicId);
   stats.stars += BOSS_CLEAR_STARS;
+  return commitReward(stats);
+}
+
+export function recordShopping(correctCount: number): RewardResult {
+  const stats = getStats();
+  stats.stars += correctCount * SHOPPING_STARS;
   return commitReward(stats);
 }
 

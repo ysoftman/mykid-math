@@ -17,9 +17,11 @@ import {
   POWER_UPS,
   recordBossClear,
   recordProblemResult,
+  recordShopping,
   recordTimeAttack,
   recordWrongConquered,
   SHOP_ITEMS,
+  SHOPPING_STARS,
   saveStats,
   todayKey,
 } from './storage';
@@ -153,6 +155,9 @@ test('wrong conquered, time attack and boss rewards', () => {
   expect(b1.updatedStats.stars).toBe(before + BOSS_CLEAR_STARS);
   expect(b1.newBadges).toContain('boss_slayer');
   expect(recordBossClear('fractions').updatedStats.bossCleared).toEqual(['fractions']);
+
+  const beforeShop = getStats().stars;
+  expect(recordShopping(3).updatedStats.stars).toBe(beforeShop + 3 * SHOPPING_STARS);
 });
 
 test('buyItem rejects unknown, poor and duplicate purchases', () => {

@@ -7,9 +7,10 @@ import { getStats, type RewardResult } from '../../utils/storage';
 import { GameIcon } from '../GameIcon';
 import { BossBattle } from './BossBattle';
 import { FriendDuel } from './FriendDuel';
+import { SHOPPING_GAME_IMAGE, ShoppingGame } from './ShoppingGame';
 import { TimeAttack } from './TimeAttack';
 
-type GameId = 'time' | 'boss' | 'duel';
+type GameId = 'time' | 'boss' | 'duel' | 'market';
 
 const GAMES: { id: GameId; image: string; title: string; description: string; tint: string }[] = [
   {
@@ -32,6 +33,13 @@ const GAMES: { id: GameId; image: string; title: string; description: string; ti
     title: '친구 대결',
     description: '번갈아 풀며 누가 더 많이 맞히나 겨뤄요',
     tint: 'bg-sky-50 border-sky-200 text-sky-900',
+  },
+  {
+    id: 'market',
+    image: SHOPPING_GAME_IMAGE,
+    title: '알뜰 장보기',
+    description: '할인 가격을 계산해 물건값과 거스름돈을 맞혀요',
+    tint: 'bg-amber-50 border-amber-200 text-amber-900',
   },
 ];
 
@@ -89,6 +97,7 @@ export const GameHub: React.FC<GameHubProps> = ({ onReward, onStatsChanged }) =>
           />
         )}
         {game === 'duel' && <FriendDuel />}
+        {game === 'market' && <ShoppingGame onReward={handleReward} />}
       </div>
     );
   }
@@ -102,7 +111,7 @@ export const GameHub: React.FC<GameHubProps> = ({ onReward, onStatsChanged }) =>
         </h2>
         <p className="text-sm text-slate-600">재미있게 놀면서 실력을 키워요!</p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {GAMES.map((g) => (
           <button
             key={g.id}
