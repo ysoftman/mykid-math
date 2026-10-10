@@ -1,6 +1,7 @@
 // Images cut from "Math Heroes Game Asset Sheet.png", "Korean-Style Hats and Pet Icons.png",
 // "Chibi Game Achievement Icons.png", "Colorful Korean Math Unit Badge Set.png"
-// and "Colorful Korean Game UI Asset Sheet.png" (transparent WebP)
+// and "Colorful Korean Game UI Asset Sheet.png" (transparent WebP);
+// banner-* are opaque crops of "Colorful Cartoon Game Banner Collection.png"
 import appLogo from '../assets/game/app-logo.webp';
 import badgeAttendance from '../assets/game/badge-attendance.webp';
 import badgeBoss from '../assets/game/badge-boss.webp';
@@ -11,6 +12,9 @@ import badgeLocked from '../assets/game/badge-locked.webp';
 import badgeSpeed from '../assets/game/badge-speed.webp';
 import badgeStar from '../assets/game/badge-star.webp';
 import badgeWrong from '../assets/game/badge-wrong.webp';
+import bannerForest from '../assets/game/banner-forest.webp';
+import bannerSea from '../assets/game/banner-sea.webp';
+import bannerSunset from '../assets/game/banner-sunset.webp';
 import bossDino from '../assets/game/boss-dino.webp';
 import bossDragon from '../assets/game/boss-dragon.webp';
 import bossOni from '../assets/game/boss-oni.webp';
@@ -174,6 +178,9 @@ export const GAME_ASSETS = {
   themeForest,
   themeSea,
   themeSunset,
+  bannerForest,
+  bannerSea,
+  bannerSunset,
   shopTitle,
   shopItems,
   resultBest,

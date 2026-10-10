@@ -29,6 +29,7 @@ export interface ShopItem {
   slot: ShopSlot;
   price: number;
   gradient?: string; // roadmap banner classes, theme only
+  banner?: GameAssetKey; // roadmap banner scenery, theme only
   image: GameAssetKey;
 }
 
@@ -74,6 +75,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     id: 'theme_forest',
     name: '초록 숲',
     image: 'themeForest',
+    banner: 'bannerForest',
     slot: 'theme',
     price: 12,
     gradient: 'from-emerald-700 to-teal-800',
@@ -82,6 +84,7 @@ export const SHOP_ITEMS: ShopItem[] = [
     id: 'theme_ocean',
     name: '푸른 바다',
     image: 'themeSea',
+    banner: 'bannerSea',
     slot: 'theme',
     price: 12,
     gradient: 'from-sky-700 to-blue-800',
@@ -90,9 +93,10 @@ export const SHOP_ITEMS: ShopItem[] = [
     id: 'theme_sunset',
     name: '노을 하늘',
     image: 'themeSunset',
+    banner: 'bannerSunset',
     slot: 'theme',
     price: 25,
-    gradient: 'from-orange-700 via-rose-700 to-fuchsia-800',
+    gradient: 'from-violet-800 via-purple-700 to-fuchsia-800',
   },
 ];
 

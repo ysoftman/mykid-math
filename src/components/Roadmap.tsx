@@ -76,9 +76,8 @@ export const Roadmap: React.FC<RoadmapProps> = ({
     100,
     Math.max(0, ((currentStars - currentLevelBaseStars) / 10) * 100),
   );
-  const equippedItem = (id?: string) => SHOP_ITEMS.find((item) => item.id === id);
-  const bannerGradient =
-    equippedItem(stats.equipped.theme)?.gradient ?? 'from-indigo-700 via-indigo-600 to-violet-700';
+  const theme = SHOP_ITEMS.find((item) => item.id === stats.equipped.theme);
+  const bannerGradient = theme?.gradient ?? 'from-indigo-700 via-indigo-600 to-violet-700';
 
   const handleExport = () => {
     const url = URL.createObjectURL(new Blob([exportData()], { type: 'application/json' }));
@@ -106,8 +105,17 @@ export const Roadmap: React.FC<RoadmapProps> = ({
     <div className="space-y-6">
       {/* User Progress Banner */}
       <div
-        className={`bg-gradient-to-r ${bannerGradient} rounded-2xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden`}
+        className={`bg-gradient-to-r ${bannerGradient} rounded-2xl p-6 sm:p-8 ${theme?.banner ? 'pt-34 sm:pt-44' : ''} text-white shadow-lg relative overflow-hidden`}
       >
+        {/* Theme scenery strip; the top padding above reserves its height */}
+        {theme?.banner && (
+          <img
+            src={GAME_ASSETS[theme.banner]}
+            alt=""
+            className="absolute inset-x-0 top-0 w-full h-28 sm:h-36 object-cover mask-b-from-70%"
+            draggable={false}
+          />
+        )}
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-3">
             <div className="inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-full text-xs font-bold tracking-wide">
