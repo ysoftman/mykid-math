@@ -75,7 +75,7 @@ export const App: React.FC = () => {
                       sound.playPop();
                       setSelectedTopicId(topic.id);
                     }}
-                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                    className={`flex shrink-0 items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                       isSelected
                         ? 'bg-indigo-600 text-white shadow-sm scale-102'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
