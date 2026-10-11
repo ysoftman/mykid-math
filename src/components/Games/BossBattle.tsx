@@ -161,7 +161,7 @@ export const BossBattle: React.FC<BossBattleProps> = ({
           <p className="text-sm text-slate-600">
             어려운(상) 문제 {BOSS_HP}개를 맞혀 보스를 물리치세요! 하트는 {START_HEARTS}개예요.
             <br />
-            승리하면 ⭐ {BOSS_CLEAR_STARS}개!
+            승리하면 <GameIcon name="uiStar" className="h-4 w-4" /> {BOSS_CLEAR_STARS}개!
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -206,7 +206,9 @@ export const BossBattle: React.FC<BossBattleProps> = ({
         <p className="text-sm text-slate-600">
           어려운 문제 {BOSS_HP}개를 모두 맞혀 보스를 물리쳤어요!
         </p>
-        <p className="text-lg font-bold text-amber-700">+{BOSS_CLEAR_STARS} ⭐ 획득!</p>
+        <p className="text-lg font-bold text-amber-700">
+          +{BOSS_CLEAR_STARS} <GameIcon name="uiStar" /> 획득!
+        </p>
         <button
           type="button"
           onClick={() => {
@@ -236,7 +238,7 @@ export const BossBattle: React.FC<BossBattleProps> = ({
             onClick={() => startBattle(topicId)}
             className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl shadow-sm active:scale-95 transition-all"
           >
-            다시 도전 🔥
+            다시 도전 <GameIcon name="uiFire" />
           </button>
           <button
             type="button"
@@ -328,7 +330,7 @@ export const BossBattle: React.FC<BossBattleProps> = ({
             onClick={nextAfterMiss}
             className="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm active:scale-95 transition-all"
           >
-            다음 문제로 공격! ➡️
+            다음 문제로 공격! <GameIcon name="arrowRight" />
           </button>
         </div>
       ) : (

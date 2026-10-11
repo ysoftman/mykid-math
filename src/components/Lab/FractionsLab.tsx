@@ -243,9 +243,16 @@ export const FractionsLab: React.FC = () => {
                 }}
                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-sm active:scale-95 transition-all"
               >
-                {isUnified
-                  ? '↩️ 원래 분수로 보기'
-                  : `✨ 공통분모 ${josa(commonDen, '으로')} 통분하기!`}
+                {isUnified ? (
+                  <>
+                    <GameIcon name="uiUndo" className="h-4 w-4" /> 원래 분수로 보기
+                  </>
+                ) : (
+                  <>
+                    <GameIcon name="uiSparkle" className="h-4 w-4" /> 공통분모{' '}
+                    {josa(commonDen, '으로')} 통분하기!
+                  </>
+                )}
               </button>
 
               <div className="text-sm font-bold text-slate-800 bg-white px-4 py-2 rounded-xl border border-slate-200">
@@ -388,7 +395,7 @@ export const FractionsLab: React.FC = () => {
                               : 'bg-white/10 border-white/40'
                       }`}
                     >
-                      {isOverlap ? '★' : ''}
+                      {isOverlap && <GameIcon name="uiStar" />}
                     </div>
                   );
                 }),

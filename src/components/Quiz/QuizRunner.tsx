@@ -305,7 +305,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
               onClick={handleCheckAnswer}
               className="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm active:scale-95 transition-all text-base"
             >
-              정답 확인하기! 🎯
+              정답 확인하기! <GameIcon name="uiTarget" />
             </button>
           ) : (
             <button
@@ -316,7 +316,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
               className="w-full sm:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm active:scale-95 transition-all text-base flex items-center justify-center gap-2"
             >
               <span>다음 문제 풀기</span>
-              <span>➡️</span>
+              <GameIcon name="arrowRight" />
             </button>
           )}
         </div>
@@ -335,18 +335,24 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
             <GameIcon name={isCorrect ? 'quizCorrect' : 'quizHint'} className="h-10 w-10" />
             <div>
               <div className="font-extrabold text-base">
-                {isCorrect
-                  ? '정답입니다! 참 잘했어요! (+2 ⭐)'
-                  : '아쉬워요! 풀이를 보고 다시 원리를 익혀볼까요?'}
+                {isCorrect ? (
+                  <>
+                    정답입니다! 참 잘했어요! (+2 <GameIcon name="uiStar" />)
+                  </>
+                ) : (
+                  '아쉬워요! 풀이를 보고 다시 원리를 익혀볼까요?'
+                )}
               </div>
               {comboBonus && (
                 <div className="text-sm font-bold text-amber-800 mt-0.5">
-                  <GameIcon name="iconComboN" className="h-4 w-4" /> +1 콤보 보너스 ⭐
+                  <GameIcon name="iconComboN" className="h-4 w-4" /> +1 콤보 보너스{' '}
+                  <GameIcon name="uiStar" className="h-4 w-4" />
                 </div>
               )}
               {boostBonus && (
                 <div className="text-sm font-bold text-amber-800 mt-0.5">
-                  ⚡ +{XP_BOOST_STARS} 부스터 보너스 ⭐
+                  <GameIcon name="uiBolt" className="h-4 w-4" /> +{XP_BOOST_STARS} 부스터 보너스{' '}
+                  <GameIcon name="uiStar" className="h-4 w-4" />
                 </div>
               )}
               <div className="text-xs mt-0.5 opacity-90">

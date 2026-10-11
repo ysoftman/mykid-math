@@ -40,7 +40,8 @@ export const DailyMission: React.FC<{ stats: UserStats }> = ({ stats }) => {
         <div className="flex items-center justify-between text-xs font-bold mb-1.5">
           {done ? (
             <span className="text-emerald-700">
-              🎉 미션 완료! 출석 도장과 별 {DAILY_MISSION_BONUS}개를 받았어요
+              <GameIcon name="uiParty" className="h-4 w-4" /> 미션 완료! 출석 도장과 별{' '}
+              {DAILY_MISSION_BONUS}개를 받았어요
             </span>
           ) : (
             <span className="text-slate-700">

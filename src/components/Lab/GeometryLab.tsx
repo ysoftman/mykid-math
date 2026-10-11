@@ -218,9 +218,16 @@ export const GeometryLab: React.FC = () => {
                 }}
                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all"
               >
-                {showTriTwin
-                  ? '↩️ 원래 삼각형만 보기'
-                  : '✨ 똑같은 삼각형 1개 더 붙여보기 (평행사변형 완성!)'}
+                {showTriTwin ? (
+                  <>
+                    <GameIcon name="uiUndo" className="h-4 w-4" /> 원래 삼각형만 보기
+                  </>
+                ) : (
+                  <>
+                    <GameIcon name="uiSparkle" className="h-4 w-4" /> 똑같은 삼각형 1개 더 붙여보기
+                    (평행사변형 완성!)
+                  </>
+                )}
               </button>
 
               <div className="text-center">
@@ -229,8 +236,8 @@ export const GeometryLab: React.FC = () => {
                   <span className="text-white font-extrabold">{triArea}</span> cm²
                 </div>
                 <p className="text-xs text-slate-300 mt-1">
-                  💡 똑같은 삼각형 2개를 붙이면 평행사변형(밑변×높이)이 되기 때문에{' '}
-                  <strong>반으로 나누는(÷2)</strong> 것입니다!
+                  <GameIcon name="uiBulb" className="h-4 w-4" /> 똑같은 삼각형 2개를 붙이면
+                  평행사변형(밑변×높이)이 되기 때문에 <strong>반으로 나누는(÷2)</strong> 것입니다!
                 </p>
               </div>
             </div>
@@ -372,7 +379,16 @@ export const GeometryLab: React.FC = () => {
                 }}
                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all"
               >
-                {showTrapTwin ? '↩️ 원래 사다리꼴만 보기' : '✨ 똑같은 사다리꼴 거꾸로 이어붙이기!'}
+                {showTrapTwin ? (
+                  <>
+                    <GameIcon name="uiUndo" className="h-4 w-4" /> 원래 사다리꼴만 보기
+                  </>
+                ) : (
+                  <>
+                    <GameIcon name="uiSparkle" className="h-4 w-4" /> 똑같은 사다리꼴 거꾸로
+                    이어붙이기!
+                  </>
+                )}
               </button>
 
               <div className="text-center">
@@ -381,8 +397,9 @@ export const GeometryLab: React.FC = () => {
                   <span className="text-white font-extrabold">{trapArea}</span> cm²
                 </div>
                 <p className="text-xs text-slate-300 mt-1">
-                  💡 똑같은 사다리꼴을 거꾸로 붙이면 밑변이 (윗변+아랫변), 높이가 같은 평행사변형이
-                  돼요. 사다리꼴은 그 절반이라서 <strong>÷2</strong>를 해요!
+                  <GameIcon name="uiBulb" className="h-4 w-4" /> 똑같은 사다리꼴을 거꾸로 붙이면
+                  밑변이 (윗변+아랫변), 높이가 같은 평행사변형이 돼요. 사다리꼴은 그 절반이라서{' '}
+                  <strong>÷2</strong>를 해요!
                 </p>
               </div>
             </div>
@@ -481,7 +498,7 @@ export const GeometryLab: React.FC = () => {
                 <div className="text-xs text-slate-300 mt-2">원 (피자 모양 조각내기)</div>
               </div>
 
-              <div className="text-2xl text-purple-400">➡️</div>
+              <GameIcon name="arrowRight" className="h-8 w-8" />
 
               {/* Unfolded teeth representation */}
               <div className="flex flex-col items-center">

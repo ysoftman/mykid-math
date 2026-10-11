@@ -123,7 +123,8 @@ export const FactorsLab: React.FC = () => {
 
           <div>
             <h4 className="text-sm font-bold text-slate-700 mb-2">
-              📐 만들 수 있는 직사각형 모양을 선택해보세요:
+              <GameIcon name="uiSetSquare" className="h-4 w-4" /> 만들 수 있는 직사각형 모양을
+              선택해보세요:
             </h4>
             <div className="flex flex-wrap gap-2">
               {pairs.map(([w, h]) => {
@@ -171,8 +172,9 @@ export const FactorsLab: React.FC = () => {
               </div>
             </div>
             <div className="mt-4 text-center text-sm text-amber-200">
-              💡 이 직사각형의 두 변 <strong>{selectedPair[0]}</strong>,{' '}
-              <strong>{selectedPair[1]}</strong>은(는) {targetNum}의 약수예요.
+              <GameIcon name="uiBulb" className="h-4 w-4" /> 이 직사각형의 두 변{' '}
+              <strong>{selectedPair[0]}</strong>, <strong>{selectedPair[1]}</strong>은(는){' '}
+              {targetNum}의 약수예요.
               <br />
               만들 수 있는 모든 직사각형(
               {pairs.map(([w, h]) => `${w}×${h}`).join(', ')})의 변을 모으면{' '}

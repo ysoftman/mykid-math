@@ -114,7 +114,7 @@ export const TimeAttack: React.FC<TimeAttackProps> = ({
         <p className="text-sm text-slate-600">
           60초 동안 여러 단원의 문제를 최대한 많이 맞혀 보세요!
           <br />
-          맞힌 문제 하나마다 ⭐ 1개를 받아요.
+          맞힌 문제 하나마다 <GameIcon name="uiStar" /> 1개를 받아요.
         </p>
         <div className="inline-block bg-amber-50 border border-amber-200 text-amber-800 font-bold px-4 py-2 rounded-full">
           <GameIcon name="iconBest" /> 최고 기록: {best}문제
@@ -125,7 +125,7 @@ export const TimeAttack: React.FC<TimeAttackProps> = ({
             onClick={start}
             className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-lg rounded-xl shadow-sm active:scale-95 transition-all"
           >
-            시작하기! 🚀
+            시작하기! <GameIcon name="uiRocket" />
           </button>
         </div>
       </div>
@@ -141,22 +141,24 @@ export const TimeAttack: React.FC<TimeAttackProps> = ({
         />
         <h3 className="text-2xl font-black text-slate-800">시간 끝!</h3>
         {result?.isNewBest && correctCount > 0 && (
-          <div className="text-xl font-black text-rose-700">🎉 신기록!</div>
+          <div className="text-xl font-black text-rose-700">
+            <GameIcon name="uiParty" className="h-7 w-7" /> 신기록!
+          </div>
         )}
         <p className="text-lg text-slate-700">
           {solvedCount}문제 중 <strong className="text-indigo-600">{correctCount}문제</strong>{' '}
           맞혔어요!
         </p>
         <p className="text-sm text-slate-600">
-          받은 별: ⭐ {correctCount + (result?.bonusStars ?? 0)} · 최고 기록:{' '}
-          {Math.max(best, correctCount)}문제
+          받은 별: <GameIcon name="uiStar" /> {correctCount + (result?.bonusStars ?? 0)} · 최고
+          기록: {Math.max(best, correctCount)}문제
         </p>
         <button
           type="button"
           onClick={start}
           className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-lg rounded-xl shadow-sm active:scale-95 transition-all"
         >
-          다시 하기 🔄
+          다시 하기 <GameIcon name="uiRedo" />
         </button>
       </div>
     );
@@ -200,9 +202,13 @@ export const TimeAttack: React.FC<TimeAttackProps> = ({
           }`}
         >
           {feedback.correct ? (
-            '⭕ 정답!'
+            <>
+              <GameIcon name="uiCorrect" /> 정답!
+            </>
           ) : (
-            <MathText text={`❌ 아쉬워요! 정답은 ${feedback.answer}`} />
+            <>
+              <GameIcon name="uiCross" /> <MathText text={`아쉬워요! 정답은 ${feedback.answer}`} />
+            </>
           )}
         </div>
       )}

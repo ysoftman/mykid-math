@@ -1,8 +1,12 @@
 // Images cut from "Math Heroes Game Asset Sheet.png", "Korean-Style Hats and Pet Icons.png",
-// "Chibi Game Achievement Icons.png", "Colorful Korean Math Unit Badge Set.png"
-// and "Colorful Korean Game UI Asset Sheet.png" (transparent WebP);
+// "Chibi Game Achievement Icons.png", "Colorful Korean Math Unit Badge Set.png",
+// "Colorful Korean Game UI Asset Sheet.png", "Colorful Chibi Sticker Icon Collection.png"
+// and "Glossy Cartoon Game Icon Sticker Set.png" (transparent WebP);
+// shop/bill-1000 and shop/coin-* come from "Glossy Chibi Game Icon Sticker Sheet.png"
 // banner-* are opaque crops of "Colorful Cartoon Game Banner Collection.png"
 import appLogo from '../assets/game/app-logo.webp';
+import arrowLeft from '../assets/game/arrow-left.webp';
+import arrowRight from '../assets/game/arrow-right.webp';
 import badgeAttendance from '../assets/game/badge-attendance.webp';
 import badgeBoss from '../assets/game/badge-boss.webp';
 import badgeCombo from '../assets/game/badge-combo.webp';
@@ -119,9 +123,26 @@ import topicFactors from '../assets/game/topic-factors.webp';
 import topicFractions from '../assets/game/topic-fractions.webp';
 import topicGeometry from '../assets/game/topic-geometry.webp';
 import topicRatios from '../assets/game/topic-ratios.webp';
+import uiBolt from '../assets/game/ui-bolt.webp';
+import uiBulb from '../assets/game/ui-bulb.webp';
+import uiCheer from '../assets/game/ui-cheer.webp';
+import uiCorrect from '../assets/game/ui-correct.webp';
+import uiCross from '../assets/game/ui-cross.webp';
+import uiCrown from '../assets/game/ui-crown.webp';
+import uiFinish from '../assets/game/ui-finish.webp';
+import uiFire from '../assets/game/ui-fire.webp';
+import uiParty from '../assets/game/ui-party.webp';
 import uiPencil from '../assets/game/ui-pencil.webp';
+import uiRedo from '../assets/game/ui-redo.webp';
+import uiRocket from '../assets/game/ui-rocket.webp';
+import uiSetSquare from '../assets/game/ui-set-square.webp';
 import uiSoundOff from '../assets/game/ui-sound-off.webp';
 import uiSoundOn from '../assets/game/ui-sound-on.webp';
+import uiSparkle from '../assets/game/ui-sparkle.webp';
+import uiStar from '../assets/game/ui-star.webp';
+import uiSwords from '../assets/game/ui-swords.webp';
+import uiTarget from '../assets/game/ui-target.webp';
+import uiUndo from '../assets/game/ui-undo.webp';
 import wizard from '../assets/game/wizard.webp';
 import xpBooster from '../assets/game/xp-booster.webp';
 
@@ -156,6 +177,25 @@ export const GAME_ASSETS = {
   uiPencil,
   uiSoundOn,
   uiSoundOff,
+  arrowLeft,
+  arrowRight,
+  uiStar,
+  uiBulb,
+  uiParty,
+  uiSparkle,
+  uiTarget,
+  uiRedo,
+  uiUndo,
+  uiFinish,
+  uiCross,
+  uiBolt,
+  uiCrown,
+  uiRocket,
+  uiFire,
+  uiSwords,
+  uiCheer,
+  uiSetSquare,
+  uiCorrect,
   bossDragon,
   bossOni,
   bossZombie,

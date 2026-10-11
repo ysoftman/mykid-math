@@ -12,19 +12,33 @@ import { TimeAttack } from './TimeAttack';
 
 type GameId = 'time' | 'boss' | 'duel' | 'market';
 
-const GAMES: { id: GameId; image: string; title: string; description: string; tint: string }[] = [
+const GAMES: {
+  id: GameId;
+  image: string;
+  title: string;
+  description: React.ReactNode;
+  tint: string;
+}[] = [
   {
     id: 'time',
     image: GAME_ASSETS.gameTime,
     title: '60초 타임어택',
-    description: '60초 안에 최대한 많이! 맞힐 때마다 ⭐ 1개',
+    description: (
+      <>
+        60초 안에 최대한 많이! 맞힐 때마다 <GameIcon name="uiStar" className="h-4 w-4" /> 1개
+      </>
+    ),
     tint: 'bg-rose-50 border-rose-200 text-rose-900',
   },
   {
     id: 'boss',
     image: GAME_ASSETS.gameBoss,
     title: '단원 보스전',
-    description: '어려운 문제로 보스를 물리치고 👑 왕관을!',
+    description: (
+      <>
+        어려운 문제로 보스를 물리치고 <GameIcon name="uiCrown" className="h-4 w-4" /> 왕관을!
+      </>
+    ),
     tint: 'bg-violet-50 border-violet-200 text-violet-900',
   },
   {
@@ -77,7 +91,7 @@ export const GameHub: React.FC<GameHubProps> = ({ onReward, onStatsChanged }) =>
           }}
           className="text-sm font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-xl border border-indigo-200 transition-colors"
         >
-          ⬅️ 게임 목록으로
+          <GameIcon name="arrowLeft" /> 게임 목록으로
         </button>
         {game === 'time' && (
           <TimeAttack

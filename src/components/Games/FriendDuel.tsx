@@ -171,7 +171,7 @@ export const FriendDuel: React.FC = () => {
           onClick={start}
           className="w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-lg rounded-xl shadow-sm active:scale-95 transition-all"
         >
-          대결 시작! ⚔️
+          대결 시작! <GameIcon name="uiSwords" />
         </button>
       </div>
     );
@@ -197,7 +197,7 @@ export const FriendDuel: React.FC = () => {
           }}
           className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-xl shadow-sm active:scale-95 transition-all"
         >
-          한 판 더! 🔄
+          한 판 더! <GameIcon name="uiRedo" />
         </button>
       </div>
     );
@@ -235,9 +235,14 @@ export const FriendDuel: React.FC = () => {
         >
           <div className="font-extrabold">
             {turnResult.correct ? (
-              '🎉 정답! +1점'
+              <>
+                <GameIcon name="uiParty" /> 정답! +1점
+              </>
             ) : (
-              <MathText text={`💡 아쉬워요! 정답은 ${turnResult.answer}`} />
+              <>
+                <GameIcon name="uiBulb" />{' '}
+                <MathText text={`아쉬워요! 정답은 ${turnResult.answer}`} />
+              </>
             )}
           </div>
           <button
@@ -245,7 +250,15 @@ export const FriendDuel: React.FC = () => {
             onClick={nextTurn}
             className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm active:scale-95 transition-all"
           >
-            {turn + 1 >= TOTAL_TURNS ? '결과 보기 🏁' : `${displayName(nextPlayer)} 차례로 ➡️`}
+            {turn + 1 >= TOTAL_TURNS ? (
+              <>
+                결과 보기 <GameIcon name="uiFinish" />
+              </>
+            ) : (
+              <>
+                {displayName(nextPlayer)} 차례로 <GameIcon name="arrowRight" />
+              </>
+            )}
           </button>
         </div>
       )}

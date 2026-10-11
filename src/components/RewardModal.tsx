@@ -68,7 +68,8 @@ export const RewardModal: React.FC<RewardModalProps> = ({ reward, onClose }) => 
 
         {reward.missionCompleted && (
           <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-lg font-extrabold text-emerald-800">
-            오늘의 미션 완료! +{DAILY_MISSION_BONUS}⭐
+            오늘의 미션 완료! +{DAILY_MISSION_BONUS}
+            <GameIcon name="uiStar" />
           </div>
         )}
 
@@ -95,7 +96,7 @@ export const RewardModal: React.FC<RewardModalProps> = ({ reward, onClose }) => 
           onClick={close}
           className="w-full rounded-xl bg-indigo-600 py-3 text-base font-bold text-white shadow-sm transition-all hover:bg-indigo-700 active:scale-95"
         >
-          좋아요! 🙌
+          좋아요! <GameIcon name="uiCheer" />
         </button>
       </div>
     </div>

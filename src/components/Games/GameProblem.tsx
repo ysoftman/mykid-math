@@ -96,7 +96,7 @@ export const GameProblem: React.FC<GameProblemProps> = ({
           disabled={disabled}
           className="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm active:scale-95 transition-all disabled:opacity-50"
         >
-          확인 🎯
+          확인 <GameIcon name="uiTarget" />
         </button>
       </div>
       {problem.answerType === 'fraction' && (

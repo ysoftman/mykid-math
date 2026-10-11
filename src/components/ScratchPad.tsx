@@ -115,7 +115,7 @@ export const ScratchPad: React.FC<ScratchPadProps> = ({ isOpen, onClose }) => {
             aria-label="연습장 닫기"
             className="w-8 h-8 rounded-xl bg-indigo-700 hover:bg-indigo-800 flex items-center justify-center font-bold text-sm"
           >
-            ✕
+            <GameIcon name="uiCross" />
           </button>
         </div>
       </div>

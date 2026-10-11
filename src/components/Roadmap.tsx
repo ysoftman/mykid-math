@@ -129,7 +129,9 @@ export const Roadmap: React.FC<RoadmapProps> = ({
                   Lv. {currentLevel} 수학 탐험가
                 </h2>
                 <p className="text-white/90 text-xs sm:text-sm break-keep">
-                  문제를 맞히면 별(⭐)을 모아 레벨업해요!
+                  문제를 맞히면 별(
+                  <GameIcon name="uiStar" className="h-4 w-4" />
+                  )을 모아 레벨업해요!
                 </p>
               </div>
             </div>
@@ -143,7 +145,7 @@ export const Roadmap: React.FC<RoadmapProps> = ({
                 }}
                 className="px-6 py-3 rounded-xl bg-white hover:bg-indigo-50 text-indigo-700 text-base font-black shadow-md transition-colors"
               >
-                오늘의 퀴즈 풀기 ▶
+                오늘의 퀴즈 풀기 <GameIcon name="arrowRight" />
               </button>
               {/* Quick Stats Summary */}
               <div className="grid grid-cols-3 gap-4 text-center whitespace-nowrap">
@@ -219,7 +221,8 @@ export const Roadmap: React.FC<RoadmapProps> = ({
           <span>
             <span className="block text-sm font-black text-amber-900">별 상점</span>
             <span className="block text-xs text-amber-800">
-              쓸 수 있는 별 ⭐ {stats.stars - stats.spentStars}
+              쓸 수 있는 별 <GameIcon name="uiStar" className="h-4 w-4" />{' '}
+              {stats.stars - stats.spentStars}
             </span>
           </span>
         </button>

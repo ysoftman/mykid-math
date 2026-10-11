@@ -31,7 +31,7 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
   const [notes, setNotes] = useState<WrongNoteItem[]>(getWrongNotes());
   const [retryId, setRetryId] = useState<string | null>(null);
   const [retryInput, setRetryInput] = useState<string>('');
-  const [retryFeedback, setRetryFeedback] = useState<string | null>(null);
+  const [retryFeedback, setRetryFeedback] = useState<React.ReactNode>(null);
   const [feedbackTone, setFeedbackTone] = useState<FeedbackTone>('notice');
   const [expandedExplanationId, setExpandedExplanationId] = useState<string | null>(null);
   const [isConquering, setIsConquering] = useState<boolean>(false);
@@ -57,7 +57,12 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
       setIsConquering(true);
       const reward = recordWrongConquered();
       setFeedbackTone('correct');
-      setRetryFeedback('🎉 완벽해요! 오답을 완전히 정복했습니다! +1⭐');
+      setRetryFeedback(
+        <>
+          <GameIcon name="uiParty" className="h-4 w-4" /> 완벽해요! 오답을 완전히 정복했습니다! +1
+          <GameIcon name="uiStar" className="h-4 w-4" />
+        </>,
+      );
       setTimeout(() => {
         removeWrongNote(p.id);
         const updated = getWrongNotes();
@@ -144,7 +149,7 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
                     className="text-slate-600 hover:text-rose-700 text-xs transition-colors"
                     title="오답 노트에서 삭제"
                   >
-                    삭제 ✕
+                    삭제 <GameIcon name="uiCross" className="h-4 w-4" />
                   </button>
                 </div>
 
@@ -189,7 +194,7 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
                       }}
                       className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm"
                     >
-                      다시 풀기 🎯
+                      다시 풀기 <GameIcon name="uiTarget" className="h-4 w-4" />
                     </button>
                   ) : (
                     <div className="flex items-center gap-2">

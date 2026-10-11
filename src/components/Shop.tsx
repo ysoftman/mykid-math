@@ -210,7 +210,9 @@ export const Shop: React.FC<ShopProps> = ({ stats, onStatsChanged }) => {
 
                   {equipped ? (
                     <>
-                      <span className="text-xs font-bold text-indigo-700">✨ 착용 중</span>
+                      <span className="text-xs font-bold text-indigo-700">
+                        <GameIcon name="uiSparkle" className="h-4 w-4" /> 착용 중
+                      </span>
                       {/* The character slot can never be empty */}
                       {slot !== 'character' && (
                         <button
