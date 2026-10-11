@@ -4,13 +4,13 @@ import type { Difficulty } from '../../types/math';
 import { formatAnswer } from '../../utils/answer';
 import { sound } from '../../utils/audio';
 import confetti from '../../utils/confetti';
-import { GAME_ASSETS } from '../../utils/gameAssets';
 import {
-  BILL_NAMES,
-  billsFor,
   type CartLine,
   discountLabel,
   makeShoppingRounds,
+  moneyFor,
+  moneyImage,
+  moneyText,
   type ShoppingRound,
   salePrice,
   won,
@@ -20,37 +20,22 @@ import { GameIcon } from '../GameIcon';
 import { MathText } from '../MathText';
 import { GameProblem } from './GameProblem';
 
-// Every shopping picture is an emoji until src/assets/shop/<id>.webp exists; dropping the file in replaces it.
+// Pictures live in src/assets/shop/<id>.webp; shopping.test.ts checks every id has one.
 const IMAGES = import.meta.glob<string>('../../assets/shop/*.webp', {
   eager: true,
   import: 'default',
 });
-const shopImageUrl = (id: string): string | undefined => IMAGES[`../../assets/shop/${id}.webp`];
 
-export const SHOPPING_GAME_IMAGE = shopImageUrl('game-shopping') ?? GAME_ASSETS.coinChest;
+export const SHOPPING_GAME_IMAGE = IMAGES['../../assets/shop/basket.webp'];
 
-const ShopImage: React.FC<{ id: string; emoji: string; className: string }> = ({
-  id,
-  emoji,
-  className,
-}) => {
-  const src = shopImageUrl(id);
-  return src ? (
-    <img
-      src={src}
-      alt=""
-      className={`inline-block object-contain ${className}`}
-      draggable={false}
-    />
-  ) : (
-    <span
-      aria-hidden
-      className={`inline-flex items-center justify-center leading-none ${className}`}
-    >
-      {emoji}
-    </span>
-  );
-};
+const ShopImage: React.FC<{ id: string; className: string }> = ({ id, className }) => (
+  <img
+    src={IMAGES[`../../assets/shop/${id}.webp`]}
+    alt=""
+    className={`inline-block object-contain ${className}`}
+    draggable={false}
+  />
+);
 
 const LEVELS: { id: Difficulty; label: string; desc: string }[] = [
   { id: 'easy', label: '하', desc: '물건 1~2개 · 1만원 안쪽' },
@@ -67,7 +52,7 @@ const CartCard: React.FC<{ line: CartLine; hideRate: boolean }> = ({ line, hideR
           {hideRate ? '할인 ?' : <MathText text={`${discountLabel(discount)} 할인`} />}
         </span>
       )}
-      <ShopImage id={goods.id} emoji={goods.emoji} className="h-14 w-14 text-5xl" />
+      <ShopImage id={goods.id} className="h-14 w-14" />
       <div className="mt-1 font-bold text-slate-800">{goods.name}</div>
       <div
         className={
@@ -90,20 +75,25 @@ const CartCard: React.FC<{ line: CartLine; hideRate: boolean }> = ({ line, hideR
   );
 };
 
-const Wallet: React.FC<{ paid: number }> = ({ paid }) => {
-  const { value, count } = billsFor(paid);
-  return (
-    <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-3 font-bold text-emerald-900">
-      <span>👛 낸 돈</span>
-      {Array.from({ length: count }, (_, i) => (
-        <ShopImage key={i} id={`bill-${value}`} emoji="💵" className="h-10 w-16 text-4xl" />
-      ))}
-      <span>
-        {BILL_NAMES[value]} × {count}장 = {won(paid)}
-      </span>
-    </div>
-  );
-};
+// Bills and coins for an amount, e.g. the money paid or the change
+const MoneyRow: React.FC<{ label: string; amount: number }> = ({ label, amount }) => (
+  <div className="flex flex-wrap items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 p-3 font-bold text-emerald-900">
+    <ShopImage id="wallet" className="h-10 w-10" />
+    <span>{label}</span>
+    {moneyFor(amount).flatMap(([value, count]) =>
+      Array.from({ length: count }, (_, i) => (
+        <ShopImage
+          key={`${value}-${i}`}
+          id={moneyImage(value)}
+          className={value >= 1000 ? 'h-10 w-16' : 'h-8 w-8'}
+        />
+      )),
+    )}
+    <span>
+      {moneyText(amount)} = {won(amount)}
+    </span>
+  </div>
+);
 
 const answerText = (round: ShoppingRound) =>
   round.type === 'rate' ? formatAnswer(round.problem) : won(Number(round.problem.correctAnswer));
@@ -165,10 +155,11 @@ export const ShoppingGame: React.FC<{ onReward: (r: RewardResult) => void }> = (
         <p className="text-sm text-slate-600">
           장바구니 물건값을 계산해요. 할인 딱지는 할인율만 알려 줘요!
           <br />
-          맞힌 문제 하나마다 ⭐ {SHOPPING_STARS}개를 받아요.
+          맞힌 문제 하나마다 <GameIcon name="uiStar" /> {SHOPPING_STARS}개를 받아요.
         </p>
         <div className="mx-auto max-w-md rounded-2xl border border-amber-200 bg-amber-50 p-3 text-left text-sm text-amber-900">
-          <MathText text="💡 1/4 할인은 가격을 4묶음으로 나눈 것 중 1묶음만큼 깎아 줘요. 25% 할인 = 25/100 = 1/4 할인!" />
+          <GameIcon name="uiBulb" className="h-4 w-4" />{' '}
+          <MathText text="1/4 할인은 가격을 4묶음으로 나눈 것 중 1묶음만큼 깎아 줘요. 25% 할인 = 25/100 = 1/4 할인!" />
         </div>
         <div className="grid grid-cols-3 gap-2">
           {LEVELS.map((l) => (
@@ -196,7 +187,7 @@ export const ShoppingGame: React.FC<{ onReward: (r: RewardResult) => void }> = (
           onClick={start}
           className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-lg rounded-xl shadow-sm active:scale-95 transition-all"
         >
-          장보러 가기! 🛒
+          장보러 가기! <ShopImage id="basket" className="h-7 w-7 align-middle" />
         </button>
       </div>
     );
@@ -213,13 +204,17 @@ export const ShoppingGame: React.FC<{ onReward: (r: RewardResult) => void }> = (
         />
         <h3 className="text-2xl font-black text-slate-800">장보기 끝!</h3>
         {correctCount === rounds.length && (
-          <div className="text-xl font-black text-rose-700">🎉 계산 척척 알뜰왕!</div>
+          <div className="text-xl font-black text-rose-700">
+            <GameIcon name="uiParty" className="h-7 w-7" /> 계산 척척 알뜰왕!
+          </div>
         )}
         <p className="text-lg text-slate-700">
           {rounds.length}문제 중 <strong className="text-indigo-600">{correctCount}문제</strong>{' '}
           맞혔어요!
         </p>
-        <p className="text-sm text-slate-600">받은 별: ⭐ {correctCount * SHOPPING_STARS}</p>
+        <p className="text-sm text-slate-600">
+          받은 별: <GameIcon name="uiStar" /> {correctCount * SHOPPING_STARS}
+        </p>
         <button
           type="button"
           onClick={() => {
@@ -228,7 +223,7 @@ export const ShoppingGame: React.FC<{ onReward: (r: RewardResult) => void }> = (
           }}
           className="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-lg rounded-xl shadow-sm active:scale-95 transition-all"
         >
-          다시 장보기 🔄
+          다시 장보기 <GameIcon name="uiRedo" />
         </button>
       </div>
     );
@@ -239,7 +234,7 @@ export const ShoppingGame: React.FC<{ onReward: (r: RewardResult) => void }> = (
     <div className="bg-white rounded-2xl p-5 sm:p-8 shadow-sm border border-slate-200 space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm font-bold">
         <span className="text-slate-700">
-          🧾 {index + 1} / {rounds.length}
+          <ShopImage id="receipt" className="h-6 w-6 align-middle" /> {index + 1} / {rounds.length}
         </span>
         <span className="text-indigo-600">
           <GameIcon name="iconCorrect" /> {correctCount}문제
@@ -248,7 +243,7 @@ export const ShoppingGame: React.FC<{ onReward: (r: RewardResult) => void }> = (
 
       <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 space-y-4">
         <div className="flex items-center gap-2 text-lg font-black text-amber-900">
-          <ShopImage id={round.store.id} emoji={round.store.emoji} className="h-9 w-9 text-3xl" />
+          <ShopImage id={round.store.icon} className="h-9 w-9" />
           {round.store.name}
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -258,7 +253,7 @@ export const ShoppingGame: React.FC<{ onReward: (r: RewardResult) => void }> = (
         </div>
       </div>
 
-      {round.type === 'change' && <Wallet paid={round.paid} />}
+      {round.type === 'change' && <MoneyRow label="낸 돈" amount={round.paid} />}
 
       <GameProblem
         key={round.problem.id}
@@ -276,14 +271,16 @@ export const ShoppingGame: React.FC<{ onReward: (r: RewardResult) => void }> = (
           }`}
         >
           <div className="font-extrabold">
+            <GameIcon name={answered ? 'uiParty' : 'uiBulb'} />{' '}
             <MathText
               text={
-                answered
-                  ? `🎉 정답! ${answerText(round)}`
-                  : `💡 아쉬워요! 정답은 ${answerText(round)}`
+                answered ? `정답! ${answerText(round)}` : `아쉬워요! 정답은 ${answerText(round)}`
               }
             />
           </div>
+          {round.type === 'change' && (
+            <MoneyRow label="거스름돈" amount={Number(round.problem.correctAnswer)} />
+          )}
           <ol className="space-y-2 text-sm text-slate-700">
             {round.problem.explanations.map((e) => (
               <li key={e.title}>
@@ -299,7 +296,15 @@ export const ShoppingGame: React.FC<{ onReward: (r: RewardResult) => void }> = (
             onClick={next}
             className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-sm active:scale-95 transition-all"
           >
-            {index + 1 < rounds.length ? '다음 장보기 ➡️' : '결과 보기 🏁'}
+            {index + 1 < rounds.length ? (
+              <>
+                다음 장보기 <GameIcon name="arrowRight" />
+              </>
+            ) : (
+              <>
+                결과 보기 <GameIcon name="uiFinish" />
+              </>
+            )}
           </button>
         </div>
       )}

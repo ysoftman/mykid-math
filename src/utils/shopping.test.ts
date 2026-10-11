@@ -1,8 +1,17 @@
 import { expect, test } from 'bun:test';
+import { existsSync } from 'node:fs';
 import type { Difficulty } from '../types/math';
 import { checkAnswer, formatAnswer } from './answer';
 import { gcd } from './mathHelpers';
-import { lineTotal, makeShoppingRound, ROUND_TYPES, STORES } from './shopping';
+import {
+  lineTotal,
+  MONEY,
+  makeShoppingRound,
+  moneyFor,
+  moneyImage,
+  ROUND_TYPES,
+  STORES,
+} from './shopping';
 
 const LIMITS: Record<Difficulty, number> = { easy: 10000, medium: 30000, hard: 50000 };
 
@@ -10,6 +19,31 @@ test('catalog ids are unique image names', () => {
   const ids = STORES.flatMap((s) => [s.id, ...s.goods.map((g) => g.id)]);
   expect(new Set(ids).size).toBe(ids.length);
   for (const s of STORES) for (const g of s.goods) expect(g.price % 100).toBe(0);
+});
+
+test('every shop picture exists', () => {
+  const ids = [
+    ...STORES.flatMap((s) => [s.icon, ...s.goods.map((g) => g.id)]),
+    ...MONEY.map(moneyImage),
+    'wallet',
+    'receipt',
+  ];
+  const missing = ids.filter(
+    (id) => !existsSync(new URL(`../assets/shop/${id}.webp`, import.meta.url)),
+  );
+  expect(missing).toEqual([]);
+});
+
+test('money breaks into the fewest bills and coins', () => {
+  for (let amount = 100; amount <= 50000; amount += 100) {
+    expect(moneyFor(amount).reduce((sum, [v, n]) => sum + v * n, 0)).toBe(amount);
+  }
+  expect(moneyFor(4600)).toEqual([
+    [1000, 4],
+    [500, 1],
+    [100, 1],
+  ]);
+  expect(moneyFor(20000)).toEqual([[10000, 2]]);
 });
 
 test.each(['easy', 'medium', 'hard'] as Difficulty[])(
