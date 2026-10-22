@@ -69,7 +69,7 @@ export const App: React.FC = () => {
             <div className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">
               단원 선택
             </div>
-            <div className="flex gap-2 overflow-x-auto pb-1">
+            <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
               {TOPICS.map((topic) => {
                 const isSelected = topic.id === selectedTopicId;
                 return (
@@ -79,7 +79,7 @@ export const App: React.FC = () => {
                       sound.playPop();
                       setSelectedTopicId(topic.id);
                     }}
-                    className={`flex shrink-0 items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                    className={`flex flex-col items-center gap-1.5 rounded-xl px-2 py-3 text-center text-xs font-bold leading-snug transition-all ${
                       isSelected
                         ? 'bg-indigo-600 text-white shadow-sm scale-102'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -88,7 +88,7 @@ export const App: React.FC = () => {
                     <img
                       src={topic.image}
                       alt=""
-                      className="h-6 w-6 object-contain"
+                      className="h-10 w-10 object-contain"
                       draggable={false}
                     />
                     <span>{topic.title}</span>
