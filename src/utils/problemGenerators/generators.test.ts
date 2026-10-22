@@ -16,6 +16,9 @@ test.each(TOPICS.map((t) => t.id as TopicId))('%s generates valid problems', (to
         const f = p.correctAnswer as { num: number; den: number };
         expect(f.den).toBeGreaterThan(0);
         expect(gcd(f.num, f.den)).toBe(1);
+      } else if (topicId === 'symmetry') {
+        // A parallelogram or trapezoid has no line of symmetry, so 0 is a real answer here
+        expect(Number(p.correctAnswer)).toBeGreaterThanOrEqual(0);
       } else {
         expect(Number(p.correctAnswer)).toBeGreaterThan(0);
       }
