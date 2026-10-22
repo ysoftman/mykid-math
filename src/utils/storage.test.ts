@@ -294,7 +294,7 @@ test('dev unlock opens everything and leaves today one problem short', () => {
   expect(s.ownedItems).toHaveLength(SHOP_ITEMS.length);
   expect(Object.values(s.inventory)).toEqual(POWER_UPS.map(() => POWER_UP_MAX));
   expect(getAttendanceStreak(s)).toBe(7);
-  expect(getWrongNotes()).toHaveLength(5);
+  expect(getWrongNotes()).toHaveLength(Object.keys(s.topicProgress).length);
   const r = recordProblemResult('factors', false);
   expect(r.missionCompleted).toBe(true);
   expect(getAttendanceStreak(r.updatedStats)).toBe(8);
