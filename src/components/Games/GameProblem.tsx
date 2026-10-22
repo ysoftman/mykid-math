@@ -5,6 +5,7 @@ import { checkAnswer, cleanAnswerInput } from '../../utils/answer';
 import { GameIcon } from '../GameIcon';
 import { MathText } from '../MathText';
 import { FractionInput } from '../Quiz/FractionInput';
+import { ProblemDiagram } from '../Quiz/ProblemDiagram';
 
 interface GameProblemProps {
   problem: Problem;
@@ -63,6 +64,7 @@ export const GameProblem: React.FC<GameProblemProps> = ({
       >
         <MathText text={problem.question} />
       </h3>
+      {problem.visual && <ProblemDiagram visual={problem.visual} />}
 
       <div
         ref={inputBoxRef}

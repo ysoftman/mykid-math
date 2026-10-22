@@ -133,6 +133,7 @@ const defaultStats: UserStats = {
     fractions: { solvedCount: 0, correctCount: 0, stars: 0 },
     decimals: { solvedCount: 0, correctCount: 0, stars: 0 },
     geometry: { solvedCount: 0, correctCount: 0, stars: 0 },
+    symmetry: { solvedCount: 0, correctCount: 0, stars: 0 },
     ratios: { solvedCount: 0, correctCount: 0, stars: 0 },
   },
   spentStars: 0,
@@ -180,6 +181,12 @@ export const BADGE_DEFINITIONS: {
     image: 'topicGeometry',
   },
   {
+    id: 'symmetry_master',
+    name: '대칭 탐험가',
+    desc: '합동과 대칭 문제를 5개 이상 맞혔어요!',
+    image: 'labTiles',
+  },
+  {
     id: 'ratio_master',
     name: '비율의 달인',
     desc: '비와 비율 문제를 5개 이상 맞혔어요!',
@@ -225,6 +232,7 @@ const BADGE_CHECKS: Record<string, (s: UserStats) => boolean> = {
   fraction_master: (s) => s.topicProgress.fractions.correctCount >= 5,
   decimal_wiz: (s) => s.topicProgress.decimals.correctCount >= 5,
   geometry_architect: (s) => s.topicProgress.geometry.correctCount >= 5,
+  symmetry_master: (s) => s.topicProgress.symmetry.correctCount >= 5,
   ratio_master: (s) => s.topicProgress.ratios.correctCount >= 5,
   star_collector: (s) => s.stars >= 20,
   math_hero: (s) => s.level >= 5,

@@ -5,6 +5,7 @@ import { generateFactorProblem } from './factors';
 import { generateFractionProblem } from './fractions';
 import { generateGeometryProblem } from './geometry';
 import { generateRatioProblem } from './ratios';
+import { generateSymmetryProblem } from './symmetry';
 
 export const TOPICS: TopicInfo[] = [
   {
@@ -48,6 +49,16 @@ export const TOPICS: TopicInfo[] = [
     accentColor: '#a855f7',
   },
   {
+    id: 'symmetry',
+    title: '합동과 대칭',
+    grade: '5학년 2학기',
+    image: GAME_ASSETS.labTiles,
+    badge: '대칭 탐험가',
+    description: '도형을 뒤집고 돌려 포개며 합동, 선대칭, 점대칭을 배워요.',
+    color: 'from-cyan-500 to-sky-600',
+    accentColor: '#06b6d4',
+  },
+  {
     id: 'ratios',
     title: '비와 비율 · 비례배분',
     grade: '6학년 1~2학기',
@@ -81,6 +92,8 @@ function generateFreshProblem(topicId: TopicId, difficulty: Difficulty): Problem
       return generateDecimalProblem(difficulty);
     case 'geometry':
       return generateGeometryProblem(difficulty);
+    case 'symmetry':
+      return generateSymmetryProblem(difficulty);
     case 'ratios':
       return generateRatioProblem(difficulty);
   }

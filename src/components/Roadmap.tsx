@@ -38,6 +38,8 @@ function badgeProgress(id: string, s: UserStats): [number, number] | null {
       return [s.topicProgress.decimals.correctCount, 5];
     case 'geometry_architect':
       return [s.topicProgress.geometry.correctCount, 5];
+    case 'symmetry_master':
+      return [s.topicProgress.symmetry.correctCount, 5];
     case 'ratio_master':
       return [s.topicProgress.ratios.correctCount, 5];
     case 'star_collector':

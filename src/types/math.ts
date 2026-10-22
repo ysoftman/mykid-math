@@ -1,4 +1,4 @@
-export type TopicId = 'factors' | 'fractions' | 'decimals' | 'geometry' | 'ratios';
+export type TopicId = 'factors' | 'fractions' | 'decimals' | 'geometry' | 'symmetry' | 'ratios';
 
 export interface TopicInfo {
   id: TopicId;
@@ -15,6 +15,30 @@ export type PowerUpId = 'time_charge' | 'heart_recover' | 'shield' | 'xp_booster
 
 export type Difficulty = 'easy' | 'medium' | 'hard';
 
+export type SymmetryFigureId =
+  | 'square'
+  | 'rectangle'
+  | 'equilateral-triangle'
+  | 'isosceles-triangle'
+  | 'rhombus'
+  | 'parallelogram'
+  | 'hexagon'
+  | 'trapezoid';
+
+export type TriangleSideId = 'AB' | 'BC' | 'CA' | 'DE' | 'EF' | 'FD';
+
+export type ProblemVisual =
+  | {
+      kind: 'shape-set';
+      shapes: { figure: SymmetryFigureId; label: string }[];
+    }
+  | {
+      kind: 'congruent-triangles';
+      firstSides: Partial<Record<TriangleSideId, string>>;
+      secondSides?: Partial<Record<TriangleSideId, string>>;
+      dottedArcs?: TriangleSideId[];
+    };
+
 export interface StepExplanation {
   title: string;
   content: string;
@@ -27,6 +51,7 @@ export interface Problem {
   difficulty: Difficulty;
   question: string;
   context?: string; // Additional context or scenario
+  visual?: ProblemVisual;
   hint: string;
   answerType: 'number' | 'fraction' | 'choice' | 'text';
   correctAnswer: number | string | { whole?: number; num: number; den: number };

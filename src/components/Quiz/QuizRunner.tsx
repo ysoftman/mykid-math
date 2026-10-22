@@ -18,6 +18,7 @@ import {
 import { GameIcon } from '../GameIcon';
 import { MathText } from '../MathText';
 import { FractionInput } from './FractionInput';
+import { ProblemDiagram } from './ProblemDiagram';
 
 const readBoost = () => {
   const stats = getStats();
@@ -241,6 +242,8 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
         <h3 className="text-lg sm:text-xl font-bold text-slate-800 leading-relaxed">
           <MathText text={problem.question} />
         </h3>
+
+        {problem.visual && <ProblemDiagram visual={problem.visual} />}
 
         {boost.remaining > 0 && (
           <div className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-800 text-sm font-extrabold px-3 py-1 rounded-full border border-amber-200 mr-2">

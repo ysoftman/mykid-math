@@ -27,6 +27,7 @@ const BOSSES: Record<TopicId, { image: GameAssetKey; name: string }> = {
   fractions: { image: 'bossOni', name: '분수 도깨비' },
   decimals: { image: 'bossZombie', name: '소수점 좀비' },
   geometry: { image: 'bossRobot', name: '도형 로봇' },
+  symmetry: { image: 'bossRobot', name: '대칭 거울 기사' },
   ratios: { image: 'bossDino', name: '비율 공룡' },
 };
 

@@ -12,6 +12,7 @@ import {
 } from '../../utils/storage';
 import { GameIcon } from '../GameIcon';
 import { MathText } from '../MathText';
+import { ProblemDiagram } from '../Quiz/ProblemDiagram';
 
 type FeedbackTone = 'correct' | 'wrong' | 'notice';
 
@@ -156,6 +157,7 @@ export const ReviewNote: React.FC<ReviewNoteProps> = ({ onClose, onRefreshStats,
                 <div className="font-bold text-slate-800 text-sm sm:text-base">
                   <MathText text={item.problem.question} />
                 </div>
+                {item.problem.visual && <ProblemDiagram visual={item.problem.visual} />}
 
                 <div className="flex flex-wrap items-center gap-4 text-xs bg-white p-3 rounded-xl border border-slate-200">
                   <div>

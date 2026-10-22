@@ -8,6 +8,7 @@ import { FactorsLab } from './components/Lab/FactorsLab';
 import { FractionsLab } from './components/Lab/FractionsLab';
 import { GeometryLab } from './components/Lab/GeometryLab';
 import { RatiosLab } from './components/Lab/RatiosLab';
+import { SymmetryLab } from './components/Lab/SymmetryLab';
 import { Navbar, type Tab } from './components/Navbar';
 import { QuizRunner } from './components/Quiz/QuizRunner';
 import { ReviewNote } from './components/Review/ReviewNote';
@@ -145,6 +146,7 @@ export const App: React.FC = () => {
             {selectedTopicId === 'fractions' && <FractionsLab />}
             {selectedTopicId === 'decimals' && <DecimalsLab />}
             {selectedTopicId === 'geometry' && <GeometryLab />}
+            {selectedTopicId === 'symmetry' && <SymmetryLab />}
             {selectedTopicId === 'ratios' && <RatiosLab />}
           </div>
         )}
