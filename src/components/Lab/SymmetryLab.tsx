@@ -64,7 +64,7 @@ export const SymmetryLab: React.FC = () => {
         <div>
           <h3 className="flex items-center gap-2 text-xl font-bold text-slate-800">
             <img
-              src={GAME_ASSETS.labTiles}
+              src={GAME_ASSETS.labSymmetry}
               alt=""
               className="h-9 w-9 object-contain"
               draggable={false}
@@ -89,7 +89,10 @@ export const SymmetryLab: React.FC = () => {
       {mode === 'congruence' && (
         <div className="space-y-5">
           <div className="rounded-xl border border-cyan-100 bg-cyan-50 p-4">
-            <h4 className="font-extrabold text-cyan-950">모양과 크기가 같으면 합동이에요</h4>
+            <h4 className="flex items-center gap-2 font-extrabold text-cyan-950">
+              <GameIcon name="symEqual" className="h-8 w-8" />
+              모양과 크기가 같으면 합동이에요
+            </h4>
             <p className="mt-1 text-sm leading-relaxed text-cyan-900">
               두 도형은 방향이 달라도 옮기거나 뒤집거나 돌려서 완전히 포개지면 합동이에요. 대응하는
               변과 각의 크기도 각각 같아요.
@@ -175,7 +178,10 @@ export const SymmetryLab: React.FC = () => {
       {mode === 'line' && (
         <div className="space-y-5">
           <div className="rounded-xl border border-cyan-100 bg-cyan-50 p-4">
-            <h4 className="font-extrabold text-cyan-950">선대칭은 선을 따라 접으면 포개져요</h4>
+            <h4 className="flex items-center gap-2 font-extrabold text-cyan-950">
+              <GameIcon name="symFlip" className="h-8 w-8" />
+              선대칭은 선을 따라 접으면 포개져요
+            </h4>
             <p className="mt-1 text-sm leading-relaxed text-cyan-900">
               노란 선이 대칭축이에요. 축에서 같은 만큼 떨어진 점끼리 서로 짝이 돼요.
             </p>
@@ -227,7 +233,8 @@ export const SymmetryLab: React.FC = () => {
           </div>
 
           <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-            <p className="text-sm text-slate-600">
+            <p className="flex items-center gap-2 text-sm text-slate-600">
+              {lineFolded && <GameIcon name="symSuccess" className="h-10 w-10" />}
               {lineFolded
                 ? '양쪽 도형이 포개졌어요. 이 선이 대칭축이라는 뜻이에요.'
                 : '점선은 대칭축에서 같은 거리에 있는 점을 이어요.'}
@@ -250,7 +257,10 @@ export const SymmetryLab: React.FC = () => {
       {mode === 'point' && (
         <div className="space-y-5">
           <div className="rounded-xl border border-cyan-100 bg-cyan-50 p-4">
-            <h4 className="font-extrabold text-cyan-950">점대칭은 한 점을 중심으로 180° 돌려요</h4>
+            <h4 className="flex items-center gap-2 font-extrabold text-cyan-950">
+              <GameIcon name="symTurn" className="h-8 w-8" />
+              점대칭은 한 점을 중심으로 180° 돌려요
+            </h4>
             <p className="mt-1 text-sm leading-relaxed text-cyan-900">
               가운데 점을 기준으로 마주 보는 점을 이었을 때, 중심은 두 점의 한가운데에 있어요.
             </p>
@@ -303,7 +313,8 @@ export const SymmetryLab: React.FC = () => {
           </div>
 
           <div className="flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
-            <p className="text-sm text-slate-600">
+            <p className="flex items-center gap-2 text-sm text-slate-600">
+              {pointFolded && <GameIcon name="symSuccess" className="h-10 w-10" />}
               {pointFolded
                 ? '두 도형이 포개졌어요. 이 점을 중심으로 180° 돌렸어요.'
                 : '점선은 대칭의 중심을 지나며 서로 짝인 점을 이어요.'}

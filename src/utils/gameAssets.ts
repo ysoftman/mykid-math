@@ -4,6 +4,7 @@
 // and "Glossy Cartoon Game Icon Sticker Set.png" (transparent WebP);
 // shop/bill-1000 and shop/coin-* come from "Glossy Chibi Game Icon Sticker Sheet.png"
 // banner-* are opaque crops of "Colorful Cartoon Game Banner Collection.png"
+// topic-symmetry, badge-symmetry, lab-symmetry and sym-* come from "Colorful Geometry Sticker Sheet.png"
 import appLogo from '../assets/game/app-logo.webp';
 import arrowLeft from '../assets/game/arrow-left.webp';
 import arrowRight from '../assets/game/arrow-right.webp';
@@ -15,6 +16,7 @@ import badgeHero from '../assets/game/badge-hero.webp';
 import badgeLocked from '../assets/game/badge-locked.webp';
 import badgeSpeed from '../assets/game/badge-speed.webp';
 import badgeStar from '../assets/game/badge-star.webp';
+import badgeSymmetry from '../assets/game/badge-symmetry.webp';
 import badgeWrong from '../assets/game/badge-wrong.webp';
 import bannerForest from '../assets/game/banner-forest.webp';
 import bannerSea from '../assets/game/banner-sea.webp';
@@ -71,6 +73,7 @@ import labCircle from '../assets/game/lab-circle.webp';
 import labFractionAdd from '../assets/game/lab-fraction-add.webp';
 import labFractionMul from '../assets/game/lab-fraction-mul.webp';
 import labGcdLcm from '../assets/game/lab-gcd-lcm.webp';
+import labSymmetry from '../assets/game/lab-symmetry.webp';
 import labTiles from '../assets/game/lab-tiles.webp';
 import labTrapezoid from '../assets/game/lab-trapezoid.webp';
 import labTriangle from '../assets/game/lab-triangle.webp';
@@ -108,6 +111,10 @@ import slotProp from '../assets/game/slot-prop.webp';
 import slotTheme from '../assets/game/slot-theme.webp';
 import solver from '../assets/game/solver.webp';
 import star from '../assets/game/star.webp';
+import symEqual from '../assets/game/sym-equal.webp';
+import symFlip from '../assets/game/sym-flip.webp';
+import symSuccess from '../assets/game/sym-success.webp';
+import symTurn from '../assets/game/sym-turn.webp';
 import tabGames from '../assets/game/tab-games.webp';
 import tabLab from '../assets/game/tab-lab.webp';
 import tabQuiz from '../assets/game/tab-quiz.webp';
@@ -123,6 +130,7 @@ import topicFactors from '../assets/game/topic-factors.webp';
 import topicFractions from '../assets/game/topic-fractions.webp';
 import topicGeometry from '../assets/game/topic-geometry.webp';
 import topicRatios from '../assets/game/topic-ratios.webp';
+import topicSymmetry from '../assets/game/topic-symmetry.webp';
 import uiBolt from '../assets/game/ui-bolt.webp';
 import uiBulb from '../assets/game/ui-bulb.webp';
 import uiCheer from '../assets/game/ui-cheer.webp';
@@ -167,6 +175,7 @@ export const GAME_ASSETS = {
   topicDecimals,
   topicGeometry,
   topicRatios,
+  topicSymmetry,
   appLogo,
   tabRoadmap,
   tabLab,
@@ -210,6 +219,7 @@ export const GAME_ASSETS = {
   badgeSpeed,
   badgeBoss,
   badgeLocked,
+  badgeSymmetry,
   slotCharacter,
   slotHat,
   slotPet,
@@ -253,6 +263,11 @@ export const GAME_ASSETS = {
   labTriangle,
   labTrapezoid,
   labCircle,
+  labSymmetry,
+  symEqual,
+  symFlip,
+  symTurn,
+  symSuccess,
   quizProblem,
   quizCombo,
   quizCorrect,

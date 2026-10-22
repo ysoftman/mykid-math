@@ -184,7 +184,7 @@ export const BADGE_DEFINITIONS: {
     id: 'symmetry_master',
     name: '대칭 탐험가',
     desc: '합동과 대칭 문제를 5개 이상 맞혔어요!',
-    image: 'labTiles',
+    image: 'badgeSymmetry',
   },
   {
     id: 'ratio_master',

@@ -52,7 +52,7 @@ export const TOPICS: TopicInfo[] = [
     id: 'symmetry',
     title: '합동과 대칭',
     grade: '5학년 2학기',
-    image: GAME_ASSETS.labTiles,
+    image: GAME_ASSETS.topicSymmetry,
     badge: '대칭 탐험가',
     description: '도형을 뒤집고 돌려 포개며 합동, 선대칭, 점대칭을 배워요.',
     color: 'from-cyan-500 to-sky-600',
