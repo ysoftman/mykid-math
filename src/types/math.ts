@@ -1,4 +1,13 @@
-export type TopicId = 'factors' | 'fractions' | 'decimals' | 'geometry' | 'symmetry' | 'ratios';
+export type TopicId =
+  | 'factors'
+  | 'fractions'
+  | 'decimals'
+  | 'geometry'
+  | 'symmetry'
+  | 'decimalMul'
+  | 'solids'
+  | 'averages'
+  | 'ratios';
 
 export interface TopicInfo {
   id: TopicId;

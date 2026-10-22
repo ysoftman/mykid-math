@@ -2,12 +2,15 @@ import type React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { GameIcon } from './components/GameIcon';
 import { GameHub } from './components/Games/GameHub';
+import { AveragesLab } from './components/Lab/AveragesLab';
+import { DecimalMulLab } from './components/Lab/DecimalMulLab';
 import { DecimalsLab } from './components/Lab/DecimalsLab';
 // Labs
 import { FactorsLab } from './components/Lab/FactorsLab';
 import { FractionsLab } from './components/Lab/FractionsLab';
 import { GeometryLab } from './components/Lab/GeometryLab';
 import { RatiosLab } from './components/Lab/RatiosLab';
+import { SolidsLab } from './components/Lab/SolidsLab';
 import { SymmetryLab } from './components/Lab/SymmetryLab';
 import { Navbar, type Tab } from './components/Navbar';
 import { QuizRunner } from './components/Quiz/QuizRunner';
@@ -147,6 +150,9 @@ export const App: React.FC = () => {
             {selectedTopicId === 'decimals' && <DecimalsLab />}
             {selectedTopicId === 'geometry' && <GeometryLab />}
             {selectedTopicId === 'symmetry' && <SymmetryLab />}
+            {selectedTopicId === 'decimalMul' && <DecimalMulLab />}
+            {selectedTopicId === 'solids' && <SolidsLab />}
+            {selectedTopicId === 'averages' && <AveragesLab />}
             {selectedTopicId === 'ratios' && <RatiosLab />}
           </div>
         )}

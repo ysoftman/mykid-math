@@ -5,9 +5,13 @@
 // shop/bill-1000 and shop/coin-* come from "Glossy Chibi Game Icon Sticker Sheet.png"
 // banner-* are opaque crops of "Colorful Cartoon Game Banner Collection.png"
 // topic-symmetry, badge-symmetry, lab-symmetry and sym-* come from "Colorful Geometry Sticker Sheet.png"
+// topic-decimal-mul, topic-solids, topic-averages, dm-*, so-* and av-* come from "Cute Math Learning Sticker Sheet.png"
 import appLogo from '../assets/game/app-logo.webp';
 import arrowLeft from '../assets/game/arrow-left.webp';
 import arrowRight from '../assets/game/arrow-right.webp';
+import avDice from '../assets/game/av-dice.webp';
+import avMean from '../assets/game/av-mean.webp';
+import avSpinner from '../assets/game/av-spinner.webp';
 import badgeAttendance from '../assets/game/badge-attendance.webp';
 import badgeBoss from '../assets/game/badge-boss.webp';
 import badgeCombo from '../assets/game/badge-combo.webp';
@@ -27,6 +31,9 @@ import bossOni from '../assets/game/boss-oni.webp';
 import bossRobot from '../assets/game/boss-robot.webp';
 import bossZombie from '../assets/game/boss-zombie.webp';
 import coinChest from '../assets/game/coin-chest.webp';
+import dmBoard from '../assets/game/dm-board.webp';
+import dmCubes from '../assets/game/dm-cubes.webp';
+import dmExpression from '../assets/game/dm-expression.webp';
 import explorer from '../assets/game/explorer.webp';
 import gameBoss from '../assets/game/game-boss.webp';
 import gameTime from '../assets/game/game-time.webp';
@@ -109,6 +116,12 @@ import slotHat from '../assets/game/slot-hat.webp';
 import slotPet from '../assets/game/slot-pet.webp';
 import slotProp from '../assets/game/slot-prop.webp';
 import slotTheme from '../assets/game/slot-theme.webp';
+import soCube from '../assets/game/so-cube.webp';
+import soLabeled from '../assets/game/so-labeled.webp';
+import soNet from '../assets/game/so-net.webp';
+import soNetAlt from '../assets/game/so-net-alt.webp';
+import soPrism from '../assets/game/so-prism.webp';
+import soWire from '../assets/game/so-wire.webp';
 import solver from '../assets/game/solver.webp';
 import star from '../assets/game/star.webp';
 import symEqual from '../assets/game/sym-equal.webp';
@@ -125,11 +138,14 @@ import themeForest from '../assets/game/theme-forest.webp';
 import themeSea from '../assets/game/theme-sea.webp';
 import themeSunset from '../assets/game/theme-sunset.webp';
 import time from '../assets/game/time.webp';
+import topicAverages from '../assets/game/topic-averages.webp';
+import topicDecimalMul from '../assets/game/topic-decimal-mul.webp';
 import topicDecimals from '../assets/game/topic-decimals.webp';
 import topicFactors from '../assets/game/topic-factors.webp';
 import topicFractions from '../assets/game/topic-fractions.webp';
 import topicGeometry from '../assets/game/topic-geometry.webp';
 import topicRatios from '../assets/game/topic-ratios.webp';
+import topicSolids from '../assets/game/topic-solids.webp';
 import topicSymmetry from '../assets/game/topic-symmetry.webp';
 import uiBolt from '../assets/game/ui-bolt.webp';
 import uiBulb from '../assets/game/ui-bulb.webp';
@@ -176,6 +192,9 @@ export const GAME_ASSETS = {
   topicGeometry,
   topicRatios,
   topicSymmetry,
+  topicDecimalMul,
+  topicSolids,
+  topicAverages,
   appLogo,
   tabRoadmap,
   tabLab,
@@ -268,6 +287,18 @@ export const GAME_ASSETS = {
   symFlip,
   symTurn,
   symSuccess,
+  dmExpression,
+  dmBoard,
+  dmCubes,
+  soPrism,
+  soCube,
+  soLabeled,
+  soNet,
+  soNetAlt,
+  soWire,
+  avMean,
+  avDice,
+  avSpinner,
   quizProblem,
   quizCombo,
   quizCorrect,

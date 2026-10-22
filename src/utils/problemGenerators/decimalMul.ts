@@ -1,0 +1,150 @@
+import type { Difficulty, Problem, StepExplanation } from '../../types/math';
+import { josa, pickOne, randomInt } from '../mathHelpers';
+
+// A factor kept as its digits and decimal places so products use integer arithmetic: 0.3 -> { digits: 3, places: 1 }
+interface Factor {
+  text: string;
+  digits: number;
+  places: number;
+}
+
+const PLACE_WORD = ['', '한', '두', '세'];
+const HUNDREDTHS = [12, 15, 24, 25, 35, 45];
+
+const factor = (digits: number, places: number): Factor => ({
+  text: String(digits / 10 ** places),
+  digits,
+  places,
+});
+const tenths = (min = 2, max = 9) => factor(randomInt(min, max), 1);
+const placesText = (f: Factor) => (f.places ? `소수 ${PLACE_WORD[f.places]} 자리` : '자연수');
+
+function multiply(a: Factor, b: Factor) {
+  const product = a.digits * b.digits;
+  const places = a.places + b.places;
+  const answer = product / 10 ** places;
+  const explanations: StepExplanation[] = [
+    { title: '1단계: 자연수처럼 곱하기', content: `${a.digits} × ${b.digits} = ${product}` },
+    {
+      title: '2단계: 소수점 아래 자리 수 세기',
+      content: `${josa(a.text, '은')} ${placesText(a)}, ${josa(b.text, '은')} ${placesText(b)}이므로 곱은 소수 ${PLACE_WORD[places]} 자리예요.`,
+    },
+    {
+      title: '3단계: 소수점 찍기',
+      content: `${product}에서 소수점을 왼쪽으로 ${places}칸 옮기면 ${answer}입니다.`,
+    },
+  ];
+  return { product, places, answer, explanations };
+}
+
+const WORD_PROBLEMS: ((a: string, b: string) => [string, string])[] = [
+  (a, b) => [`1m의 무게가 ${a}kg인 끈이 있습니다. 이 끈 ${b}m의 무게는 몇 kg인가요?`, 'kg'],
+  (a, b) => [
+    `한 병에 주스가 ${a}L씩 들어 있습니다. ${b}병에 들어 있는 주스는 모두 몇 L인가요?`,
+    'L',
+  ],
+  (a, b) => [
+    `한 시간에 ${a}km를 걷는 거북이가 있습니다. ${b}시간 동안 걷는 거리는 몇 km인가요?`,
+    'km',
+  ],
+];
+
+export function generateDecimalMulProblem(difficulty: Difficulty): Problem {
+  const id = `dmul_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+  const type = pickOne(
+    difficulty === 'easy'
+      ? ['nat_times_dec', 'use_nat_product']
+      : difficulty === 'medium'
+        ? ['dec_times_dec', 'mixed_times_dec', 'use_nat_product', 'places_count']
+        : ['hundredths', 'mixed_times_dec', 'places_count', 'word_problem', 'square'],
+  );
+  const base = { id, topicId: 'decimalMul' as const, difficulty, answerType: 'number' as const };
+  const calcHint =
+    '자연수끼리 곱한 다음, 두 소수의 소수점 아래 자리 수를 더한 만큼 소수점을 왼쪽으로 옮겨요.';
+
+  if (type === 'places_count') {
+    let a = tenths();
+    let b =
+      difficulty === 'hard' || Math.random() < 0.5 ? factor(pickOne(HUNDREDTHS), 2) : tenths();
+    // A product ending in 0 would drop a place (0.5 × 0.4 = 0.2), so keep the count unambiguous
+    while ((a.digits * b.digits) % 10 === 0) {
+      a = tenths();
+      b = factor(b.digits, b.places);
+    }
+    const { answer, places, explanations } = multiply(a, b);
+    return {
+      ...base,
+      subtopic: '곱의 소수점 아래 자리 수',
+      question: `${a.text} × ${b.text}의 곱은 소수점 아래 몇째 자리까지 있는 수인가요? (숫자만 쓰세요)`,
+      hint: '두 소수의 소수점 아래 자리 수를 더하면 곱의 소수점 아래 자리 수가 돼요.',
+      correctAnswer: places,
+      explanations: [
+        explanations[1],
+        { title: '확인하기', content: `${a.text} × ${b.text} = ${answer}` },
+      ],
+    };
+  }
+
+  if (type === 'use_nat_product') {
+    const x = randomInt(2, 9);
+    const y = randomInt(2, 9);
+    const a = factor(x, 1);
+    const b = factor(y, difficulty === 'easy' ? 1 : pickOne([1, 2]));
+    const { answer, places, explanations } = multiply(a, b);
+    return {
+      ...base,
+      subtopic: '자연수의 곱을 이용하기',
+      question: `${x} × ${y} = ${x * y}임을 이용하여 ${a.text} × ${josa(b.text, '을')} 구하세요.`,
+      hint: '자연수의 곱은 그대로이고, 소수점 아래 자리 수만큼 소수점을 왼쪽으로 옮기면 돼요.',
+      correctAnswer: answer,
+      explanations: [
+        explanations[1],
+        {
+          title: '소수점 옮기기',
+          content: `${x * y}에서 소수점을 왼쪽으로 ${places}칸 옮기면 ${answer}입니다.`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'word_problem' || type === 'square') {
+    const a = tenths();
+    const b = type === 'square' ? a : factor(pickOne([15, 25, 35, 45]), 1);
+    const { answer, explanations } = multiply(a, b);
+    const [question, unit] =
+      type === 'square'
+        ? [`한 변의 길이가 ${a.text}m인 정사각형 모양 천의 넓이는 몇 m²인가요?`, 'm²']
+        : pickOne(WORD_PROBLEMS)(a.text, b.text);
+    return {
+      ...base,
+      subtopic: '소수의 곱 문장제',
+      question,
+      hint: `${a.text} × ${josa(b.text, '을')} 계산하면 돼요. ${calcHint}`,
+      correctAnswer: answer,
+      explanations: [
+        { title: '1단계: 식 세우기', content: `${a.text} × ${b.text}` },
+        ...explanations,
+        { title: '답', content: `${answer}${unit}` },
+      ],
+    };
+  }
+
+  const [a, b, subtopic] =
+    type === 'nat_times_dec'
+      ? [factor(randomInt(2, 9), 0), tenths(), '자연수와 소수의 곱']
+      : type === 'dec_times_dec'
+        ? [tenths(), tenths(), '소수 한 자리끼리의 곱']
+        : type === 'mixed_times_dec'
+          ? [tenths(11, 19), tenths(), '1보다 큰 소수의 곱']
+          : [factor(pickOne(HUNDREDTHS), 2), tenths(2, 8), '소수 두 자리와 소수 한 자리의 곱'];
+  const [left, right] = Math.random() < 0.5 ? [a, b] : [b, a];
+  const { answer, explanations } = multiply(left, right);
+  return {
+    ...base,
+    subtopic,
+    question: `다음을 계산하세요:  ${left.text} × ${right.text}`,
+    hint: calcHint,
+    correctAnswer: answer,
+    explanations,
+  };
+}

@@ -40,6 +40,12 @@ function badgeProgress(id: string, s: UserStats): [number, number] | null {
       return [s.topicProgress.geometry.correctCount, 5];
     case 'symmetry_master':
       return [s.topicProgress.symmetry.correctCount, 5];
+    case 'decimal_mul_master':
+      return [s.topicProgress.decimalMul.correctCount, 5];
+    case 'solids_master':
+      return [s.topicProgress.solids.correctCount, 5];
+    case 'averages_master':
+      return [s.topicProgress.averages.correctCount, 5];
     case 'ratio_master':
       return [s.topicProgress.ratios.correctCount, 5];
     case 'star_collector':
