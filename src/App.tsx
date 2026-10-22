@@ -25,7 +25,12 @@ import { TOPICS } from './utils/problemGenerators';
 import { getStats, getWrongNotes, type RewardResult } from './utils/storage';
 
 export const App: React.FC = () => {
-  const [currentTab, setCurrentTab] = useState<Tab>('roadmap');
+  const [currentTab, switchTab] = useState<Tab>('roadmap');
+  // Tab views are swapped in place, so reset the scroll the browser would otherwise keep from the previous tab
+  const setCurrentTab = (tab: Tab) => {
+    switchTab(tab);
+    window.scrollTo({ top: 0 });
+  };
   const [selectedTopicId, setSelectedTopicId] = useState<TopicId>('fractions');
   const [stats, setStats] = useState<UserStats>(getStats());
   const [wrongNotesCount, setWrongNotesCount] = useState<number>(getWrongNotes().length);
