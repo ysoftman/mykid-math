@@ -155,13 +155,13 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
       subtopic: '직육면체의 겉넓이',
       difficulty,
       question: `가로 ${a}cm, 세로 ${b}cm, 높이 ${c}cm인 직육면체의 겉넓이는 몇 cm²인가요?`,
-      hint: `직육면체는 마주 보는 두 면의 모양과 크기가 같아요. 서로 다른 세 면의 넓이를 더한 뒤 2배 해요!`,
+      hint: `직육면체는 마주 보는 두 면의 모양과 크기가 같아요. 겉넓이 = (한 꼭짓점에서 만나는 세 면의 넓이의 합) × 2`,
       answerType: 'number',
       correctAnswer: faces * 2,
       explanations: [
         {
-          title: '1단계: 서로 다른 세 면의 넓이',
-          content: `${a} × ${b} = ${a * b}cm², ${b} × ${c} = ${b * c}cm², ${a} × ${c} = ${a * c}cm²`,
+          title: '1단계: 한 꼭짓점에서 만나는 세 면의 넓이',
+          content: `가로 × 세로 = ${a} × ${b} = ${a * b}cm², 세로 × 높이 = ${b} × ${c} = ${b * c}cm², 가로 × 높이 = ${a} × ${c} = ${a * c}cm²`,
         },
         {
           title: '2단계: 세 면의 넓이의 합 × 2',
@@ -223,7 +223,7 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
     const reasons = isPrism
       ? {
           면: `밑면 2개 + 옆면 ${n}개 = ${n + 2}개`,
-          모서리: `두 밑면의 모서리 ${n}개씩 + 옆면끼리 만나는 모서리 ${n}개 = ${n * 3}개`,
+          모서리: `두 밑면의 모서리 ${n} × 2 = ${n * 2}개와 옆면끼리 만나는 모서리 ${n}개를 더하면 ${n * 2} + ${n} = ${n * 3}개`,
           꼭짓점: `두 밑면에 꼭짓점이 ${n}개씩이므로 ${n} × 2 = ${n * 2}개`,
         }
       : {
