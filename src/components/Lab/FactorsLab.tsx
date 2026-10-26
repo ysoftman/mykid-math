@@ -236,7 +236,7 @@ export const FactorsLab: React.FC = () => {
               <div className="text-xs font-bold text-amber-700 uppercase tracking-wider mb-1">
                 공통인 약수 중 가장 큰 수
               </div>
-              <div className="text-xl font-bold text-slate-800">최대공약수 (GCD)</div>
+              <div className="text-xl font-bold text-slate-800">최대공약수</div>
               <div className="text-4xl font-black text-amber-700 my-2">{calculatedGCD}</div>
               <div className="text-xs text-slate-600">
                 공약수 목록: <strong className="text-amber-700">{commonFactors.join(', ')}</strong>{' '}
@@ -248,7 +248,7 @@ export const FactorsLab: React.FC = () => {
               <div className="text-xs font-bold text-blue-700 uppercase tracking-wider mb-1">
                 공통인 배수 중 가장 작은 수
               </div>
-              <div className="text-xl font-bold text-slate-800">최소공배수 (LCM)</div>
+              <div className="text-xl font-bold text-slate-800">최소공배수</div>
               <div className="text-4xl font-black text-blue-700 my-2">{calculatedLCM}</div>
               <div className="text-xs text-slate-600">
                 두 수가 처음으로 함께 만나는 배수는 <strong>{calculatedLCM}</strong>입니다!

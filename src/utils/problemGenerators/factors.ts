@@ -14,7 +14,7 @@ function pickLcmPair(max: number, maxLcm = Number.POSITIVE_INFINITY): [number, n
   return [a, b];
 }
 
-// 거꾸로 나눗셈: divide both numbers by a common prime until no common factor but 1 is left
+// Divide both numbers by a common prime until no common factor but 1 is left
 function commonDivisions(a: number, b: number) {
   const steps: string[] = [];
   const divisors: number[] = [];
@@ -177,10 +177,14 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
           title: '1단계: 정사각형의 한 변 구하기',
           content: `한 변은 ${josa(width, '과')} ${height}의 공약수여야 하고, 가장 큰 정사각형이므로 최대공약수인 ${g}cm입니다.`,
         },
-        {
-          title: '2단계: 정사각형의 수 세기',
-          content: `가로로 ${width} ÷ ${g} = ${m2}장, 세로로 ${height} ÷ ${g} = ${m1}장이므로 모두 ${m2} × ${m1} = ${m1 * m2}장입니다.`,
-        },
+        ...(askCount
+          ? [
+              {
+                title: '2단계: 정사각형의 수 세기',
+                content: `가로로 ${width} ÷ ${g} = ${m2}장, 세로로 ${height} ÷ ${g} = ${m1}장이므로 모두 ${m2} × ${m1} = ${m1 * m2}장입니다.`,
+              },
+            ]
+          : []),
       ],
     };
   }
@@ -206,22 +210,20 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
           title: '1단계: 정사각형의 한 변 구하기',
           content: `한 변은 ${josa(a, '과')} ${b}의 공배수여야 하고, 가장 작은 정사각형이므로 최소공배수인 ${side}cm입니다.`,
         },
-        {
-          title: '2단계: 필요한 카드 수 세기',
-          content: `가로로 ${side} ÷ ${a} = ${side / a}장, 세로로 ${side} ÷ ${b} = ${side / b}장이므로 모두 ${side / a} × ${side / b} = ${count}장입니다.`,
-        },
+        ...(askCount
+          ? [
+              {
+                title: '2단계: 필요한 카드 수 세기',
+                content: `가로로 ${side} ÷ ${a} = ${side / a}장, 세로로 ${side} ÷ ${b} = ${side / b}장이므로 모두 ${side / a} × ${side / b} = ${count}장입니다.`,
+              },
+            ]
+          : []),
       ],
     };
   }
 
   if (type === 'smallest_3digit_common_multiple') {
-    const max = difficulty === 'easy' ? 6 : difficulty === 'medium' ? 10 : 15;
-    let a = randomInt(2, max);
-    let b = randomInt(2, max);
-    while (a === b || lcm(a, b) >= 100) {
-      a = randomInt(2, max);
-      b = randomInt(2, max);
-    }
+    const [a, b] = pickLcmPair(difficulty === 'easy' ? 6 : difficulty === 'medium' ? 10 : 15, 99);
     const l = lcm(a, b);
     const answer = Math.ceil(100 / l) * l;
 
@@ -273,7 +275,7 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
         },
         {
           title: '2단계: 모든 약수 나열하기',
-          content: `짝을 이루는 수를 모두 모으면 ${num}의 약수는 [ ${factors.join(', ')} ] 입니다.`,
+          content: `짝을 이루는 수를 모두 모으면 ${num}의 약수는 ${factors.join(', ')}입니다.`,
         },
         {
           title: '3단계: 개수 세기',
@@ -303,15 +305,15 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
     return {
       id,
       topicId: 'factors',
-      subtopic: '최대공약수 (GCD)',
+      subtopic: '최대공약수',
       difficulty,
       question: `두 수 ${josa(a, '과')} ${b}의 최대공약수를 구하세요.`,
-      hint: `두 수를 모두 나눌 수 있는 공통인 약수 중에서 가장 큰 수를 찾아보세요! '거꾸로 나눗셈'을 쓰면 쉬워요.`,
+      hint: `두 수를 모두 나눌 수 있는 공통인 약수 중에서 가장 큰 수를 찾아보세요! 두 수를 1이 아닌 공약수로 계속 나누어 보면 쉬워요.`,
       answerType: 'number',
       correctAnswer: g,
       explanations: [
         {
-          title: '1단계: 공약수로 계속 나누기 (거꾸로 나눗셈)',
+          title: '1단계: 공약수로 계속 나누기',
           content: `${josa(a, '과')} ${josa(b, '을')} 1 말고 다른 공약수가 없을 때까지 나눕니다: ${steps.join(' → ')}`,
         },
         {
@@ -341,7 +343,7 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
     return {
       id,
       topicId: 'factors',
-      subtopic: '최소공배수 (LCM)',
+      subtopic: '최소공배수',
       difficulty,
       question: `두 수 ${josa(a, '과')} ${b}의 최소공배수를 구하세요.`,
       hint: `두 수의 배수 중에서 가장 처음으로 같아지는(가장 작은) 공배수를 찾아보세요.`,

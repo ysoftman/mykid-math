@@ -17,7 +17,7 @@ export const TOPICS: TopicInfo[] = [
     grade: '5학년 1학기',
     image: GAME_ASSETS.topicFactors,
     badge: '약수 탐정',
-    description: '최대공약수(GCD), 최소공배수(LCM)와 배수의 원리를 탐구해요.',
+    description: '최대공약수, 최소공배수와 배수의 원리를 탐구해요.',
     color: 'from-amber-500 to-orange-500',
     accentColor: '#f59e0b',
   },
