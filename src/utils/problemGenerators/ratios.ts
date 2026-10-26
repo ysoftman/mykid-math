@@ -54,7 +54,8 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
     const sb = randomInt(3, max);
     let sa = randomInt(1, sb - 1);
     while (gcd(sa, sb) !== 1) sa = randomInt(1, sb - 1);
-    const m = difficulty === 'easy' ? randomInt(1, 3) : randomInt(2, 6);
+    // m >= 2 so there is always something to reduce; m is then the gcd of the two terms
+    const m = difficulty === 'easy' ? randomInt(2, 3) : randomInt(2, 6);
 
     return {
       id,
@@ -68,11 +69,11 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
       explanations: [
         {
           title: '1단계: 비율을 분수로 쓰기',
-          content: `비교하는 양 ${sa * m}, 기준량 ${sb * m}이므로 비율은 ${sa * m}/${sb * m} 입니다.`,
+          content: `비교하는 양 ${sa * m}, 기준량 ${sb * m}이므로 비율은 ${sa * m}/${sb * m}입니다.`,
         },
         {
           title: '2단계: 약분하기',
-          content: `${sa * m}/${sb * m} = ${sa}/${sb}`,
+          content: `분자와 분모를 최대공약수 ${josa(m, '으로')} 나누면 ${sa * m}/${sb * m} = ${sa}/${sb}입니다.`,
         },
       ],
     };
@@ -293,12 +294,11 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
         : difficulty === 'medium'
           ? randomInt(2, 6)
           : randomInt(5, 12);
-    const b =
-      difficulty === 'easy'
-        ? randomInt(2, 6)
-        : difficulty === 'medium'
-          ? randomInt(3, 8)
-          : randomInt(6, 15);
+    const [bMin, bMax] =
+      difficulty === 'easy' ? [2, 6] : difficulty === 'medium' ? [3, 8] : [6, 15];
+    // An n : n ratio makes the blank trivially equal to c
+    let b = randomInt(bMin, bMax);
+    while (b === a) b = randomInt(bMin, bMax);
     const multiplier =
       difficulty === 'easy'
         ? randomInt(2, 4)
@@ -471,8 +471,13 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
 
   // Proportional distribution
   const maxRatio = difficulty === 'easy' ? 3 : difficulty === 'medium' ? 5 : 6;
-  const r1 = randomInt(1, maxRatio);
-  const r2 = randomInt(2, maxRatio);
+  // Distinct terms already in simplest form, so no 3 : 3 or 4 : 6
+  let r1 = randomInt(1, maxRatio);
+  let r2 = randomInt(2, maxRatio);
+  while (r1 === r2 || gcd(r1, r2) !== 1) {
+    r1 = randomInt(1, maxRatio);
+    r2 = randomInt(2, maxRatio);
+  }
   const unit =
     difficulty === 'easy'
       ? randomInt(2, 6)
@@ -484,7 +489,8 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
   const friend = pickOne(['민수', '지우', '태호', '서연이']);
   const isFirst = Math.random() > 0.5;
   const targetName = isFirst ? KID_CALL : friend;
-  const targetAns = isFirst ? r1 * unit : r2 * unit;
+  const targetRatio = isFirst ? r1 : r2;
+  const targetAns = targetRatio * unit;
 
   return {
     id,
@@ -493,21 +499,21 @@ export function generateRatioProblem(difficulty: Difficulty): Problem {
     difficulty,
     context: '스티커 나누기',
     question: `스티커 ${total}장을 ${KID_CALL}와 ${friend}가 ${r1} : ${r2}의 비로 나누어 가지려고 합니다. ${targetName}가 갖게 될 스티커는 몇 장일까요?`,
-    hint: `전체를 총 (${r1} + ${r2} = ${r1 + r2})조각으로 나눈 다음, 그중 ${isFirst ? r1 : r2}조각의 양을 구하면 돼요!`,
+    hint: `전체를 (${r1} + ${r2} = ${r1 + r2})묶음으로 똑같이 나눈 다음, 그중 ${targetRatio}묶음이 몇 장인지 구하면 돼요!`,
     answerType: 'number',
     correctAnswer: targetAns,
     explanations: [
       {
         title: '1단계: 비의 합 구하기',
-        content: `전체 비의 합 = ${r1} + ${r2} = ${r1 + r2} 묶음`,
+        content: `비의 합은 ${r1} + ${r2} = ${r1 + r2}이므로 전체를 ${r1 + r2}묶음으로 똑같이 나눠요.`,
       },
       {
         title: '2단계: 1묶음의 크기 구하기',
-        content: `${total} ÷ ${r1 + r2} = 1묶음당 ${unit}장`,
+        content: `${total} ÷ ${r1 + r2} = ${unit}이므로 1묶음은 ${unit}장이에요.`,
       },
       {
         title: '3단계: 배분하기',
-        content: `${targetName}의 몫 = ${unit} × ${isFirst ? r1 : r2} = ${targetAns}장`,
+        content: `${targetName}의 몫은 ${targetRatio}묶음이므로 ${unit} × ${targetRatio} = ${targetAns}장이에요.`,
       },
     ],
   };
