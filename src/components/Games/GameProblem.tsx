@@ -102,7 +102,9 @@ export const GameProblem: React.FC<GameProblemProps> = ({
         </button>
       </div>
       {problem.answerType === 'fraction' && (
-        <p className="text-xs text-slate-500">기약분수로 적어요. 답이 자연수면 분자 칸에만!</p>
+        <p className="text-xs text-slate-500">
+          기약분수로 적어요. 답이 0이나 자연수면 분자 칸에만!
+        </p>
       )}
       {notice && <p className="text-xs font-bold text-amber-700">{notice}</p>}
     </div>

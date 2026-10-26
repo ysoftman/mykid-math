@@ -26,6 +26,10 @@ test('fraction answers', () => {
   expect(checkAnswer(frac(3, 4), '3/0')).toBe('wrong');
   expect(checkAnswer(frac(3, 4), '')).toBe('empty');
   expect(checkAnswer(frac(3, 4), '/4')).toBe('empty');
+  // 0 over any denominator is just 0
+  expect(checkAnswer(frac(0, 1), '0')).toBe('correct');
+  expect(checkAnswer(frac(0, 1), '0/5')).toBe('correct');
+  expect(checkAnswer(frac(0, 1), '0/0')).toBe('wrong');
 });
 
 test('whole-number fraction answers accept a bare numerator', () => {

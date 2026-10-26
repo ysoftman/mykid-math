@@ -25,7 +25,8 @@ export function checkAnswer(problem: Problem, input: string): AnswerResult {
     const den = denText === '' ? 1 : Number(denText);
     if (!Number.isInteger(num) || !Number.isInteger(den) || den === 0) return 'wrong';
     const target = problem.correctAnswer as { num: number; den: number };
-    if (num === target.num && den === target.den) return 'correct';
+    // 0 over any denominator is just 0, which a kid cannot "reduce"
+    if (num === target.num && (den === target.den || num === 0)) return 'correct';
     return num * target.den === den * target.num ? 'unreduced' : 'wrong';
   }
   if (!/\d/.test(raw)) return 'empty';

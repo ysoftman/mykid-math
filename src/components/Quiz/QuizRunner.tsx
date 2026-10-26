@@ -279,7 +279,7 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
                 disabled={isAnswered}
               />
               <span className="text-xs text-slate-500">
-                (기약분수로 적어요. 답이 자연수면 분자 칸에만!)
+                (기약분수로 적어요. 답이 0이나 자연수면 분자 칸에만!)
               </span>
             </div>
           ) : (
