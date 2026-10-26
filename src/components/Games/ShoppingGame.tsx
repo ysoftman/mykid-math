@@ -20,17 +20,14 @@ import { GameIcon } from '../GameIcon';
 import { MathText } from '../MathText';
 import { GameProblem } from './GameProblem';
 
-// Pictures live in src/assets/shop/<id>.webp; shopping.test.ts checks every id has one.
-const IMAGES = import.meta.glob<string>('../../assets/shop/*.webp', {
-  eager: true,
-  import: 'default',
-});
+// Pictures live in public/shop/<id>.webp; shopping.test.ts checks every id has one.
+const shopImage = (id: string) => `shop/${id}.webp`;
 
-export const SHOPPING_GAME_IMAGE = IMAGES['../../assets/shop/basket.webp'];
+export const SHOPPING_GAME_IMAGE = shopImage('basket');
 
 const ShopImage: React.FC<{ id: string; className: string }> = ({ id, className }) => (
   <img
-    src={IMAGES[`../../assets/shop/${id}.webp`]}
+    src={shopImage(id)}
     alt=""
     className={`inline-block object-contain ${className}`}
     draggable={false}

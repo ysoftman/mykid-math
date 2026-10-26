@@ -1,0 +1,4 @@
+# Bundling for the dev server (bun serve.ts); the production build is set up in build.ts
+[serve.static]
+plugins = ["bun-plugin-tailwind"]
+define = { "import.meta.env.DEV" = "true" }

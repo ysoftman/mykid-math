@@ -5,14 +5,16 @@ import { sound } from '../utils/audio';
 import { GAME_ASSETS } from '../utils/gameAssets';
 import { GameIcon } from './GameIcon';
 
-// Build time in KST, e.g. "2026.10.08 23:41"
-const VERSION = new Intl.DateTimeFormat('sv-SE', {
-  timeZone: 'Asia/Seoul',
-  dateStyle: 'short',
-  timeStyle: 'short',
-})
-  .format(new Date(__APP_BUILD_TIME__))
-  .replaceAll('-', '.');
+// Build time in KST, e.g. "2026.10.08 23:41"; the dev server has no build time
+const VERSION = import.meta.env.DEV
+  ? 'dev'
+  : new Intl.DateTimeFormat('sv-SE', {
+      timeZone: 'Asia/Seoul',
+      dateStyle: 'short',
+      timeStyle: 'short',
+    })
+      .format(new Date(__APP_BUILD_TIME__))
+      .replaceAll('-', '.');
 
 export type Tab = 'roadmap' | 'lab' | 'quiz' | 'review' | 'shop' | 'games';
 

@@ -4,13 +4,13 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "bun serve.ts",
+    "build": "bun --bun tsc -b && bun build.ts",
     "lint": "biome lint .",
     "format": "biome format --write .",
     "check": "biome check .",
     "test": "bun test",
-    "preview": "vite preview"
+    "preview": "bun serve.ts preview"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.4",
@@ -20,14 +20,12 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
-    "@tailwindcss/vite": "^4.3.3",
+    "@types/bun": "^1.4.4",
     "@types/canvas-confetti": "^1.9.0",
-    "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
-    "@vitejs/plugin-react": "^6.1.1",
+    "bun-plugin-tailwind": "^0.1.2",
     "tailwindcss": "^4.3.3",
-    "typescript": "~6.0.2",
-    "vite": "^8.3.0"
+    "typescript": "~6.0.2"
   }
 }

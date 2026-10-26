@@ -88,7 +88,7 @@ bun run preview
 
 ## 🛠 기술 스택
 
-- **프론트엔드**: React 19, TypeScript, Vite
+- **프론트엔드**: React 19, TypeScript, Bun (번들러·dev 서버·테스트)
 - **스타일링**: Tailwind CSS v4
 - **효과음**: Web Audio API (외부 의존성 없는 자체 신디사이저 사운드)
 - **축하 효과**: Canvas-Confetti

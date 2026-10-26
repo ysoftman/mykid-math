@@ -29,7 +29,7 @@ test('every shop picture exists', () => {
     'receipt',
   ];
   const missing = ids.filter(
-    (id) => !existsSync(new URL(`../assets/shop/${id}.webp`, import.meta.url)),
+    (id) => !existsSync(new URL(`../../public/shop/${id}.webp`, import.meta.url)),
   );
   expect(missing).toEqual([]);
 });
