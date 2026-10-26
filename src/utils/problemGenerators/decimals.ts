@@ -1,5 +1,5 @@
 import type { Difficulty, Problem } from '../../types/math';
-import { josa, pickOne, randomInt, simplifyFraction } from '../mathHelpers';
+import { gcd, josa, pickOne, randomInt, simplifyFraction } from '../mathHelpers';
 import { KID_CALL } from '../profile';
 
 // Random integer in [min, max] whose last digit is not 0, so n / 10^k shows every decimal place (no 2.0 or 1.10)
@@ -8,6 +8,40 @@ function randomScaled(min: number, max: number): number {
   while (n % 10 === 0) n = randomInt(min, max);
   return n;
 }
+
+// scaled / 10^places written with every place first, then without its trailing 0s:
+// "0.150이고, 소수 끝자리 0을 생략하면 0.15입니다." or just "0.15입니다."
+export function decimalResultText(scaled: number, places: number): string {
+  const value = scaled / 10 ** places;
+  const full = value.toFixed(places);
+  return String(value) === full
+    ? `${full}입니다.`
+    : `${full}이고, 소수 끝자리 0을 생략하면 ${value}입니다.`;
+}
+
+const REMAINDER_STORIES = [
+  {
+    context: '끈 자르기',
+    unit: 'm',
+    question: (total: number, each: number) =>
+      `끈 ${total}m를 ${each}m씩 자르려고 합니다. 최대한 많이 자르면 남는 끈은 몇 m인가요?`,
+    shared: (each: number, count: number) => `${each}m씩 ${count}도막을 자를 수 있어요.`,
+  },
+  {
+    context: '쌀 나누어 담기',
+    unit: 'kg',
+    question: (total: number, each: number) =>
+      `쌀 ${total}kg을 한 봉지에 ${each}kg씩 나누어 담으려고 합니다. 최대한 많은 봉지에 담으면 남는 쌀은 몇 kg인가요?`,
+    shared: (_each: number, count: number) => `${count}봉지에 담을 수 있어요.`,
+  },
+  {
+    context: '물 나누어 담기',
+    unit: 'L',
+    question: (total: number, each: number) =>
+      `물 ${total}L를 한 통에 ${each}L씩 나누어 담으려고 합니다. 최대한 많은 통에 담으면 남는 물은 몇 L인가요?`,
+    shared: (_each: number, count: number) => `${count}통에 담을 수 있어요.`,
+  },
+];
 
 const PLACE_NAMES: Record<number, string> = { 10: '십', 100: '백', 1000: '천', 10000: '만' };
 
@@ -75,6 +109,7 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
     let num = randomInt(1, den - 1);
     while (num % 10 === 0 && den === 100) num = randomInt(1, den - 1);
     const simplified = simplifyFraction(num, den);
+    const common = gcd(num, den);
     const decimalText = (num / den).toFixed(den === 10 ? 1 : 2);
 
     return {
@@ -83,7 +118,7 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
       subtopic: '소수를 분수로',
       difficulty,
       question: `${josa(decimalText, '을')} 기약분수로 나타내세요.`,
-      hint: `소수 첫째 자리는 분모가 10, 소수 둘째 자리는 분모가 100인 분수예요. 그다음 약분해요!`,
+      hint: `소수 첫째 자리는 분모가 10, 소수 둘째 자리는 분모가 100인 분수예요. 그다음 약분할 수 있으면 약분해요!`,
       answerType: 'fraction',
       correctAnswer: { num: simplified.num, den: simplified.den },
       explanations: [
@@ -91,17 +126,23 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
           title: '1단계: 분모가 10 또는 100인 분수로 바꾸기',
           content: `${decimalText} = ${num}/${den}`,
         },
-        {
-          title: '2단계: 약분하기',
-          content: `${num}/${den} = ${simplified.num}/${simplified.den}`,
-        },
+        common === 1
+          ? {
+              title: '2단계: 기약분수인지 확인하기',
+              content: `${josa(num, '과')} ${den}의 공약수는 1뿐이므로 ${josa(`${num}/${den}`, '은')} 이미 기약분수입니다.`,
+            }
+          : {
+              title: '2단계: 약분하기',
+              content: `분모와 분자를 최대공약수 ${josa(common, '으로')} 나누면 ${num}/${den} = ${simplified.num}/${simplified.den}입니다.`,
+            },
       ],
     };
   }
 
   if (type === 'rounding') {
     const places = difficulty === 'easy' ? 1 : 2;
-    const n = randomInt(1001, 99999); // the number is n / 1000
+    // The number is n / 1000; a nonzero last digit means it really needs rounding (not 28.650 to two places)
+    const n = randomScaled(1001, 99999);
     // n / 10 and n / 100 are exact at .5, so Math.round rounds halves up (n / 1000 * 100 can land just below)
     const answer = Math.round(n / 10 ** (3 - places)) / 10 ** places;
     const rawText = (n / 1000).toFixed(3);
@@ -146,7 +187,7 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
         subtopic: '소수 × 자연수',
         difficulty,
         question: `다음 식을 계산하세요:  ${dec} × ${intVal}`,
-        hint: `먼저 자연수 곱셈처럼 계산한 다음, 소수의 소수점 아래 자릿수만큼 결과에 점을 찍어주세요.`,
+        hint: `먼저 자연수의 곱셈처럼 계산한 다음, 소수의 소수점 아래 자리 수만큼 소수점을 왼쪽으로 옮겨요.`,
         answerType: 'number',
         correctAnswer: ans,
         explanations: [
@@ -156,7 +197,7 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
           },
           {
             title: '2단계: 소수점 위치 맞추기',
-            content: `${josa(dec, '은')} 소수점 아래 한 자리이므로, ${product}에서 소수점을 왼쪽으로 한 칸 옮기면 ${ans}입니다.`,
+            content: `${josa(dec, '은')} 소수점 아래 한 자리이므로, ${product}에서 소수점을 왼쪽으로 한 칸 옮기면 ${decimalResultText(product, 1)}`,
           },
         ],
       };
@@ -176,7 +217,7 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
       subtopic: '소수 × 소수',
       difficulty,
       question: `다음 식을 계산하세요:  ${aInt / aScale} × ${bInt / 10}`,
-      hint: `두 소수의 소수점 아래 자릿수를 합치면 총 몇 자리인가요? 자연수 곱셈 결과에서 그만큼 왼쪽으로 점을 옮겨요!`,
+      hint: `두 소수의 소수점 아래 자리 수를 더하면 모두 몇 자리인가요? 자연수의 곱에서 그만큼 소수점을 왼쪽으로 옮겨요!`,
       answerType: 'number',
       correctAnswer: ans,
       explanations: [
@@ -185,8 +226,8 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
           content: `${aInt} × ${bInt} = ${product}`,
         },
         {
-          title: '2단계: 소수점 자릿수 합산',
-          content: `소수점 아래 자릿수가 ${aPlaces} + 1 = ${aPlaces + 1}자리이므로, ${product}에서 소수점을 왼쪽으로 ${aPlaces + 1}칸 옮기면 ${ans}입니다.`,
+          title: '2단계: 소수점 아래 자리 수 더하기',
+          content: `두 소수의 소수점 아래 자리 수를 더하면 ${aPlaces} + 1 = ${aPlaces + 1}이므로, ${product}에서 소수점을 왼쪽으로 ${aPlaces + 1}칸 옮기면 ${decimalResultText(product, aPlaces + 1)}`,
         },
       ],
     };
@@ -305,25 +346,26 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
     const restInt = randomScaled(1, each * 10 - 1); // in tenths, less than one share
     const total = (each * 10 * groups + restInt) / 10;
     const rest = restInt / 10;
+    const story = pickOne(REMAINDER_STORIES);
 
     return {
       id,
       topicId: 'decimals',
       subtopic: '나누어 주고 남는 양',
       difficulty,
-      context: '주스 나누기',
-      question: `주스 ${total}L를 한 모둠에 ${each}L씩 나누어 주려고 합니다. 최대한 많은 모둠에 나누어 주면 남는 주스는 몇 L인가요?`,
-      hint: `${total} ÷ ${each}의 몫을 자연수까지만 구한 다음, 나누어 준 양을 전체에서 빼 보세요.`,
+      context: story.context,
+      question: story.question(total, each),
+      hint: `${total} ÷ ${each}의 몫을 자연수까지만 구한 다음, ${josa(each, '과')} 몫의 곱을 전체에서 빼 보세요.`,
       answerType: 'number',
       correctAnswer: rest,
       explanations: [
         {
-          title: '1단계: 나누어 줄 수 있는 모둠 수',
-          content: `${total} ÷ ${each}의 몫을 자연수까지 구하면 ${groups}이므로 ${groups}모둠에 나누어 줄 수 있어요.`,
+          title: '1단계: 몫을 자연수까지 구하기',
+          content: `${total} ÷ ${each}의 몫을 자연수까지 구하면 ${groups}이므로 ${story.shared(each, groups)}`,
         },
         {
           title: '2단계: 남는 양 구하기',
-          content: `${total} - ${each} × ${groups} = ${total} - ${each * groups} = ${rest}L`,
+          content: `${total} - ${each} × ${groups} = ${total} - ${each * groups} = ${rest}${story.unit}`,
         },
       ],
     };
@@ -396,9 +438,9 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
     const places = difficulty === 'hard' ? 2 : 1;
     const scale = 10 ** places;
     const maxValue = difficulty === 'easy' ? 5 : difficulty === 'medium' ? 20 : 100;
-    let a = randomInt(scale, maxValue * scale);
-    let b = randomInt(scale, maxValue * scale);
-    while (a === b) b = randomInt(scale, maxValue * scale);
+    let a = randomScaled(scale, maxValue * scale);
+    let b = randomScaled(scale, maxValue * scale);
+    while (a === b) b = randomScaled(scale, maxValue * scale);
     const operation = pickOne(['+', '-']);
 
     if (operation === '-' && a < b) [a, b] = [b, a];
@@ -424,7 +466,7 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
         },
         {
           title: '2단계: 같은 자리끼리 계산하기',
-          content: `${first} ${operation} ${second} = ${answer.toFixed(places)}`,
+          content: `${first} ${operation} ${second} = ${decimalResultText(answerScaled, places)}`,
         },
       ],
     };
@@ -603,7 +645,7 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
       },
       {
         title: '2단계: 소수 곱셈 계산',
-        content: `${length} × ${count} = ${total}m 입니다.`,
+        content: `${length} × ${count} = ${total}m입니다.`,
       },
     ],
   };
