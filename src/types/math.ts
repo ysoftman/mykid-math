@@ -43,9 +43,10 @@ export type ProblemVisual =
     }
   | {
       kind: 'congruent-triangles';
+      // Side lengths AB, BC, CA used to draw both triangles to scale
+      lengths?: [number, number, number];
       firstSides: Partial<Record<TriangleSideId, string>>;
       secondSides?: Partial<Record<TriangleSideId, string>>;
-      dottedArcs?: TriangleSideId[];
     };
 
 export interface StepExplanation {

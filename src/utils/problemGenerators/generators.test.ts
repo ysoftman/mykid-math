@@ -28,6 +28,21 @@ test.each(TOPICS.map((t) => t.id as TopicId))('%s generates valid problems', (to
   }
 });
 
+test('congruent triangles are drawn from the lengths they show', () => {
+  for (const difficulty of DIFFICULTIES) {
+    for (let i = 0; i < 1000; i++) {
+      const { visual } = generateProblem('symmetry', difficulty);
+      if (visual?.kind !== 'congruent-triangles') continue;
+      const [ab, bc, ca] = visual.lengths ?? [];
+      expect(new Set([ab, bc, ca]).size).toBe(3);
+      expect(ab + bc + ca).toBeGreaterThan(2 * Math.max(ab, bc, ca));
+      expect(visual.firstSides.AB ?? `${ab}cm`).toBe(`${ab}cm`);
+      expect(visual.firstSides.BC ?? `${bc}cm`).toBe(`${bc}cm`);
+      expect(visual.firstSides.CA ?? `${ca}cm`).toBe(`${ca}cm`);
+    }
+  }
+});
+
 test('particles after numbers match how the number is read', () => {
   const base = { 와: '과', 를: '을', 가: '이', 는: '은', 로: '으로' } as Record<string, string>;
   // "12와", "3/4을", "2.5는" before a space or punctuation; copulas such as "4이므로" are not checked

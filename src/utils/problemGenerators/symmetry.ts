@@ -48,7 +48,28 @@ const FIGURES: Figure[] = [
     isPointSymmetric: false,
   },
 ];
+const SIDES = ['AB', 'BC', 'CA'] as const;
 const SIDE_PAIRS = { AB: 'DE', BC: 'EF', CA: 'FD' } as const;
+
+// Sides AB, BC, CA that are all different and not too flat, so the drawing to scale reads clearly
+function randomTriangle(max: number): [number, number, number] {
+  for (;;) {
+    const sides: [number, number, number] = [
+      randomInt(3, max),
+      randomInt(3, max),
+      randomInt(3, max),
+    ];
+    const [a, b, c] = [...sides].sort((x, y) => x - y);
+    // largest angle under about 110°, smallest angle over about 25°
+    if (
+      a < b &&
+      b < c &&
+      c * c < a * a + b * b + 0.7 * a * b &&
+      b * b + c * c - a * a < 1.8 * b * c
+    )
+      return sides;
+  }
+}
 
 export function generateSymmetryProblem(difficulty: Difficulty): Problem {
   const id = `sym_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
@@ -57,27 +78,34 @@ export function generateSymmetryProblem(difficulty: Difficulty): Problem {
       ? ['line_symmetry', 'matching_side']
       : difficulty === 'medium'
         ? ['line_symmetry', 'point_symmetry', 'matching_side']
-        : ['point_symmetry', 'triangle_perimeter', 'line_symmetry'],
+        : ['point_symmetry', 'triangle_perimeter', 'line_symmetry', 'matching_side'],
   );
 
   if (problemType === 'matching_side') {
-    const side = pickOne(Object.keys(SIDE_PAIRS) as Array<keyof typeof SIDE_PAIRS>);
+    const lengths = randomTriangle(difficulty === 'easy' ? 12 : 30);
+    const index = randomInt(0, 2);
+    const side = SIDES[index];
     const matchingSide = SIDE_PAIRS[side];
-    const length = randomInt(3, difficulty === 'easy' ? 12 : 30);
-    const firstSides: Partial<Record<TriangleSideId, string>> = { [side]: `${length}cm` };
-    const secondSides: Partial<Record<TriangleSideId, string>> = { [matchingSide]: '?' };
+    const length = lengths[index];
+    // From medium on, every side of ABC is shown and the child has to pick the matching one
+    const showAll = difficulty !== 'easy';
+    const firstSides: Partial<Record<TriangleSideId, string>> = showAll
+      ? Object.fromEntries(SIDES.map((s, i) => [s, `${lengths[i]}cm`]))
+      : { [side]: `${length}cm` };
 
     return {
       id,
       topicId: 'symmetry',
       subtopic: '합동인 도형의 대응변',
       difficulty,
-      question: `△ABC와 △DEF는 합동이고, ${side}의 길이가 ${length}cm입니다. ${matchingSide}의 길이는 몇 cm인가요?`,
+      question: showAll
+        ? `삼각형 ABC와 삼각형 DEF는 서로 합동입니다. 변 ${matchingSide}의 길이는 몇 cm인가요?`
+        : `삼각형 ABC와 삼각형 DEF는 서로 합동입니다. 변 ${side}의 길이가 ${length}cm일 때, 변 ${matchingSide}의 길이는 몇 cm인가요?`,
       visual: {
         kind: 'congruent-triangles',
+        lengths,
         firstSides,
-        secondSides,
-        dottedArcs: [side],
+        secondSides: { [matchingSide]: '?' },
       },
       hint: '합동인 도형에서 서로 대응하는 변의 길이는 같아요. 꼭짓점의 순서대로 대응하는 점을 찾아보세요.',
       answerType: 'number',
@@ -85,43 +113,43 @@ export function generateSymmetryProblem(difficulty: Difficulty): Problem {
       explanations: [
         {
           title: '1단계: 대응하는 꼭짓점 찾기',
-          content: '△ABC≡△DEF에서 A와 D, B와 E, C와 F가 서로 대응해요.',
+          content: '삼각형 DEF를 뒤집어 포개면 꼭짓점 A와 D, B와 E, C와 F가 서로 만나요.',
         },
         {
-          title: '2단계: 대응변 길이 확인하기',
-          content: `${side}와 ${matchingSide}는 대응하는 변이므로 길이가 같아요. ${matchingSide} = ${length}cm`,
+          title: '2단계: 대응변의 길이 알기',
+          content: `변 ${side}와 변 ${matchingSide}는 서로 대응하는 변이라 길이가 같아요. 변 ${matchingSide} = ${length}cm`,
         },
       ],
     };
   }
 
   if (problemType === 'triangle_perimeter') {
-    const ab = randomInt(3, 12);
-    const bc = randomInt(3, 12);
-    const minCa = Math.abs(ab - bc) + 1;
-    const maxCa = Math.min(ab + bc - 1, 12);
-    const ca = randomInt(minCa, maxCa);
+    const lengths = randomTriangle(12);
+    const [ab, bc, ca] = lengths;
     const perimeter = ab + bc + ca;
-    const firstSides = { AB: `${ab}cm`, BC: `${bc}cm`, CA: `${ca}cm` };
 
     return {
       id,
       topicId: 'symmetry',
       subtopic: '합동인 도형의 둘레',
       difficulty,
-      question: `△ABC와 △DEF는 합동입니다. △ABC의 세 변이 ${ab}cm, ${bc}cm, ${ca}cm일 때 △DEF의 둘레는 몇 cm인가요?`,
-      visual: { kind: 'congruent-triangles', firstSides },
-      hint: '합동인 도형은 대응하는 변의 길이가 모두 같아요. 먼저 △ABC의 둘레를 구해 보세요.',
+      question: `삼각형 ABC와 삼각형 DEF는 서로 합동입니다. 삼각형 ABC의 세 변의 길이가 각각 ${ab}cm, ${bc}cm, ${ca}cm일 때, 삼각형 DEF의 둘레는 몇 cm인가요?`,
+      visual: {
+        kind: 'congruent-triangles',
+        lengths,
+        firstSides: { AB: `${ab}cm`, BC: `${bc}cm`, CA: `${ca}cm` },
+      },
+      hint: '합동인 도형은 대응하는 변의 길이가 모두 같아요. 먼저 삼각형 ABC의 둘레를 구해 보세요.',
       answerType: 'number',
       correctAnswer: perimeter,
       explanations: [
         {
-          title: '1단계: △ABC의 둘레 구하기',
+          title: '1단계: 삼각형 ABC의 둘레 구하기',
           content: `${ab} + ${bc} + ${ca} = ${perimeter}cm`,
         },
         {
           title: '2단계: 합동인 도형의 둘레',
-          content: `합동인 도형은 크기가 같아서 둘레도 같아요. △DEF의 둘레도 ${perimeter}cm예요.`,
+          content: `대응하는 변의 길이가 모두 같으니 둘레도 같아요. 삼각형 DEF의 둘레도 ${perimeter}cm예요.`,
         },
       ],
     };

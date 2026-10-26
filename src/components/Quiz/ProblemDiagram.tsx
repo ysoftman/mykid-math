@@ -12,78 +12,6 @@ const SHAPE_POINTS: Record<SymmetryFigureId, string> = {
   trapezoid: '62,35 140,35 174,145 30,145',
 };
 
-const TRIANGLE_LABELS: {
-  side: TriangleSideId;
-  x: number;
-  y: number;
-  anchor: 'start' | 'middle' | 'end';
-  sideX1: number;
-  sideY1: number;
-  sideX2: number;
-  sideY2: number;
-}[] = [
-  {
-    side: 'AB',
-    x: 82,
-    y: 114,
-    anchor: 'end',
-    sideX1: 60,
-    sideY1: 190,
-    sideX2: 150,
-    sideY2: 45,
-  },
-  {
-    side: 'BC',
-    x: 218,
-    y: 114,
-    anchor: 'start',
-    sideX1: 150,
-    sideY1: 45,
-    sideX2: 240,
-    sideY2: 190,
-  },
-  {
-    side: 'CA',
-    x: 150,
-    y: 215,
-    anchor: 'middle',
-    sideX1: 240,
-    sideY1: 190,
-    sideX2: 60,
-    sideY2: 190,
-  },
-  {
-    side: 'DE',
-    x: 382,
-    y: 114,
-    anchor: 'end',
-    sideX1: 360,
-    sideY1: 190,
-    sideX2: 450,
-    sideY2: 45,
-  },
-  {
-    side: 'EF',
-    x: 518,
-    y: 114,
-    anchor: 'start',
-    sideX1: 450,
-    sideY1: 45,
-    sideX2: 540,
-    sideY2: 190,
-  },
-  {
-    side: 'FD',
-    x: 450,
-    y: 215,
-    anchor: 'middle',
-    sideX1: 540,
-    sideY1: 190,
-    sideX2: 360,
-    sideY2: 190,
-  },
-];
-
 const ShapeCard: React.FC<{ figure: SymmetryFigureId; label: string }> = ({ figure, label }) => (
   <figure className="flex min-w-0 flex-col items-center rounded-xl border border-slate-200 bg-white px-2 py-3">
     <svg
@@ -119,9 +47,63 @@ const ShapeSetDiagram: React.FC<Extract<ProblemVisual, { kind: 'shape-set' }>> =
   </div>
 );
 
+// Old wrong notes saved before lengths existed fall back to this shape
+const DEFAULT_LENGTHS: [number, number, number] = [5, 6, 7];
+
+type Point = { x: number; y: number };
+
+// A, B, C of a triangle with sides AB, BC, CA drawn to scale, standing on y=190 inside a 200×150 box
+function trianglePoints(
+  [ab, bc, ca]: [number, number, number],
+  centerX: number,
+  mirror: boolean,
+): Point[] {
+  const bx = (ab * ab - bc * bc + ca * ca) / (2 * ca);
+  const raw = [
+    { x: 0, y: 0 },
+    { x: bx, y: -Math.sqrt(ab * ab - bx * bx) },
+    { x: ca, y: 0 },
+  ];
+  const minX = Math.min(0, bx);
+  const maxX = Math.max(ca, bx);
+  const scale = Math.min(200 / (maxX - minX), 150 / -raw[1].y);
+  return raw.map(({ x, y }) => {
+    const dx = (x - (minX + maxX) / 2) * scale;
+    return { x: centerX + (mirror ? -dx : dx), y: 190 + y * scale };
+  });
+}
+
+const TRIANGLES = [
+  {
+    vertices: 'ABC',
+    sides: ['AB', 'BC', 'CA'] as TriangleSideId[],
+    centerX: 150,
+    mirror: false,
+    fill: '#cffafe',
+    stroke: '#0891b2',
+  },
+  {
+    vertices: 'DEF',
+    sides: ['DE', 'EF', 'FD'] as TriangleSideId[],
+    centerX: 450,
+    mirror: true,
+    fill: '#fef3c7',
+    stroke: '#d97706',
+  },
+];
+
+const labelStyle = {
+  fontWeight: 700,
+  paintOrder: 'stroke',
+  stroke: 'white',
+  strokeLinejoin: 'round',
+  strokeWidth: 5,
+  dominantBaseline: 'middle',
+} as const;
+
 const CongruentTrianglesDiagram: React.FC<
   Extract<ProblemVisual, { kind: 'congruent-triangles' }>
-> = ({ firstSides, secondSides = {}, dottedArcs = [] }) => {
+> = ({ lengths = DEFAULT_LENGTHS, firstSides, secondSides = {} }) => {
   const sideValues = { ...firstSides, ...secondSides };
 
   return (
@@ -129,118 +111,97 @@ const CongruentTrianglesDiagram: React.FC<
       <svg
         viewBox="0 0 600 260"
         role="img"
-        aria-label="서로 합동인 삼각형 ABC와 DEF 및 대응변의 길이"
+        aria-label="서로 합동인 삼각형 ABC와 삼각형 DEF 및 변의 길이"
         className="mx-auto h-48 min-w-[460px] max-w-3xl sm:h-56"
       >
-        <path d="M 60 190 L 150 45 L 240 190 Z" fill="#cffafe" stroke="#0891b2" strokeWidth="4" />
-        <path d="M 360 190 L 450 45 L 540 190 Z" fill="#fef3c7" stroke="#d97706" strokeWidth="4" />
-        {TRIANGLE_LABELS.map(({ side, sideX1, sideY1, sideX2, sideY2 }) => {
-          if (!dottedArcs.includes(side)) return null;
-          const isFirstTriangle = side === 'AB' || side === 'BC' || side === 'CA';
-          const color = isFirstTriangle ? '#0891b2' : '#d97706';
-          const dx = sideX2 - sideX1;
-          const dy = sideY2 - sideY1;
-          const length = Math.hypot(dx, dy);
-          let normalX = -dy / length;
-          let normalY = dx / length;
-          const middleX = (sideX1 + sideX2) / 2;
-          const middleY = (sideY1 + sideY2) / 2;
-          const triangleCenterX = isFirstTriangle ? 150 : 450;
-          const triangleCenterY = 425 / 3;
-          const outwardDot =
-            normalX * (middleX - triangleCenterX) + normalY * (middleY - triangleCenterY);
-          if (outwardDot < 0) {
-            normalX *= -1;
-            normalY *= -1;
-          }
-          const controlX = middleX + normalX * 32;
-          const controlY = middleY + normalY * 32;
-          const labelX = middleX + normalX * 16;
-          const labelY = middleY + normalY * 16;
-          const value = sideValues[side];
+        {TRIANGLES.map(({ vertices, sides, centerX, mirror, fill, stroke }) => {
+          const points = trianglePoints(lengths, centerX, mirror);
+          const center = {
+            x: (points[0].x + points[1].x + points[2].x) / 3,
+            y: (points[0].y + points[1].y + points[2].y) / 3,
+          };
+          // Pushes a point away from the triangle's center so labels sit outside it
+          const outward = (point: Point, distance: number) => {
+            const length = Math.hypot(point.x - center.x, point.y - center.y);
+            return {
+              x: point.x + ((point.x - center.x) / length) * distance,
+              y: point.y + ((point.y - center.y) / length) * distance,
+            };
+          };
 
           return (
-            <g key={side}>
-              <path
-                d={`M ${sideX1} ${sideY1} Q ${controlX} ${controlY} ${sideX2} ${sideY2}`}
-                fill="none"
-                stroke={color}
-                strokeDasharray="2 5"
-                strokeLinecap="round"
-                strokeWidth="3"
+            <g key={vertices}>
+              <polygon
+                points={points.map(({ x, y }) => `${x},${y}`).join(' ')}
+                fill={fill}
+                stroke={stroke}
+                strokeWidth="4"
+                strokeLinejoin="round"
               />
+              {points.map((point, index) => {
+                const { x, y } = outward(point, 16);
+                return (
+                  <text
+                    key={vertices[index]}
+                    x={x}
+                    y={y}
+                    fill="#0f172a"
+                    fontSize="17"
+                    fontWeight="700"
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                  >
+                    {vertices[index]}
+                  </text>
+                );
+              })}
+              {sides.map((side, index) => {
+                const value = sideValues[side];
+                if (!value) return null;
+                const from = points[index];
+                const to = points[(index + 1) % 3];
+                const dx = to.x - from.x;
+                const dy = to.y - from.y;
+                const length = Math.hypot(dx, dy);
+                const middle = { x: (from.x + to.x) / 2, y: (from.y + to.y) / 2 };
+                // Normal of the side, flipped to point away from the triangle
+                let normalX = -dy / length;
+                let normalY = dx / length;
+                if (normalX * (middle.x - center.x) + normalY * (middle.y - center.y) < 0) {
+                  normalX *= -1;
+                  normalY *= -1;
+                }
+
+                return (
+                  <text
+                    key={side}
+                    x={middle.x + normalX * 14}
+                    y={middle.y + normalY * 14}
+                    fill={value === '?' ? '#4f46e5' : '#0f172a'}
+                    fontSize={value === '?' ? 18 : 15}
+                    textAnchor={normalX > 0.35 ? 'start' : normalX < -0.35 ? 'end' : 'middle'}
+                    {...labelStyle}
+                  >
+                    {value}
+                  </text>
+                );
+              })}
               <text
-                x={labelX}
-                y={labelY}
-                fill="#0f172a"
-                fontSize="14"
+                x={centerX}
+                y="245"
+                fill="#475569"
+                fontSize="15"
                 fontWeight="700"
                 textAnchor="middle"
-                dominantBaseline="middle"
-                paintOrder="stroke"
-                stroke="white"
-                strokeLinejoin="round"
-                strokeWidth="5"
               >
-                {value}
+                삼각형 {vertices}
               </text>
             </g>
-          );
-        })}
-        <g fill="#0f172a" fontSize="17" fontWeight="700" textAnchor="middle">
-          <text x="49" y="202">
-            A
-          </text>
-          <text x="150" y="35">
-            B
-          </text>
-          <text x="251" y="202">
-            C
-          </text>
-          <text x="349" y="202">
-            D
-          </text>
-          <text x="450" y="35">
-            E
-          </text>
-          <text x="551" y="202">
-            F
-          </text>
-        </g>
-        {TRIANGLE_LABELS.map(({ side, x, y, anchor }) => {
-          if (dottedArcs.includes(side)) return null;
-          const value = sideValues[side];
-          if (!value) return null;
-
-          return (
-            <text
-              key={side}
-              x={x}
-              y={y}
-              fill="#0f172a"
-              fontSize="14"
-              fontWeight="700"
-              textAnchor={anchor}
-              paintOrder="stroke"
-              stroke="white"
-              strokeLinejoin="round"
-              strokeWidth="5"
-            >
-              {side} {value}
-            </text>
           );
         })}
         <text x="300" y="120" fill="#4f46e5" fontSize="21" fontWeight="700" textAnchor="middle">
           ≡
         </text>
-        <g fill="#475569" fontSize="15" fontWeight="700" textAnchor="middle">
-          <text x="150" y="250">
-            △ABC
-          </text>
-          <text x="450" y="250">
-            △DEF
-          </text>
-        </g>
       </svg>
     </div>
   );
