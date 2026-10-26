@@ -5,7 +5,7 @@ const PARTS = { 면: 6, 모서리: 12, 꼭짓점: 8 } as const;
 type Part = keyof typeof PARTS;
 const PART_TOPIC: Record<Part, string> = { 면: '면은', 모서리: '모서리는', 꼭짓점: '꼭짓점은' };
 const PART_MEANING: Record<Part, string> = {
-  면: '평평한 부분',
+  면: '선분으로 둘러싸인 부분',
   모서리: '면과 면이 만나는 선분',
   꼭짓점: '모서리와 모서리가 만나는 점',
 };
@@ -59,7 +59,7 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
         `${solid}에서 ${part}의 수를 세어 보세요. 모두 몇 개인가요?`,
         `${solid} 모양 상자가 있어요. 이 상자의 ${PART_TOPIC[part]} 몇 개인가요?`,
       ]),
-      hint: `${part}은 ${PART_MEANING[part]}이에요. 보이지 않는 뒤쪽까지 빠짐없이 세어 보세요.`,
+      hint: `${PART_TOPIC[part]} ${PART_MEANING[part]}이에요. 보이지 않는 뒤쪽까지 빠짐없이 세어 보세요.`,
       correctAnswer: count,
       explanations: [
         PARTS_EXPLANATION,
@@ -79,7 +79,7 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
       subtopic: '정육면체의 모서리 길이의 합',
       question: pickOne([
         `한 모서리의 길이가 ${edge}cm인 정육면체의 모든 모서리 길이의 합은 몇 cm인가요?`,
-        `한 모서리가 ${edge}cm인 정육면체 상자의 모서리를 따라 철사를 둘렀어요. 철사는 모두 몇 cm 필요한가요?`,
+        `철사로 한 모서리가 ${edge}cm인 정육면체 모양의 뼈대를 만들려고 해요. 철사는 모두 몇 cm 필요한가요?`,
       ]),
       hint: '정육면체는 길이가 같은 모서리가 12개예요. 한 모서리의 길이에 12를 곱해요.',
       correctAnswer: sum,
@@ -182,17 +182,20 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
       ...base,
       subtopic: '길이가 같은 모서리',
       question: pickOne([
-        '직육면체에서 길이가 같은 모서리는 몇 개씩 있나요?',
-        '직육면체의 모서리 12개를 길이가 같은 것끼리 묶으면 한 묶음에 몇 개씩인가요?',
+        '가로, 세로, 높이가 모두 다른 직육면체에서 길이가 같은 모서리는 몇 개씩 있나요?',
+        '가로, 세로, 높이가 모두 다른 직육면체의 모서리 12개를 길이가 같은 것끼리 묶으면 한 묶음에 몇 개씩인가요?',
       ]),
-      hint: '직육면체의 모서리는 가로, 세로, 높이 세 종류예요. 12개를 세 종류로 나눠 보세요.',
+      hint: '가로, 세로, 높이가 모두 다르면 모서리의 길이는 세 가지예요. 12개를 세 가지로 나눠 보세요.',
       correctAnswer: 4,
       explanations: [
         {
           title: '1단계: 모서리의 종류',
-          content: '직육면체의 모서리는 가로, 세로, 높이 3종류예요.',
+          content: '가로, 세로, 높이가 모두 다르므로 모서리는 가로, 세로, 높이 3종류로 나뉘어요.',
         },
-        { title: '2단계: 나누기', content: '모서리 12개 ÷ 3종류 = 4개씩 길이가 같아요.' },
+        {
+          title: '2단계: 나누기',
+          content: '모서리 12개를 3종류로 나누면 12 ÷ 3 = 4이므로 4개씩 길이가 같아요.',
+        },
       ],
     };
   }
@@ -230,12 +233,12 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
         `${solid}에서 한 면과 수직인 면은 모두 몇 개인가요?`,
         `${solid}의 밑면과 수직으로 만나는 면은 몇 개인가요?`,
       ]),
-      hint: '한 면과 평행한 면 1개를 빼면 나머지 면은 모두 그 면과 수직이에요.',
+      hint: '그 면과 마주 보는 면은 평행해요. 이 두 면을 빼면 남은 면은 모두 그 면과 수직이에요.',
       correctAnswer: 4,
       explanations: [
         {
           title: '1단계: 평행한 면 빼기',
-          content: '면 6개 중에서 자기 자신과 평행한 면 1개를 빼면 4개가 남아요.',
+          content: '면 6개 중에서 그 면 1개와 마주 보는 평행한 면 1개를 빼면 6 - 2 = 4개가 남아요.',
         },
         { title: '2단계: 수직인 면', content: '남은 4개의 면은 모두 그 면과 수직으로 만나요.' },
       ],
@@ -243,21 +246,27 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
   }
 
   if (type === 'vertex_meet') {
-    const part = pickOne(['모서리', '면']);
+    const part = pickOne<Part>(['모서리', '면']);
     return {
       ...base,
       subtopic: '한 꼭짓점에서 만나는 모서리와 면',
-      question: `${solid}의 한 꼭짓점에서 만나는 ${PART_TOPIC[part as Part]} 몇 개인가요?`,
-      hint: '상자의 한 귀퉁이를 떠올려 보세요. 거기서 만나는 모서리와 면의 수를 세어요.',
+      question: `${solid}의 한 꼭짓점에서 만나는 ${PART_TOPIC[part]} 몇 개인가요?`,
+      hint:
+        part === '면'
+          ? '상자의 한 귀퉁이를 떠올려 보세요. 그 귀퉁이에 모인 면이 몇 개인지 세어요.'
+          : '상자의 한 귀퉁이를 떠올려 보세요. 그 귀퉁이에서 뻗어 나가는 모서리가 몇 개인지 세어요.',
       correctAnswer: 3,
       explanations: [
         {
           title: '1단계: 꼭짓점 살펴보기',
-          content: '한 꼭짓점에서는 가로, 세로, 높이 방향의 모서리가 만나요.',
+          content:
+            part === '면'
+              ? '한 꼭짓점에서는 위(또는 아래) 면, 앞(또는 뒤) 면, 왼쪽(또는 오른쪽) 면이 하나씩 만나요.'
+              : '한 꼭짓점에서는 가로, 세로, 높이 방향의 모서리가 하나씩 만나요.',
         },
         {
           title: '2단계: 세기',
-          content: `한 꼭짓점에서 만나는 ${PART_TOPIC[part as Part]} 3개예요.`,
+          content: `한 꼭짓점에서 만나는 ${PART_TOPIC[part]} 3개예요.`,
         },
       ],
     };
