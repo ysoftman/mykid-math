@@ -10,6 +10,15 @@ import {
 } from '../mathHelpers';
 import { KID_CALL } from '../profile';
 
+// Last explanation step: reduce num/den, show it as a whole number, or say it is already in lowest terms
+function lowestTermsStep(num: number, den: number): string {
+  const simplified = simplifyFraction(num, den);
+  const frac = `${num}/${den}`;
+  if (simplified.den === den) return `${josa(frac, '은')} 더 이상 약분되지 않는 기약분수예요.`;
+  if (simplified.den === 1) return `${frac} = ${num} ÷ ${den} = ${simplified.num} (자연수)`;
+  return `${josa(frac, '을')} 약분하면 ${simplified.num}/${simplified.den}입니다.`;
+}
+
 export function generateFractionProblem(difficulty: Difficulty): Problem {
   const type = pickOne([
     'addition',
@@ -122,8 +131,8 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
           content: `${improper1}/${commonDen} ${op} ${improper2}/${commonDen} = ${resultNum}/${commonDen}`,
         },
         {
-          title: '3단계: 약분하기',
-          content: `기약분수로 나타내면 ${simplified.num}/${simplified.den} 입니다.`,
+          title: '3단계: 기약분수로 나타내기',
+          content: lowestTermsStep(resultNum, commonDen),
         },
       ],
     };
@@ -140,7 +149,12 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
     const num = randomNumerator(den);
     const count = difficulty === 'easy' ? randomInt(2, 6) : randomInt(4, 12);
     const total = simplifyFraction(num * count, den);
-    const totalText = total.den === 1 ? `${total.num}` : `${total.num}/${total.den}`;
+    const totalFrac = total.den === 1 ? `${total.num}` : `${total.num}/${total.den}`;
+    // A length over 1 reads as a mixed number, e.g. "3과 3/4"
+    const isMixed = total.den > 1 && total.num > total.den;
+    const totalText = isMixed
+      ? `${josa(Math.floor(total.num / total.den), '과')} ${total.num % total.den}/${total.den}`
+      : totalFrac;
 
     return {
       id,
@@ -148,18 +162,18 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
       subtopic: '분수의 나눗셈 문장제',
       difficulty,
       context: '끈 자르기',
-      question: `${KID_CALL}가 길이가 ${totalText}m인 끈을 ${num}/${den}m씩 잘랐습니다. 모두 몇 도막이 되나요?`,
-      hint: `전체 길이를 한 도막의 길이로 나누면 돼요. 분수의 나눗셈은 나누는 분수를 뒤집어 곱해요!`,
+      question: `${KID_CALL}는 길이가 ${totalText}m인 끈을 ${num}/${den}m씩 잘랐습니다. 모두 몇 도막이 되나요?`,
+      hint: `전체 길이를 한 도막의 길이로 나누면 돼요. ${isMixed ? '대분수를 가분수로 바꾼 다음, ' : '분수의 나눗셈은 '}나누는 분수의 분모와 분자를 바꾸어 곱해요!`,
       answerType: 'number',
       correctAnswer: count,
       explanations: [
         {
           title: '1단계: 식 세우기',
-          content: `도막 수 = ${totalText} ÷ ${num}/${den}`,
+          content: `도막 수 = ${totalText} ÷ ${num}/${den}${isMixed ? ` = ${totalFrac} ÷ ${num}/${den}` : ''}`,
         },
         {
-          title: '2단계: 역수를 곱해 계산하기',
-          content: `${totalText} × ${den}/${num} = ${count}, 따라서 ${count}도막입니다.`,
+          title: '2단계: 곱셈으로 바꾸어 계산하기',
+          content: `${totalFrac} × ${den}/${num} = ${count}, 따라서 ${count}도막입니다.`,
         },
       ],
     };
@@ -188,11 +202,8 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
           content: `${expr} = (${naturalFirst ? `${n} × ${num}` : `${num} × ${n}`})/${den} = ${num * n}/${den}`,
         },
         {
-          title: '2단계: 약분하기',
-          content:
-            product.den === 1
-              ? `${num * n}/${den} = ${num * n} ÷ ${den} = ${product.num} (자연수)`
-              : `기약분수로 나타내면 ${product.num}/${product.den} 입니다.`,
+          title: '2단계: 기약분수로 나타내기',
+          content: lowestTermsStep(num * n, den),
         },
       ],
     };
@@ -351,8 +362,8 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
           content: `(${newNum1} - ${newNum2}) / ${commonDen} = ${diffNum}/${commonDen}`,
         },
         {
-          title: '3단계: 기약분수로 약분',
-          content: `결과는 ${simplified.num}/${simplified.den} 입니다.`,
+          title: '3단계: 기약분수로 나타내기',
+          content: lowestTermsStep(diffNum, commonDen),
         },
       ],
     };
@@ -389,11 +400,8 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
           content: `(${num1} × ${num2}) / (${den1} × ${den2}) = ${multNum}/${multDen}`,
         },
         {
-          title: '2단계: 기약분수로 약분하기',
-          content:
-            simplified.den === multDen
-              ? `${josa(`${multNum}/${multDen}`, '은')} 더 이상 약분되지 않는 기약분수예요.`
-              : `${multNum}/${multDen} = ${simplified.num}/${simplified.den}`,
+          title: '2단계: 기약분수로 나타내기',
+          content: lowestTermsStep(multNum, multDen),
         },
       ],
     };
@@ -422,7 +430,7 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
       subtopic: '어떤 수의 분수만큼 구하기',
       difficulty,
       question: `${KID_CALL}가 구운 쿠키 ${whole}개 중에서 ${num}/${den}만큼을 친구들에게 나누어 주었습니다. 나누어 준 쿠키는 몇 개인가요?`,
-      hint: `전체를 분모 ${den}만큼 똑같이 나눈 다음, 그중 분자 ${num}만큼을 구해요.`,
+      hint: `쿠키 ${whole}개를 똑같이 ${den}묶음으로 나누고, 그중 ${num}묶음만큼을 구해요.`,
       answerType: 'number',
       correctAnswer: answer,
       explanations: [
@@ -543,7 +551,7 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
       subtopic: '단위의 분수만큼 구하기',
       difficulty,
       question: `${u.whole}의 ${josa(frac, '은')} 몇 ${u.unit}인가요?`,
-      hint: `먼저 ${u.subject} 몇 ${u.unit}인지 떠올린 다음, 분모만큼 똑같이 나누고 분자만큼 모아 보세요.`,
+      hint: `먼저 ${u.subject} 몇 ${u.unit}인지 떠올린 다음, 똑같이 ${josa(den, '으로')} 나눈 것 중의 ${num}만큼을 구해 보세요.`,
       answerType: 'number',
       correctAnswer: part * num,
       explanations: [
@@ -552,7 +560,7 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
           content: `${u.whole} = ${u.value}${u.unit}입니다.`,
         },
         {
-          title: '2단계: 1/분모만큼 구하기',
+          title: '2단계: 단위분수만큼 구하기',
           content: `${u.value}${u.unit}의 1/${den}은 ${u.value} ÷ ${den} = ${part}${u.unit}입니다.`,
         },
         ...(num > 1
@@ -621,8 +629,13 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
         : [5, 6, 8, 9, 10];
   const den1 = pickOne(divisionDenominators);
   const num1 = randomNumerator(den1, 2);
-  const den2 = pickOne(divisionDenominators.filter((den) => den > 2));
-  const num2 = randomNumerator(den2);
+  let den2 = pickOne(divisionDenominators.filter((den) => den > 2));
+  let num2 = randomNumerator(den2);
+  // A fraction divided by itself is always 1, which is too easy
+  while (num1 === num2 && den1 === den2) {
+    den2 = pickOne(divisionDenominators.filter((den) => den > 2));
+    num2 = randomNumerator(den2);
+  }
 
   // num1/den1 ÷ num2/den2 = num1/den1 × den2/num2
   const divNum = num1 * den2;
@@ -635,7 +648,7 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
     subtopic: '분수의 나눗셈',
     difficulty,
     question: `다음 분수의 나눗셈을 계산하여 기약분수로 나타내세요:  ${num1}/${den1} ÷ ${num2}/${den2}`,
-    hint: `나누는 분수(${num2}/${den2})의 분자와 분모를 뒤집어서 '곱하기'로 바꾸어 계산해요! (역수 곱하기)`,
+    hint: `나눗셈을 곱셈으로 바꾸고, 나누는 분수 ${num2}/${den2}의 분모와 분자를 바꾸어 곱해요!`,
     answerType: 'fraction',
     correctAnswer: { num: simplified.num, den: simplified.den },
     explanations: [
@@ -648,8 +661,8 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
         content: `(${num1} × ${den2}) / (${den1} × ${num2}) = ${divNum}/${divDen}`,
       },
       {
-        title: '3단계: 약분하여 기약분수로 만들기',
-        content: `기약분수로 나타내면 ${simplified.num}/${simplified.den} 입니다.`,
+        title: '3단계: 기약분수로 나타내기',
+        content: lowestTermsStep(divNum, divDen),
       },
     ],
   };
