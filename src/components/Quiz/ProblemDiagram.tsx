@@ -9,7 +9,7 @@ const SHAPE_POINTS: Record<SymmetryFigureId, string> = {
   rhombus: '100,35 175,90 100,145 25,90',
   parallelogram: '52,35 172,35 148,145 28,145',
   hexagon: '100,22 160,55 160,125 100,158 40,125 40,55',
-  trapezoid: '62,35 140,35 174,145 30,145',
+  trapezoid: '42,35 122,35 174,145 30,145',
 };
 
 const ShapeCard: React.FC<{ figure: SymmetryFigureId; label: string }> = ({ figure, label }) => (
