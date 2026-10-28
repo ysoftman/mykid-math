@@ -1,5 +1,5 @@
 import type { Difficulty, Problem } from '../../types/math';
-import { gcd, josa, pickOne, randomInt, simplifyFraction } from '../mathHelpers';
+import { gcd, josa, pickOne, randomInt, shuffle, simplifyFraction } from '../mathHelpers';
 import { KID_CALL } from '../profile';
 
 // Random integer in [min, max] whose last digit is not 0, so n / 10^k shows every decimal place (no 2.0 or 1.10)
@@ -43,12 +43,42 @@ const REMAINDER_STORIES = [
   },
 ];
 
+const WORD_STORIES = [
+  {
+    context: '리본 끈 이어 붙이기',
+    unit: 'm',
+    question: (amount: number, count: number) =>
+      `${KID_CALL}에게 길이가 ${amount}m인 리본 끈이 ${count}개 있습니다. ${KID_CALL}가 이 리본 끈들을 겹치지 않게 모두 이어 붙이면 총 몇 m가 될까요?`,
+    hint: '한 개의 길이 × 개수로 식을 세워보세요!',
+  },
+  {
+    context: '주스 병 모으기',
+    unit: 'L',
+    question: (amount: number, count: number) =>
+      `한 병에 주스가 ${amount}L씩 들어 있습니다. 똑같은 주스 ${count}병에 들어 있는 주스는 모두 몇 L인가요?`,
+    hint: '한 병의 양 × 병의 수로 식을 세워보세요!',
+  },
+];
+
+// 이상 and 이하 include the bound, 초과 and 미만 leave it out; topic is the word with its particle
+const RANGE_WORDS: Record<string, { topic: string; meaning: (n: number) => string }> = {
+  이상: { topic: '이상은', meaning: (n) => `${josa(n, '과')} 같거나 큰 수` },
+  이하: { topic: '이하는', meaning: (n) => `${josa(n, '과')} 같거나 작은 수` },
+  초과: { topic: '초과는', meaning: (n) => `${n}보다 큰 수` },
+  미만: { topic: '미만은', meaning: (n) => `${n}보다 작은 수` },
+};
+const PLACE_COUNT = ['', '한', '두', '세'];
+
 const PLACE_NAMES: Record<number, string> = { 10: '십', 100: '백', 1000: '천', 10000: '만' };
 
 export function generateDecimalProblem(difficulty: Difficulty): Problem {
   const type = pickOne([
-    'multiplication',
+    'compare',
     'division',
+    'nat_div_dec',
+    'nat_div_nat',
+    'fraction_to_decimal',
+    'number_range',
     'addition_subtraction',
     'word_problem',
     'place_shift',
@@ -68,10 +98,12 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
     const op = pickOne(
       difficulty === 'easy'
         ? ['× 10', '× 100', '÷ 10']
-        : ['× 10', '× 100', '× 1000', '÷ 10', '÷ 100'],
+        : difficulty === 'medium'
+          ? ['× 10', '× 100', '× 1000', '÷ 10', '÷ 100']
+          : ['× 100', '× 1000', '÷ 100', '÷ 1000'],
     );
     const factor = Number(op.slice(2));
-    // ×: results stay below 1000; ÷10: one decimal place, ÷100: whole number, so answers have at most 2 decimals
+    // ×: results stay below 1000; ÷10: one decimal place, ÷100 and ÷1000: whole number, so answers have at most 3 decimals
     const valueText =
       op[0] === '×'
         ? String(randomScaled(11, 999) / (factor === 1000 ? 1000 : 100))
@@ -105,12 +137,17 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
   }
 
   if (type === 'to_fraction') {
-    const den = difficulty === 'easy' ? 10 : 100;
-    let num = randomInt(1, den - 1);
-    while (num % 10 === 0 && den === 100) num = randomInt(1, den - 1);
+    // easy: tenths; medium: hundredths; hard: hundredths that reduce, or eighths such as 0.375
+    const eighths = difficulty === 'hard' && Math.random() < 0.5;
+    const den = difficulty === 'easy' ? 10 : eighths ? 1000 : 100;
+    let num = eighths ? pickOne([125, 375, 625, 875]) : randomInt(1, den - 1);
+    while (den === 100 && (num % 10 === 0 || (difficulty === 'hard' && gcd(num, den) === 1))) {
+      num = randomInt(1, den - 1);
+    }
     const simplified = simplifyFraction(num, den);
     const common = gcd(num, den);
-    const decimalText = (num / den).toFixed(den === 10 ? 1 : 2);
+    const places = String(den).length - 1;
+    const decimalText = (num / den).toFixed(places);
 
     return {
       id,
@@ -118,12 +155,12 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
       subtopic: '소수를 분수로',
       difficulty,
       question: `${josa(decimalText, '을')} 기약분수로 나타내세요.`,
-      hint: `소수 첫째 자리는 분모가 10, 소수 둘째 자리는 분모가 100인 분수예요. 그다음 약분할 수 있으면 약분해요!`,
+      hint: `소수 ${PLACE_COUNT[places]} 자리 수는 분모가 ${den}인 분수로 나타낼 수 있어요. 그다음 약분할 수 있으면 약분해요!`,
       answerType: 'fraction',
       correctAnswer: { num: simplified.num, den: simplified.den },
       explanations: [
         {
-          title: '1단계: 분모가 10 또는 100인 분수로 바꾸기',
+          title: `1단계: 분모가 ${den}인 분수로 바꾸기`,
           content: `${decimalText} = ${num}/${den}`,
         },
         common === 1
@@ -142,7 +179,10 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
   if (type === 'rounding') {
     const places = difficulty === 'easy' ? 1 : 2;
     // The number is n / 1000; a nonzero last digit means it really needs rounding (not 28.650 to two places)
-    const n = randomScaled(1001, 99999);
+    let n = randomScaled(1001, 99999);
+    // hard: half the time the kept place is 9 and rounds up, so the 1 carries over (43.597 → 43.60)
+    if (difficulty === 'hard' && Math.random() < 0.5)
+      n = Math.floor(n / 100) * 100 + 90 + randomInt(5, 9);
     // n / 10 and n / 100 are exact at .5, so Math.round rounds halves up (n / 1000 * 100 can land just below)
     const answer = Math.round(n / 10 ** (3 - places)) / 10 ** places;
     const rawText = (n / 1000).toFixed(3);
@@ -172,79 +212,194 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
     };
   }
 
-  if (type === 'multiplication') {
-    if (difficulty === 'easy') {
-      // Decimal x Integer
-      const decInt = randomScaled(11, 49);
-      const dec = decInt / 10;
-      const intVal = randomInt(2, 6);
-      const product = decInt * intVal;
-      const ans = product / 10;
-
-      return {
-        id,
-        topicId: 'decimals',
-        subtopic: '소수 × 자연수',
-        difficulty,
-        question: `다음 식을 계산하세요:  ${dec} × ${intVal}`,
-        hint: `먼저 자연수의 곱셈처럼 계산한 다음, 소수의 소수점 아래 자리 수만큼 소수점을 왼쪽으로 옮겨요.`,
-        answerType: 'number',
-        correctAnswer: ans,
-        explanations: [
-          {
-            title: '1단계: 자연수처럼 곱하기',
-            content: `${decInt} × ${intVal} = ${product}`,
-          },
-          {
-            title: '2단계: 소수점 위치 맞추기',
-            content: `${josa(dec, '은')} 소수점 아래 한 자리이므로, ${product}에서 소수점을 왼쪽으로 한 칸 옮기면 ${decimalResultText(product, 1)}`,
-          },
-        ],
-      };
+  if (type === 'compare') {
+    // A tenths number against hundredths numbers close to it, such as 0.8 and 0.75; hard compares three
+    const whole = difficulty === 'easy' ? 0 : randomInt(1, 9);
+    const tenth = randomInt(1, 9);
+    const scaled = new Set<number>([whole * 100 + tenth * 10]);
+    while (scaled.size < (difficulty === 'hard' ? 3 : 2)) {
+      scaled.add(whole * 100 + randomScaled(Math.max(1, tenth * 10 - 9), tenth * 10 + 9));
     }
-
-    // Multiply decimals, using hundredths for the hardest level.
-    const aPlaces = difficulty === 'hard' ? 2 : 1;
-    const aScale = 10 ** aPlaces;
-    const aInt = randomScaled(aScale + 1, 9 * aScale);
-    const bInt = randomInt(2, 9);
-    const product = aInt * bInt;
-    const ans = product / 10 ** (aPlaces + 1);
+    const values = shuffle([...scaled].map((v) => v / 100));
+    const bigger = Math.random() < 0.5;
+    const answer = bigger ? Math.max(...values) : Math.min(...values);
+    const ordered = [...values].sort((a, b) => (bigger ? b - a : a - b));
+    const tenthText = String((whole * 100 + tenth * 10) / 100);
+    const most = values.length === 3 ? '가장' : '더';
+    const askWord = bigger ? '큰' : '작은';
 
     return {
       id,
       topicId: 'decimals',
-      subtopic: '소수 × 소수',
+      subtopic: '소수의 크기 비교',
       difficulty,
-      question: `다음 식을 계산하세요:  ${aInt / aScale} × ${bInt / 10}`,
-      hint: `두 소수의 소수점 아래 자리 수를 더하면 모두 몇 자리인가요? 자연수의 곱에서 그만큼 소수점을 왼쪽으로 옮겨요!`,
+      question:
+        values.length === 3
+          ? `${values.join(', ')} 중에서 가장 ${askWord} 수는 얼마인가요?`
+          : `${josa(values[0], '과')} ${values[1]} 중에서 더 ${askWord} 수는 얼마인가요?`,
+      hint: `소수점 아래 자리 수가 다르면 끝자리에 0을 붙여 자리 수를 같게 한 다음, 높은 자리부터 차례로 비교해요.`,
       answerType: 'number',
-      correctAnswer: ans,
+      correctAnswer: answer,
       explanations: [
         {
-          title: '1단계: 자연수의 곱 구하기',
-          content: `${aInt} × ${bInt} = ${product}`,
+          title: '1단계: 소수점 아래 자리 수 같게 하기',
+          content: `${josa(tenthText, '은')} ${josa(Number(tenthText).toFixed(2), '으로')} 생각하면 모두 소수 두 자리가 돼요.`,
         },
         {
-          title: '2단계: 소수점 아래 자리 수 더하기',
-          content: `두 소수의 소수점 아래 자리 수를 더하면 ${aPlaces} + 1 = ${aPlaces + 1}이므로, ${product}에서 소수점을 왼쪽으로 ${aPlaces + 1}칸 옮기면 ${decimalResultText(product, aPlaces + 1)}`,
+          title: '2단계: 높은 자리부터 비교하기',
+          content: `${ordered.map((v) => v.toFixed(2)).join(bigger ? ' > ' : ' < ')}이므로 ${most} ${askWord} 수는 ${answer}입니다.`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'nat_div_nat' || type === 'fraction_to_decimal') {
+    // The divisor divides 10, 100 or 1000, so the quotient ends: 3 ÷ 4 = 3/4 = 75/100 = 0.75
+    const fraction = type === 'fraction_to_decimal';
+    // Fractions below hard also use 20, 25 and 50, which reach 100 by multiplying by 5, 4 or 2
+    const dens =
+      fraction && difficulty !== 'hard'
+        ? difficulty === 'easy'
+          ? [2, 4, 5, 20, 25, 50]
+          : [4, 5, 20, 25, 50]
+        : difficulty === 'easy'
+          ? [2, 4, 5]
+          : difficulty === 'medium'
+            ? [2, 4, 5, 20, 25]
+            : [8, 25, 40, 50];
+    // A fraction to convert stays below 1, as in 3/4 or 7/20
+    const maxA = (den: number) =>
+      Math.min(difficulty === 'easy' || den === 8 ? 9 : 19, fraction ? den - 1 : 99);
+    // Every pair is equally likely, so 1/2 does not come up as often as 7/20
+    const [a, b] = pickOne(
+      dens.flatMap((den) =>
+        Array.from({ length: maxA(den) }, (_, i): [number, number] => [i + 1, den]).filter(
+          ([n]) => gcd(n, den) === 1,
+        ),
+      ),
+    );
+    const den = b === 2 || b === 5 ? 10 : b === 8 || b === 40 ? 1000 : 100;
+    const factor = den / b;
+    const num = a * factor;
+    const quotient = num / den;
+    const steps = [
+      {
+        title: `분모를 ${josa(den, '으로')} 만들기`,
+        content: `분모와 분자에 똑같이 ${josa(factor, '을')} 곱하면 ${a}/${b} = ${num}/${den}입니다.`,
+      },
+      {
+        title: '소수로 나타내기',
+        content: `${num}/${den} = ${quotient}`,
+      },
+    ];
+    if (!fraction) steps.unshift({ title: '분수로 나타내기', content: `${a} ÷ ${b} = ${a}/${b}` });
+
+    return {
+      id,
+      topicId: 'decimals',
+      subtopic: fraction ? '분수를 소수로' : '몫을 소수로 나타내기',
+      difficulty,
+      question: fraction
+        ? `${josa(`${a}/${b}`, '을')} 소수로 나타내세요.`
+        : `${a} ÷ ${b}의 몫을 소수로 나타내세요.`,
+      hint: fraction
+        ? '분모가 10, 100, 1000 중 하나가 되도록 분모와 분자에 같은 수를 곱해 보세요.'
+        : `${a} ÷ ${josa(b, '을')} 분수 ${josa(`${a}/${b}`, '으로')} 나타낸 다음, 분모가 10, 100, 1000인 분수로 바꾸어 보세요.`,
+      answerType: 'number',
+      correctAnswer: quotient,
+      explanations: steps.map((s, i) => ({ ...s, title: `${i + 1}단계: ${s.title}` })),
+    };
+  }
+
+  if (type === 'number_range') {
+    // easy: 이상 with 이하 or 미만; medium: any pair; hard: a decimal bound, as in 2.5 초과 7 이하
+    const lowWord = difficulty === 'easy' ? '이상' : pickOne(['이상', '초과']);
+    const highWord = pickOne(['이하', '미만']);
+    let low: number;
+    let high: number;
+    if (difficulty === 'hard') {
+      low = randomScaled(11, 99) / 10;
+      // A whole upper bound keeps 이하 and 미만 apart; a decimal one is 2.1 to 7.9 above the first natural number
+      const start = Math.ceil(low);
+      high =
+        Math.random() < 0.5
+          ? start + randomInt(3, 7)
+          : randomScaled(10 * start + 21, 10 * start + 79) / 10;
+    } else {
+      low = randomInt(10, difficulty === 'easy' ? 40 : 80);
+      high = low + randomInt(difficulty === 'easy' ? 3 : 4, difficulty === 'easy' ? 7 : 9);
+    }
+    const first = lowWord === '이상' ? Math.ceil(low) : Math.floor(low) + 1;
+    const last = highWord === '이하' ? Math.floor(high) : Math.ceil(high) - 1;
+    const inside = Array.from({ length: last - first + 1 }, (_, i) => first + i);
+
+    return {
+      id,
+      topicId: 'decimals',
+      subtopic: '수의 범위',
+      difficulty,
+      question: `${low} ${lowWord} ${high} ${highWord}인 자연수는 모두 몇 개인가요?`,
+      hint: '이상과 이하는 그 수를 포함하고, 초과와 미만은 그 수를 포함하지 않아요. 범위에 드는 자연수를 차례로 써 보세요.',
+      answerType: 'number',
+      correctAnswer: inside.length,
+      explanations: [
+        {
+          title: '1단계: 범위의 뜻 알기',
+          content: `${low} ${RANGE_WORDS[lowWord].topic} ${RANGE_WORDS[lowWord].meaning(low)}, ${high} ${RANGE_WORDS[highWord].topic} ${RANGE_WORDS[highWord].meaning(high)}예요.`,
+        },
+        {
+          title: '2단계: 범위에 드는 자연수 세기',
+          content: `범위에 드는 자연수는 ${inside.join(', ')}이므로 모두 ${inside.length}개입니다.`,
         },
       ],
     };
   }
 
   if (type === 'division') {
-    // Division: Choose clean quotient
-    const quotient =
-      difficulty === 'easy'
-        ? randomInt(2, 8)
-        : difficulty === 'medium'
-          ? randomInt(3, 12)
-          : randomInt(5, 20);
-    const places = difficulty === 'hard' ? 2 : 1;
+    if (difficulty === 'hard') {
+      // Different place counts with a decimal quotient: 1.56 ÷ 1.2 becomes 15.6 ÷ 12 = 1.3
+      let divisorInt = randomScaled(11, 29);
+      let quotientInt = randomScaled(11, 29);
+      while ((divisorInt * quotientInt) % 10 === 0) {
+        divisorInt = randomScaled(11, 29);
+        quotientInt = randomScaled(11, 29);
+      }
+      const dividendInt = divisorInt * quotientInt; // in hundredths
+      const divisor = divisorInt / 10;
+      const quotient = quotientInt / 10;
+      const shifted = dividendInt / 10;
+
+      return {
+        id,
+        topicId: 'decimals',
+        subtopic: '소수의 나눗셈',
+        difficulty,
+        question: `다음 나눗셈을 계산하세요:  ${dividendInt / 100} ÷ ${divisor}`,
+        hint: `나누는 수가 자연수가 되도록 두 수에 똑같이 10을 곱한 다음, (소수) ÷ (자연수)로 계산해 보세요.`,
+        answerType: 'number',
+        correctAnswer: quotient,
+        explanations: [
+          {
+            title: '1단계: 소수점 이동하기 (10배)',
+            content: `나누는 수 ${josa(divisor, '이')} 자연수가 되도록 두 수에 똑같이 10을 곱합니다: ${shifted} ÷ ${divisorInt}`,
+          },
+          {
+            title: '2단계: 소수를 자연수로 나누기',
+            content: `${dividendInt} ÷ ${divisorInt} = ${quotientInt}이고, ${josa(shifted, '은')} ${dividendInt}의 1/10이므로 몫은 ${quotient}입니다.`,
+          },
+        ],
+      };
+    }
+
+    // easy: tenths; medium: tenths or hundredths. A natural dividend would be the 자연수 ÷ 소수 type.
+    const places = difficulty === 'medium' && Math.random() < 0.5 ? 2 : 1;
     const scale = 10 ** places;
-    const divisorInt =
-      places === 2 ? randomScaled(12, 55) : randomInt(2, difficulty === 'easy' ? 6 : 8);
+    const pick = (): [number, number] => [
+      places === 2 ? randomScaled(11, 25) : randomInt(2, difficulty === 'easy' ? 6 : 9),
+      difficulty === 'easy' ? randomInt(2, 8) : randomInt(3, 12),
+    ];
+    let [divisorInt, quotient] = pick();
+    while ((divisorInt * quotient) % scale === 0) [divisorInt, quotient] = pick();
     const dividendInt = divisorInt * quotient;
 
     return {
@@ -269,17 +424,66 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
     };
   }
 
+  if (type === 'nat_div_dec') {
+    // (자연수) ÷ (소수) where divisor × quotient is a natural number: 6 ÷ 1.5 = 4, 3 ÷ 0.12 = 25
+    const scale = difficulty === 'hard' ? 100 : 10;
+    const [divisorInt, quotient] = pickOne<[number, number]>(
+      difficulty === 'hard'
+        ? [
+            [pickOne([25, 75, 125, 175]), pickOne([4, 8, 12])],
+            [pickOne([4, 8, 12, 16, 24, 36]), 25],
+            [pickOne([15, 35, 45, 65]), 20],
+          ]
+        : difficulty === 'medium'
+          ? [
+              [pickOne([5, 15, 25, 35, 45]), pickOne([2, 4, 6, 8, 12])],
+              [pickOne([2, 4, 6, 8, 12, 14, 16, 18]), pickOne([5, 15, 25])],
+            ]
+          : [
+              [pickOne([5, 15, 25]), pickOne([2, 4, 6, 8])],
+              [pickOne([2, 4, 6, 8]), pickOne([5, 15])],
+            ],
+    );
+    const dividend = (divisorInt * quotient) / scale;
+    const divisor = divisorInt / scale;
+
+    return {
+      id,
+      topicId: 'decimals',
+      subtopic: '자연수 ÷ 소수',
+      difficulty,
+      question: `다음 나눗셈을 계산하세요:  ${dividend} ÷ ${divisor}`,
+      hint: `나누는 수가 자연수가 되도록 두 수에 똑같이 ${josa(scale, '을')} 곱해요. 자연수 ${dividend}에도 똑같이 곱하는 것을 잊지 마세요!`,
+      answerType: 'number',
+      correctAnswer: quotient,
+      explanations: [
+        {
+          title: `1단계: 소수점 이동하기 (${scale}배)`,
+          content: `나누는 수 ${josa(divisor, '이')} 자연수가 되도록 두 수에 똑같이 ${josa(scale, '을')} 곱합니다: ${dividend * scale} ÷ ${divisorInt}`,
+        },
+        {
+          title: '2단계: 자연수의 나눗셈 계산',
+          content: `${dividend * scale} ÷ ${divisorInt} = ${quotient}`,
+        },
+      ],
+    };
+  }
+
   if (type === 'decimal_div_natural') {
     const places = difficulty === 'hard' ? 2 : 1;
     const scale = 10 ** places;
     const n = randomInt(2, difficulty === 'easy' ? 5 : 9);
-    const maxQuotient = (difficulty === 'easy' ? 5 : 9) * scale;
-    let q = randomScaled(scale + 1, maxQuotient);
-    // Keep the dividend a decimal as well (e.g. not 2.5 × 4 = 10)
-    while ((q * n) % 10 === 0) q = randomScaled(scale + 1, maxQuotient);
+    // easy: quotient 1.1~5.9; medium: also quotients below 1; hard: hundredths, including 1.5 ÷ 6 = 0.25 and 4.1 ÷ 2 = 2.05
+    const [minQ, maxQ] =
+      difficulty === 'easy' ? [11, 59] : difficulty === 'medium' ? [2, 99] : [11, 399];
+    let q = randomScaled(minQ, maxQ);
+    // Keep the dividend a decimal (e.g. not 2.5 × 4 = 10)
+    while ((q * n) % scale === 0) q = randomScaled(minQ, maxQ);
     const dividendInt = q * n;
     const dividend = dividendInt / scale;
     const quotient = q / scale;
+    // 1.5 ÷ 6 is worked as 1.50 ÷ 6, bringing a 0 down
+    const padded = dividend.toFixed(places);
 
     return {
       id,
@@ -293,11 +497,14 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
       explanations: [
         {
           title: '1단계: 자연수의 나눗셈으로 계산하기',
-          content: `${dividendInt} ÷ ${n} = ${q}`,
+          content:
+            String(dividend) === padded
+              ? `${dividendInt} ÷ ${n} = ${q}`
+              : `나누어떨어지도록 ${josa(dividend, '을')} ${josa(padded, '으로')} 생각하고 계산합니다: ${dividendInt} ÷ ${n} = ${q}`,
         },
         {
           title: '2단계: 몫에 소수점 찍기',
-          content: `${josa(dividend, '은')} ${dividendInt}의 1/${scale}이므로, 몫도 ${q}의 1/${scale}인 ${quotient}입니다.`,
+          content: `${josa(padded, '은')} ${dividendInt}의 1/${scale}이므로, 몫도 ${q}의 1/${scale}인 ${quotient}입니다.`,
         },
       ],
     };
@@ -305,8 +512,8 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
 
   if (type === 'quotient_rounding') {
     const places = difficulty === 'hard' ? 2 : 1;
-    const b = pickOne([3, 6, 7, 9, 11, 12]);
-    const maxA = difficulty === 'easy' ? 30 : difficulty === 'medium' ? 60 : 100;
+    const b = pickOne(difficulty === 'easy' ? [3, 6, 7, 9] : [3, 6, 7, 9, 11, 12]);
+    const maxA = difficulty === 'easy' ? 30 : 60;
     let a = randomInt(b + 1, maxA);
     // The quotient must go past the asked place, or there is nothing to round
     while ((a * 10 ** places) % b === 0) a = randomInt(b + 1, maxA);
@@ -372,7 +579,38 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
   }
 
   if (type === 'round_up_down') {
-    if (Math.random() < 0.5) {
+    const up = Math.random() < 0.5;
+    if (difficulty === 'hard') {
+      // A decimal rounded up or down to the tenths: 3.42 → 3.5 (올림) or 3.4 (버림)
+      const n = randomScaled(101, 999);
+      const answer = (up ? Math.ceil(n / 10) : Math.floor(n / 10)) / 10;
+      const below = (n % 10) / 100; // the part below the tenths, such as 0.02 in 3.42
+
+      return {
+        id,
+        topicId: 'decimals',
+        subtopic: up ? '어림하기 (올림)' : '어림하기 (버림)',
+        difficulty,
+        question: `${josa(n / 100, '을')} ${up ? '올림' : '버림'}하여 소수 첫째 자리까지 나타내세요.`,
+        hint: `${up ? '올림은 구하려는 자리 아래 수를 올려서' : '버림은 구하려는 자리 아래 수를 버려서'} 나타내는 방법이에요. 소수 첫째 자리 아래에 어떤 수가 있는지 살펴보세요.`,
+        answerType: 'number',
+        correctAnswer: answer,
+        explanations: [
+          {
+            title: '1단계: 구하려는 자리 아래 수 확인',
+            content: `${n / 100}에서 소수 첫째 자리 아래 수는 ${below}입니다.`,
+          },
+          {
+            title: up ? '2단계: 올림하기' : '2단계: 버림하기',
+            content: up
+              ? `${josa(below, '을')} 0.1로 보고 올리면 ${answer.toFixed(1)}입니다.`
+              : `${josa(below, '을')} 0으로 보고 버리면 ${answer.toFixed(1)}입니다.`,
+          },
+        ],
+      };
+    }
+
+    if (up) {
       // 올림: leftover marbles still need one more box
       const unit = 10;
       const maxCount = unit * (difficulty === 'easy' ? 9 : 20);
@@ -437,18 +675,25 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
   if (type === 'addition_subtraction') {
     const places = difficulty === 'hard' ? 2 : 1;
     const scale = 10 ** places;
-    const maxValue = difficulty === 'easy' ? 5 : difficulty === 'medium' ? 20 : 100;
+    const maxValue = difficulty === 'easy' ? 5 : difficulty === 'medium' ? 20 : 10;
     let a = randomScaled(scale, maxValue * scale);
-    let b = randomScaled(scale, maxValue * scale);
-    while (a === b) b = randomScaled(scale, maxValue * scale);
+    // hard mixes in a one-place number half the time, as in 3.47 + 1.6
+    const bScale = difficulty === 'hard' && Math.random() < 0.5 ? 10 : scale;
+    let b = randomScaled(bScale, maxValue * bScale) * (scale / bScale);
+    while (a === b) b = randomScaled(bScale, maxValue * bScale) * (scale / bScale);
     const operation = pickOne(['+', '-']);
 
     if (operation === '-' && a < b) [a, b] = [b, a];
 
     const answerScaled = operation === '+' ? a + b : a - b;
     const answer = answerScaled / scale;
-    const first = (a / scale).toFixed(places);
-    const second = (b / scale).toFixed(places);
+    const first = String(a / scale);
+    const second = String(b / scale);
+    const shorter = [a, b].find((v) => v % 10 === 0);
+    const alignNote =
+      shorter === undefined
+        ? ''
+        : ` ${josa(shorter / scale, '은')} ${josa((shorter / scale).toFixed(places), '으로')} 생각하고 계산해요.`;
 
     return {
       id,
@@ -462,7 +707,7 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
       explanations: [
         {
           title: '1단계: 소수점 자리 맞추기',
-          content: `${josa(first, '과')} ${second}의 소수점을 같은 위치에 맞춥니다.`,
+          content: `${josa(first, '과')} ${second}의 소수점을 같은 위치에 맞춥니다.${alignNote}`,
         },
         {
           title: '2단계: 같은 자리끼리 계산하기',
@@ -512,7 +757,10 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
         max: 900,
       },
     ];
-    const c = pickOne(conversions);
+    // easy stays with length (× 10, × 100); medium adds kg and L (× 1000)
+    const c = pickOne(
+      difficulty === 'easy' ? conversions.filter((x) => x.factor <= 100) : conversions,
+    );
     // Keep the big-unit value a decimal: one decimal place, or two on hard (2.35m, 0.25kg)
     const step = c.factor === 10 ? 1 : difficulty === 'hard' ? c.factor / 100 : c.factor / 10;
     let smallValue = randomInt(c.min / step, c.max / step) * step;
@@ -587,7 +835,9 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
     const scale = 10 ** places;
     const unitText = places === 2 ? '0.01' : '0.1';
     const target = difficulty === 'easy' ? 1 : randomInt(1, difficulty === 'medium' ? 3 : 5);
-    const aInt = randomScaled(1, target * scale - 1);
+    let aInt = randomScaled(1, target * scale - 1);
+    // Not the half, where the answer just repeats the given number (0.5 + □ = 1)
+    while (aInt * 2 === target * scale) aInt = randomScaled(1, target * scale - 1);
     const a = aInt / scale;
     const answer = (target * scale - aInt) / scale;
 
@@ -613,40 +863,46 @@ export function generateDecimalProblem(difficulty: Difficulty): Problem {
     };
   }
 
-  // Word Problem
-  const lengthPlaces = difficulty === 'hard' ? 2 : 1;
-  const lengthScale = 10 ** lengthPlaces;
-  const maxLength = difficulty === 'easy' ? 25 : difficulty === 'medium' ? 40 : 250;
-  const minLength = difficulty === 'hard' ? 101 : 12;
-  const lengthInt = randomScaled(minLength, maxLength);
-  const length = lengthInt / lengthScale;
+  // Word Problem: (소수) × (자연수) in a story
+  const places = difficulty === 'hard' ? 2 : 1;
+  const scale = 10 ** places;
+  const maxAmount = difficulty === 'easy' ? 25 : difficulty === 'medium' ? 40 : 250;
+  const minAmount = difficulty === 'hard' ? 101 : 12;
+  const amountInt = randomScaled(minAmount, maxAmount);
+  const amount = amountInt / scale;
   const count =
     difficulty === 'easy'
       ? randomInt(2, 4)
       : difficulty === 'medium'
         ? randomInt(3, 6)
         : randomInt(4, 8);
-  const total = (lengthInt * count) / lengthScale;
+  const product = amountInt * count;
+  const story = pickOne(WORD_STORIES);
 
   return {
     id,
     topicId: 'decimals',
     subtopic: '소수 실생활 문제',
     difficulty,
-    context: '리본 끈 이어 붙이기',
-    question: `${KID_CALL}에게 길이가 ${length}m인 리본 끈이 ${count}개 있습니다. ${KID_CALL}가 이 리본 끈들을 겹치지 않게 모두 이어 붙이면 총 몇 m가 될까요?`,
-    hint: `한 개의 길이 × 개수로 식을 세워보세요!`,
+    context: story.context,
+    question: story.question(amount, count),
+    hint: story.hint,
     answerType: 'number',
-    correctAnswer: total,
+    correctAnswer: product / scale,
     explanations: [
       {
         title: '1단계: 식 세우기',
-        content: `총 길이 = ${length} × ${count}`,
+        content: `${amount} × ${count}`,
       },
       {
-        title: '2단계: 소수 곱셈 계산',
-        content: `${length} × ${count} = ${total}m입니다.`,
+        title: '2단계: 자연수처럼 곱하기',
+        content: `${amountInt} × ${count} = ${product}`,
       },
+      {
+        title: '3단계: 소수점 찍기',
+        content: `${josa(amount, '은')} 소수 ${PLACE_COUNT[places]} 자리이므로 ${product}에서 소수점을 왼쪽으로 ${places}칸 옮기면 ${decimalResultText(product, places)}`,
+      },
+      { title: '답', content: `${product / scale}${story.unit}` },
     ],
   };
 }
