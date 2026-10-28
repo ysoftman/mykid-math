@@ -20,13 +20,15 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
     'diameter_from_circumference',
     'square_rect_area',
     'cube_volume',
+    'semicircle',
   ]);
   const id = `geo_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
   if (shape === 'rectangle_perimeter') {
     const max = difficulty === 'easy' ? 9 : difficulty === 'medium' ? 20 : 40;
     const width = randomInt(2, max);
-    const height = randomInt(2, max);
+    let height = randomInt(2, max);
+    while (height === width) height = randomInt(2, max);
     const perimeter = (width + height) * 2;
 
     return {
@@ -85,8 +87,10 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
     const max = difficulty === 'easy' ? 4 : difficulty === 'medium' ? 5 : 6;
     const pick = () => [randomInt(2, max), randomInt(2, max), randomInt(2, max)];
     let [a, b, c] = pick();
-    while (a * b * c > 200) [a, b, c] = pick();
+    // A box with three equal edges is a cube, not a cuboid problem
+    while (a * b * c > 200 || (a === b && b === c)) [a, b, c] = pick();
     const volume = a * b * c;
+    const askHeight = difficulty === 'hard' && Math.random() < 0.5;
 
     return {
       id,
@@ -94,20 +98,35 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
       subtopic: '직육면체의 부피',
       difficulty,
       context: '보물 상자',
-      question: `${KID_CALL}의 보물 상자는 가로 ${a}cm, 세로 ${b}cm, 높이 ${c}cm인 직육면체 모양입니다. 이 상자의 부피는 몇 cm³인가요?`,
-      hint: `부피는 1cm³ 쌓기나무가 몇 개 들어가는지와 같아요. 공식: 가로 × 세로 × 높이`,
+      question: askHeight
+        ? `${KID_CALL}의 보물 상자는 가로 ${a}cm, 세로 ${b}cm인 직육면체 모양이고, 부피는 ${volume}cm³입니다. 이 상자의 높이는 몇 cm인가요?`
+        : `${KID_CALL}의 보물 상자는 가로 ${a}cm, 세로 ${b}cm, 높이 ${c}cm인 직육면체 모양입니다. 이 상자의 부피는 몇 cm³인가요?`,
+      hint: askHeight
+        ? `부피 = 가로 × 세로 × 높이예요. 먼저 밑면의 넓이(가로 × 세로)를 구하고, 부피를 밑면의 넓이로 나눠 보세요.`
+        : `부피는 1cm³ 쌓기나무가 몇 개 들어가는지와 같아요. 공식: 가로 × 세로 × 높이`,
       answerType: 'number',
-      correctAnswer: volume,
-      explanations: [
-        {
-          title: '1단계: 밑면에 놓이는 쌓기나무 수',
-          content: `${a} × ${b} = ${a * b}개`,
-        },
-        {
-          title: '2단계: 높이만큼 쌓기',
-          content: `${a * b} × ${c} = ${volume}cm³`,
-        },
-      ],
+      correctAnswer: askHeight ? c : volume,
+      explanations: askHeight
+        ? [
+            {
+              title: '1단계: 밑면의 넓이',
+              content: `${a} × ${b} = ${a * b}cm²`,
+            },
+            {
+              title: '2단계: 부피를 밑면의 넓이로 나누기',
+              content: `${volume} ÷ ${a * b} = ${c}, 따라서 높이는 ${c}cm입니다.`,
+            },
+          ]
+        : [
+            {
+              title: '1단계: 밑면에 놓이는 쌓기나무 수',
+              content: `${a} × ${b} = ${a * b}개`,
+            },
+            {
+              title: '2단계: 높이만큼 쌓기',
+              content: `${a * b} × ${c} = ${volume}cm³`,
+            },
+          ],
     };
   }
 
@@ -119,26 +138,42 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
           ? randomInt(2, 4)
           : randomInt(3, 5);
     const area = 6 * edge * edge;
+    const askEdge = difficulty === 'hard' && Math.random() < 0.5;
 
     return {
       id,
       topicId: 'geometry',
       subtopic: '정육면체의 겉넓이',
       difficulty,
-      question: `한 모서리의 길이가 ${edge}cm인 정육면체의 겉넓이는 몇 cm²인가요?`,
-      hint: `정육면체는 크기가 같은 정사각형 면 6개로 이루어져 있어요!`,
+      question: askEdge
+        ? `겉넓이가 ${area}cm²인 정육면체의 한 모서리의 길이는 몇 cm인가요?`
+        : `한 모서리의 길이가 ${edge}cm인 정육면체의 겉넓이는 몇 cm²인가요?`,
+      hint: askEdge
+        ? `정육면체는 크기가 같은 정사각형 면 6개로 이루어져 있어요. 겉넓이를 6으로 나누면 한 면의 넓이가 돼요.`
+        : `정육면체는 크기가 같은 정사각형 면 6개로 이루어져 있어요!`,
       answerType: 'number',
-      correctAnswer: area,
-      explanations: [
-        {
-          title: '1단계: 한 면의 넓이',
-          content: `${edge} × ${edge} = ${edge * edge}cm²`,
-        },
-        {
-          title: '2단계: 면 6개의 넓이 더하기',
-          content: `${edge * edge} × 6 = ${area}cm²`,
-        },
-      ],
+      correctAnswer: askEdge ? edge : area,
+      explanations: askEdge
+        ? [
+            {
+              title: '1단계: 한 면의 넓이',
+              content: `${area} ÷ 6 = ${edge * edge}cm²`,
+            },
+            {
+              title: '2단계: 한 모서리의 길이',
+              content: `같은 수를 두 번 곱해 ${josa(edge * edge, '이')} 되는 수는 ${edge}이므로 한 모서리는 ${edge}cm입니다.`,
+            },
+          ]
+        : [
+            {
+              title: '1단계: 한 면의 넓이',
+              content: `${edge} × ${edge} = ${edge * edge}cm²`,
+            },
+            {
+              title: '2단계: 면 6개의 넓이 더하기',
+              content: `${edge * edge} × 6 = ${area}cm²`,
+            },
+          ],
     };
   }
 
@@ -146,7 +181,7 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
     const max = difficulty === 'easy' ? 4 : difficulty === 'medium' ? 5 : 6;
     const pick = () => [randomInt(2, max), randomInt(2, max), randomInt(2, max)];
     let [a, b, c] = pick();
-    while (2 * (a * b + b * c + a * c) > 200) [a, b, c] = pick();
+    while (2 * (a * b + b * c + a * c) > 200 || (a === b && b === c)) [a, b, c] = pick();
     const faces = a * b + b * c + a * c;
 
     return {
@@ -231,23 +266,63 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
           모서리: `밑면의 모서리 ${n}개 + 옆면끼리 만나는 모서리 ${n}개 = ${n * 2}개`,
           꼭짓점: `밑면의 꼭짓점 ${n}개 + 각뿔의 꼭짓점 1개 = ${n + 1}개`,
         };
+    const topic = (p: string) => (p === '모서리' ? '모서리는' : `${p}은`);
+    const subject = (p: string) => (p === '모서리' ? '모서리가' : `${p}이`);
+    const kind = isPrism ? '각기둥' : '각뿔';
+    // Hard may give the count of one part and ask for another; a pyramid has as many faces as vertices, so that pair is skipped
+    const given =
+      difficulty === 'hard' && Math.random() < 0.5
+        ? pickOne(
+            (['면', '모서리', '꼭짓점'] as const).filter(
+              (p) => p !== part && (isPrism || p === '모서리' || part === '모서리'),
+            ),
+          )
+        : null;
+    // Otherwise the solid may be named by its base, as in "밑면이 오각형인 각기둥"
+    const byBase = !given && Math.random() < 0.5;
+    const baseFromGiven = given
+      ? {
+          면: isPrism
+            ? `${kind}의 면은 밑면 2개와 옆면으로 이루어져요. 옆면은 ${counts.면} - 2 = ${n}개`
+            : `${kind}의 면은 밑면 1개와 옆면으로 이루어져요. 옆면은 ${counts.면} - 1 = ${n}개`,
+          모서리: isPrism
+            ? `${kind}의 모서리의 수는 밑면의 변의 수의 3배예요. 밑면의 변은 ${counts.모서리} ÷ 3 = ${n}개`
+            : `${kind}의 모서리의 수는 밑면의 변의 수의 2배예요. 밑면의 변은 ${counts.모서리} ÷ 2 = ${n}개`,
+          꼭짓점: isPrism
+            ? `${kind}의 꼭짓점의 수는 밑면의 꼭짓점의 수의 2배예요. 밑면의 꼭짓점은 ${counts.꼭짓점} ÷ 2 = ${n}개`
+            : `${kind}의 꼭짓점의 수는 밑면의 꼭짓점의 수보다 1개 많아요. 밑면의 꼭짓점은 ${counts.꼭짓점} - 1 = ${n}개`,
+        }[given]
+      : '';
 
     return {
       id,
       topicId: 'geometry',
       subtopic: isPrism ? '각기둥의 구성 요소' : '각뿔의 구성 요소',
       difficulty,
-      question: `${solid}의 ${part === '모서리' ? '모서리는' : `${part}은`} 모두 몇 개인가요?`,
-      hint: isPrism
-        ? `각기둥은 서로 평행한 밑면이 2개이고, 옆면은 밑면의 변의 수만큼 있어요.`
-        : `각뿔은 밑면이 1개이고, 삼각형 모양의 옆면이 밑면의 변의 수만큼 있어요.`,
+      question: given
+        ? `${subject(given)} ${counts[given]}개인 ${kind}의 ${topic(part)} 모두 몇 개인가요?`
+        : byBase
+          ? `밑면이 ${KOREAN_COUNT[n]}각형인 ${kind}의 ${topic(part)} 모두 몇 개인가요?`
+          : `${solid}의 ${topic(part)} 모두 몇 개인가요?`,
+      hint: given
+        ? `먼저 ${given}의 수로 밑면이 몇각형인지 알아낸 다음, ${part}의 수를 세어 보세요.`
+        : isPrism
+          ? `각기둥은 서로 평행한 밑면이 2개이고, 옆면은 밑면의 변의 수만큼 있어요.`
+          : `각뿔은 밑면이 1개이고, 삼각형 모양의 옆면이 밑면의 변의 수만큼 있어요.`,
       answerType: 'number',
       correctAnswer: counts[part],
       explanations: [
-        {
-          title: '1단계: 밑면 모양 살펴보기',
-          content: `${solid}의 밑면은 ${KOREAN_COUNT[n]}각형이므로 밑면 하나의 변과 꼭짓점이 각각 ${n}개입니다.`,
-        },
+        given
+          ? {
+              title: '1단계: 밑면 모양 알아내기',
+              content: `${baseFromGiven}이므로 밑면은 ${KOREAN_COUNT[n]}각형이고, 이 입체도형은 ${solid}입니다.`,
+            }
+          : {
+              title: '1단계: 밑면 모양 살펴보기',
+              content: byBase
+                ? `${kind}의 이름은 밑면의 모양에 따라 정해요. 밑면이 ${KOREAN_COUNT[n]}각형이므로 ${solid}이고, 밑면 하나의 변과 꼭짓점이 각각 ${n}개입니다.`
+                : `${solid}의 밑면은 ${KOREAN_COUNT[n]}각형이므로 밑면 하나의 변과 꼭짓점이 각각 ${n}개입니다.`,
+            },
         {
           title: `2단계: ${part}의 수 세기`,
           content: reasons[part],
@@ -408,7 +483,11 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
   if (shape === 'rhombus') {
     const dMax = difficulty === 'easy' ? 8 : difficulty === 'medium' ? 12 : 16;
     const d1 = randomInt(4, dMax);
-    const d2 = d1 % 2 === 0 ? randomInt(3, dMax) : randomInt(2, Math.floor(dMax / 2)) * 2;
+    // Equal diagonals would make a square
+    let d2 = d1;
+    while (d2 === d1) {
+      d2 = d1 % 2 === 0 ? randomInt(3, dMax) : randomInt(2, Math.floor(dMax / 2)) * 2;
+    }
     const area = (d1 * d2) / 2;
 
     return {
@@ -422,12 +501,12 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
       correctAnswer: area,
       explanations: [
         {
-          title: '1단계: 대각선 곱하기',
-          content: `${d1} × ${d2} = ${d1 * d2}`,
+          title: '1단계: 마름모를 둘러싼 직사각형의 넓이',
+          content: `두 대각선을 가로와 세로로 하는 직사각형의 넓이는 ${d1} × ${d2} = ${d1 * d2}cm²예요.`,
         },
         {
           title: '2단계: 2로 나누기',
-          content: `${d1 * d2} ÷ 2 = ${area}cm²`,
+          content: `마름모의 넓이는 이 직사각형 넓이의 절반이므로 ${d1 * d2} ÷ 2 = ${area}cm²`,
         },
       ],
     };
@@ -440,28 +519,46 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
         : difficulty === 'medium'
           ? randomInt(4, 12)
           : randomInt(6, 12);
-    const height = difficulty === 'hard' ? randomInt(5, 12) : randomInt(3, 12);
-    const area = base * height;
+    // Hard also asks about a triangle, whose area is half of base × height
+    const isTriangle = difficulty === 'hard' && Math.random() < 0.5;
+    let height = difficulty === 'hard' ? randomInt(5, 12) : randomInt(3, 12);
+    while (isTriangle && (base * height) % 2 === 1) height = randomInt(5, 12);
+    const area = isTriangle ? (base * height) / 2 : base * height;
 
     return {
       id,
       topicId: 'geometry',
       subtopic: '넓이로 높이 구하기',
       difficulty,
-      question: `밑변이 ${base}cm인 평행사변형의 넓이가 ${area}cm²입니다. 높이는 몇 cm인가요?`,
-      hint: `평행사변형의 넓이는 밑변 × 높이예요. 넓이를 밑변으로 나누어 보세요.`,
+      question: isTriangle
+        ? `밑변이 ${base}cm인 삼각형의 넓이가 ${area}cm²입니다. 높이는 몇 cm인가요?`
+        : `밑변이 ${base}cm인 평행사변형의 넓이가 ${area}cm²입니다. 높이는 몇 cm인가요?`,
+      hint: isTriangle
+        ? `삼각형의 넓이는 (밑변 × 높이) ÷ 2예요. 넓이에 2를 곱하면 밑변 × 높이가 돼요.`
+        : `평행사변형의 넓이는 밑변 × 높이예요. 넓이를 밑변으로 나누어 보세요.`,
       answerType: 'number',
       correctAnswer: height,
-      explanations: [
-        {
-          title: '1단계: 넓이 공식 확인하기',
-          content: `넓이 = 밑변 × 높이이므로 ${area} = ${base} × □ 입니다.`,
-        },
-        {
-          title: '2단계: 높이 구하기',
-          content: `${area} ÷ ${base} = ${height}, 따라서 높이는 ${height}cm입니다.`,
-        },
-      ],
+      explanations: isTriangle
+        ? [
+            {
+              title: '1단계: 밑변 × 높이 구하기',
+              content: `삼각형의 넓이 = (밑변 × 높이) ÷ 2이므로 밑변 × 높이 = ${area} × 2 = ${area * 2}입니다.`,
+            },
+            {
+              title: '2단계: 높이 구하기',
+              content: `${area * 2} ÷ ${base} = ${height}, 따라서 높이는 ${height}cm입니다.`,
+            },
+          ]
+        : [
+            {
+              title: '1단계: 넓이 공식 확인하기',
+              content: `넓이 = 밑변 × 높이이므로 ${area} = ${base} × □ 입니다.`,
+            },
+            {
+              title: '2단계: 높이 구하기',
+              content: `${area} ÷ ${base} = ${height}, 따라서 높이는 ${height}cm입니다.`,
+            },
+          ],
     };
   }
 
@@ -474,7 +571,8 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
       'square_from_area',
     ] as const);
     const w = randomInt(2, max);
-    const h = randomInt(2, max);
+    let h = randomInt(2, max);
+    while (h === w) h = randomInt(2, max);
     const s = randomInt(2, max);
     const isRect = variant === 'rect_area' || variant === 'rect_side';
     const content = {
@@ -558,6 +656,42 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
     };
   }
 
+  if (shape === 'semicircle') {
+    const r = difficulty === 'easy' ? randomInt(2, 4) : randomInt(3, 8);
+    const useDiameter = difficulty === 'hard' && Math.random() < 0.5;
+    const circleArea = Math.round(r * r * 314) / 100;
+    const area = Math.round(r * r * 157) / 100;
+
+    return {
+      id,
+      topicId: 'geometry',
+      subtopic: '반원의 넓이',
+      difficulty,
+      question: `${useDiameter ? '지름' : '반지름'}이 ${useDiameter ? r * 2 : r}cm인 반원의 넓이는 몇 cm²인가요? (단, 원주율은 3.14로 계산합니다)`,
+      hint: `반원은 원을 지름으로 똑같이 둘로 나눈 것 중 하나예요. 먼저 원의 넓이(반지름 × 반지름 × 원주율)를 구한 다음 2로 나눠 보세요.${useDiameter ? ' 반지름은 지름의 절반이에요.' : ''}`,
+      answerType: 'number',
+      correctAnswer: area,
+      explanations: [
+        ...(useDiameter
+          ? [
+              {
+                title: '1단계: 반지름 구하기',
+                content: `반지름 = 지름 ÷ 2 = ${r * 2} ÷ 2 = ${r}cm`,
+              },
+            ]
+          : []),
+        {
+          title: `${useDiameter ? 2 : 1}단계: 원의 넓이 구하기`,
+          content: `원의 넓이 = 반지름 × 반지름 × 원주율 = ${r} × ${r} × 3.14 = ${r * r} × 3.14 = ${circleArea}cm²`,
+        },
+        {
+          title: `${useDiameter ? 3 : 2}단계: 반으로 나누기`,
+          content: `반원의 넓이는 원의 넓이의 절반이므로 ${circleArea} ÷ 2 = ${area}cm²`,
+        },
+      ],
+    };
+  }
+
   // Circle area with pi = 3.14
   const radius =
     difficulty === 'easy'
@@ -566,21 +700,27 @@ export function generateGeometryProblem(difficulty: Difficulty): Problem {
         ? randomInt(3, 7)
         : randomInt(4, 8);
   const area = Math.round(radius * radius * 3.14 * 100) / 100;
+  const useDiameter = difficulty === 'hard' && Math.random() < 0.5;
 
   return {
     id,
     topicId: 'geometry',
     subtopic: '원의 넓이',
     difficulty,
-    question: `반지름이 ${radius}cm인 원의 넓이는 몇 cm²인가요? (단, 원주율은 3.14로 계산합니다)`,
-    hint: `원을 아주 잘게 잘라 엇갈려 이어 붙이면 직사각형에 가까워져요! 공식: 반지름 × 반지름 × 원주율(3.14)`,
+    question: `${useDiameter ? '지름' : '반지름'}이 ${useDiameter ? radius * 2 : radius}cm인 원의 넓이는 몇 cm²인가요? (단, 원주율은 3.14로 계산합니다)`,
+    hint: `원을 아주 잘게 잘라 엇갈려 이어 붙이면 직사각형에 가까워져요! 공식: 반지름 × 반지름 × 원주율(3.14)${useDiameter ? '. 반지름은 지름의 절반이에요.' : ''}`,
     answerType: 'number',
     correctAnswer: area,
     explanations: [
-      {
-        title: '1단계: 원의 넓이 공식',
-        content: `원의 넓이 = 반지름 × 반지름 × 원주율`,
-      },
+      useDiameter
+        ? {
+            title: '1단계: 반지름 구하기',
+            content: `반지름 = 지름 ÷ 2 = ${radius * 2} ÷ 2 = ${radius}cm`,
+          }
+        : {
+            title: '1단계: 원의 넓이 공식',
+            content: `원의 넓이 = 반지름 × 반지름 × 원주율`,
+          },
       {
         title: '2단계: 수치 계산',
         content: `${radius} × ${radius} × 3.14 = ${radius * radius} × 3.14 = ${area}cm²`,

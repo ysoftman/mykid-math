@@ -20,7 +20,12 @@ function unfoldCircle(r: number, slices: number) {
 }
 
 export const GeometryLab: React.FC = () => {
-  const [shape, setShape] = useState<'triangle' | 'trapezoid' | 'circle'>('triangle');
+  const [shape, setShape] = useState<'triangle' | 'trapezoid' | 'rhombus' | 'circle'>('triangle');
+
+  // Rhombus state: the two diagonals
+  const [diagonal1, setDiagonal1] = useState<number>(8);
+  const [diagonal2, setDiagonal2] = useState<number>(6);
+  const [showRhombusBox, setShowRhombusBox] = useState<boolean>(false);
 
   // Triangle state
   const [base, setBase] = useState<number>(8);
@@ -39,6 +44,7 @@ export const GeometryLab: React.FC = () => {
 
   const triArea = (base * height) / 2;
   const trapArea = ((topBase + bottomBase) * trapHeight) / 2;
+  const rhombusArea = (diagonal1 * diagonal2) / 2;
   const circleArea = Math.round(radius * radius * 3.14 * 100) / 100;
   const circumference = Math.round(2 * radius * 3.14 * 100) / 100;
   const unfold = unfoldCircle(radius * 10, slices);
@@ -89,6 +95,22 @@ export const GeometryLab: React.FC = () => {
           >
             <GameIcon name="labTrapezoid" />
             사다리꼴
+          </button>
+          <button
+            onClick={() => {
+              sound.playPop();
+              setShape('rhombus');
+            }}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-bold rounded-xl transition-all ${
+              shape === 'rhombus'
+                ? 'bg-white text-indigo-700 shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <svg viewBox="0 0 20 20" aria-hidden="true" className="h-5 w-5 shrink-0">
+              <polygon points="10,1 19,10 10,19 1,10" fill="#a855f7" stroke="#6d28d9" />
+            </svg>
+            마름모
           </button>
           <button
             onClick={() => {
@@ -199,12 +221,14 @@ export const GeometryLab: React.FC = () => {
                 strokeWidth="1.5"
                 strokeDasharray="3"
               />
+              {/* Above the top of the height line, clear of the slanted sides */}
               <text
-                x={45 + (base * 15) / 2}
-                y={150 - (height * 12) / 2}
+                x={40 + (base * 15) / 2}
+                y={142 - height * 12}
                 fill="#fbbf24"
                 fontSize="15"
                 fontWeight="bold"
+                textAnchor="middle"
               >
                 높이 {height}cm
               </text>
@@ -341,13 +365,13 @@ export const GeometryLab: React.FC = () => {
                 strokeDasharray="3"
               />
               <text
-                x="64"
+                x="57"
                 y={150 - (trapHeight * 12) / 2}
                 fill="#fbbf24"
-                fontSize="14"
+                fontSize="13"
                 textAnchor="end"
               >
-                높이 {trapHeight}
+                높이 {trapHeight}cm
               </text>
               <text
                 x={50 + 20 + (topBase * 12) / 2}
@@ -400,6 +424,152 @@ export const GeometryLab: React.FC = () => {
                   <GameIcon name="uiBulb" className="h-4 w-4" /> 똑같은 사다리꼴을 거꾸로 붙이면
                   밑변이 (윗변+아랫변), 높이가 같은 평행사변형이 돼요. 사다리꼴은 그 절반이라서{' '}
                   <strong>÷2</strong>를 해요!
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {shape === 'rhombus' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="bg-purple-50/50 p-4 rounded-xl border border-purple-100">
+              <label className="text-xs font-bold text-purple-900 block mb-1">
+                한 대각선: {diagonal1} cm
+              </label>
+              <input
+                type="range"
+                min="4"
+                max="12"
+                value={diagonal1}
+                aria-label="한 대각선"
+                onChange={(e) => {
+                  sound.playPop();
+                  setDiagonal1(Number(e.target.value));
+                }}
+                className="w-full accent-purple-600 cursor-pointer"
+              />
+            </div>
+            <div className="bg-purple-50/50 p-4 rounded-xl border border-purple-100">
+              <label className="text-xs font-bold text-purple-900 block mb-1">
+                다른 대각선: {diagonal2} cm
+              </label>
+              <input
+                type="range"
+                min="2"
+                max="8"
+                value={diagonal2}
+                aria-label="다른 대각선"
+                onChange={(e) => {
+                  sound.playPop();
+                  setDiagonal2(Number(e.target.value));
+                }}
+                className="w-full accent-purple-600 cursor-pointer"
+              />
+            </div>
+          </div>
+
+          <div className="bg-slate-900 rounded-2xl p-6 flex flex-col items-center justify-center text-white">
+            <svg viewBox="0 0 400 180" className="w-full max-w-sm h-48">
+              <defs>
+                <pattern id="rhombusGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                  <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#334155" strokeWidth="0.5" />
+                </pattern>
+              </defs>
+              <rect width="400" height="180" fill="url(#rhombusGrid)" />
+
+              {/* Rectangle around the rhombus: its sides are the two diagonals */}
+              {showRhombusBox && (
+                <rect
+                  x={200 - diagonal1 * 7.5}
+                  y={90 - diagonal2 * 7.5}
+                  width={diagonal1 * 15}
+                  height={diagonal2 * 15}
+                  fill="#ec4899"
+                  fillOpacity="0.35"
+                  stroke="#fbcfe8"
+                  strokeWidth="2"
+                  strokeDasharray="4"
+                />
+              )}
+              <polygon
+                points={`200,${90 - diagonal2 * 7.5} ${200 + diagonal1 * 7.5},90 200,${90 + diagonal2 * 7.5} ${200 - diagonal1 * 7.5},90`}
+                fill="#a855f7"
+                fillOpacity="0.8"
+                stroke="#d8b4fe"
+                strokeWidth="2"
+              />
+              <line
+                x1={200 - diagonal1 * 7.5}
+                y1="90"
+                x2={200 + diagonal1 * 7.5}
+                y2="90"
+                stroke="#fbbf24"
+                strokeWidth="1.5"
+                strokeDasharray="3"
+              />
+              <line
+                x1="200"
+                y1={90 - diagonal2 * 7.5}
+                x2="200"
+                y2={90 + diagonal2 * 7.5}
+                stroke="#fbbf24"
+                strokeWidth="1.5"
+                strokeDasharray="3"
+              />
+              {/* Each label sits at one end of its own diagonal */}
+              <text
+                x={194 - diagonal1 * 7.5}
+                y="95"
+                fill="#fbbf24"
+                fontSize="14"
+                fontWeight="bold"
+                textAnchor="end"
+              >
+                한 대각선 {diagonal1}cm
+              </text>
+              <text
+                x="200"
+                y={82 - diagonal2 * 7.5}
+                fill="#fbbf24"
+                fontSize="14"
+                fontWeight="bold"
+                textAnchor="middle"
+              >
+                다른 대각선 {diagonal2}cm
+              </text>
+            </svg>
+
+            <div className="mt-4 flex flex-col items-center gap-3">
+              <button
+                onClick={() => {
+                  sound.playPop();
+                  setShowRhombusBox(!showRhombusBox);
+                }}
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm transition-all"
+              >
+                {showRhombusBox ? (
+                  <>
+                    <GameIcon name="uiUndo" className="h-4 w-4" /> 마름모만 보기
+                  </>
+                ) : (
+                  <>
+                    <GameIcon name="uiSparkle" className="h-4 w-4" /> 마름모를 둘러싼 직사각형
+                    그려보기
+                  </>
+                )}
+              </button>
+
+              <div className="text-center">
+                <div className="text-lg font-bold text-purple-300">
+                  넓이 = ({diagonal1} × {diagonal2}) ÷ 2 ={' '}
+                  <span className="text-white font-extrabold">{rhombusArea}</span> cm²
+                </div>
+                <p className="text-xs text-slate-300 mt-1">
+                  <GameIcon name="uiBulb" className="h-4 w-4" /> 두 대각선을 가로와 세로로 하는
+                  직사각형의 넓이는 {diagonal1} × {diagonal2} = {diagonal1 * diagonal2}cm²예요.
+                  마름모의 넓이는 그 직사각형 넓이의 <strong>절반(÷2)</strong>이에요!
                 </p>
               </div>
             </div>
@@ -492,7 +662,7 @@ export const GeometryLab: React.FC = () => {
                     textAnchor="middle"
                     fontWeight="bold"
                   >
-                    반지름 {radius}
+                    반지름 {radius}cm
                   </text>
                 </svg>
                 <div className="text-xs text-slate-300 mt-2">원 (피자 모양 조각내기)</div>
@@ -532,13 +702,23 @@ export const GeometryLab: React.FC = () => {
                 <span className="text-white font-extrabold">{circleArea}</span> cm²
               </div>
               <p className="text-xs text-slate-300">
-                (원주 = 2 × {radius} × 3.14 = {circumference}cm, 직사각형 가로 = {circumference / 2}
-                cm, 세로 = {radius}cm)
+                (원주 = 지름 × 원주율 = {radius * 2} × 3.14 = {circumference}cm, 직사각형 가로 ={' '}
+                {circumference / 2}cm, 세로 = {radius}cm)
               </p>
             </div>
           </div>
         </div>
       )}
+
+      <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+        <GameIcon name="uiBulb" className="mt-0.5 h-5 w-5 shrink-0" />
+        <p>
+          <strong>기억해요:</strong> 직사각형의 넓이 = 가로 × 세로, 평행사변형의 넓이 = 밑변 × 높이,
+          삼각형의 넓이 = (밑변 × 높이) ÷ 2, 사다리꼴의 넓이 = (윗변 + 아랫변) × 높이 ÷ 2, 마름모의
+          넓이 = (한 대각선 × 다른 대각선) ÷ 2, 원주 = 지름 × 원주율, 원의 넓이 = 반지름 × 반지름 ×
+          원주율이에요. 원주율은 3.14로 계산해요.
+        </p>
+      </div>
     </div>
   );
 };
