@@ -2,7 +2,7 @@ import type { Difficulty, Problem, StepExplanation } from '../types/math';
 import { gcd, josa, pickOne, randomInt, shuffle } from './mathHelpers';
 
 export interface Goods {
-  id: string; // also the image file name: src/assets/shop/<id>.webp
+  id: string; // also the image file name: public/shop/<id>.webp
   name: string;
   price: number;
 }
@@ -10,7 +10,7 @@ export interface Goods {
 export interface Store {
   id: string;
   name: string;
-  icon: string; // image id under src/assets/shop/
+  icon: string; // image id under public/shop/
   goods: Goods[];
 }
 
@@ -107,7 +107,7 @@ export const STORES: Store[] = [
   },
 ];
 
-// Bills and coins, largest first; pictures are src/assets/shop/<moneyImage(value)>.webp
+// Bills and coins, largest first; pictures are public/shop/<moneyImage(value)>.webp
 export const MONEY = [50000, 10000, 5000, 1000, 500, 100];
 const MONEY_NAMES: Record<number, string> = {
   50000: '5만원',

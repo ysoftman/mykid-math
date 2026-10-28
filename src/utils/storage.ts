@@ -495,6 +495,7 @@ export function importData(json: string): void {
   const data = JSON.parse(json);
   if (
     data?.app !== 'mykid-math' ||
+    data.version !== 1 ||
     typeof data.stats?.stars !== 'number' ||
     typeof data.stats?.topicProgress !== 'object' ||
     !Array.isArray(data.wrongNotes)

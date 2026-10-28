@@ -9,10 +9,12 @@ import {
   DAILY_MISSION_BONUS,
   DAILY_MISSION_GOAL,
   equipItem,
+  exportData,
   getAttendanceStreak,
   getEquippedCharacter,
   getStats,
   getWrongNotes,
+  importData,
   POWER_UP_MAX,
   POWER_UPS,
   recordBossClear,
@@ -298,4 +300,27 @@ test('dev unlock opens everything and leaves today one problem short', () => {
   const r = recordProblemResult('factors', false);
   expect(r.missionCompleted).toBe(true);
   expect(getAttendanceStreak(r.updatedStats)).toBe(8);
+});
+
+test('importData accepts a backup from exportData', () => {
+  recordProblemResult('factors', true);
+  const backup = exportData();
+  store.clear();
+  importData(backup);
+  expect(getStats().totalSolved).toBe(1);
+});
+
+test('importData rejects wrong version, app and shape', () => {
+  const good = JSON.parse(exportData());
+  const cases = [
+    { ...good, version: 2 },
+    { ...good, version: undefined },
+    { ...good, app: 'other-app' },
+    { ...good, stats: { ...good.stats, stars: '10' } },
+    { ...good, wrongNotes: {} },
+  ];
+  for (const bad of cases) {
+    expect(() => importData(JSON.stringify(bad))).toThrow('Invalid backup file');
+  }
+  expect(() => importData('not json')).toThrow();
 });
