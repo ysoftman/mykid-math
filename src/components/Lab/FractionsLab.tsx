@@ -29,6 +29,11 @@ export const FractionsLab: React.FC = () => {
   const unifiedNum2 = num2 * (commonDen / den2);
   const totalNum = unifiedNum1 + unifiedNum2;
   const simplifiedSum = simplifyFraction(totalNum, commonDen);
+  // With a common denominator the numerators alone compare and divide
+  const comparison = unifiedNum1 > unifiedNum2 ? '>' : unifiedNum1 < unifiedNum2 ? '<' : '=';
+  const quotient = simplifyFraction(unifiedNum1, unifiedNum2);
+  // Below the lg breakpoint a bar of more than 12 cells is too narrow for each 1/n label
+  const cellLabel = (cells: number) => (cells > 12 ? 'hidden lg:inline' : undefined);
 
   // Multiplication calculations
   const productNum = mNum1 * mNum2;
@@ -195,11 +200,13 @@ export const FractionsLab: React.FC = () => {
                   return (
                     <div
                       key={idx}
-                      className={`flex-1 border-r border-slate-300 last:border-r-0 flex items-center justify-center text-xs font-bold transition-all duration-300 ${
+                      className={`flex-1 min-w-0 border-r border-slate-300 last:border-r-0 flex items-center justify-center text-xs font-bold transition-all duration-300 ${
                         isFilled ? 'bg-blue-700 text-white shadow-inner' : 'bg-white text-slate-500'
                       }`}
                     >
-                      <Fraction num={1} den={isUnified ? commonDen : den1} />
+                      <span className={cellLabel(isUnified ? commonDen : den1)}>
+                        <Fraction num={1} den={isUnified ? commonDen : den1} />
+                      </span>
                     </div>
                   );
                 })}
@@ -222,13 +229,15 @@ export const FractionsLab: React.FC = () => {
                   return (
                     <div
                       key={idx}
-                      className={`flex-1 border-r border-slate-300 last:border-r-0 flex items-center justify-center text-xs font-bold transition-all duration-300 ${
+                      className={`flex-1 min-w-0 border-r border-slate-300 last:border-r-0 flex items-center justify-center text-xs font-bold transition-all duration-300 ${
                         isFilled
                           ? 'bg-indigo-600 text-white shadow-inner'
                           : 'bg-white text-slate-500'
                       }`}
                     >
-                      <Fraction num={1} den={isUnified ? commonDen : den2} />
+                      <span className={cellLabel(isUnified ? commonDen : den2)}>
+                        <Fraction num={1} den={isUnified ? commonDen : den2} />
+                      </span>
                     </div>
                   );
                 })}
@@ -260,6 +269,17 @@ export const FractionsLab: React.FC = () => {
                 <span className="text-blue-700">
                   <Fraction num={num1} den={den1} /> + <Fraction num={num2} den={den2} /> ={' '}
                 </span>
+                {isUnified && den1 !== den2 && (
+                  <span className="text-slate-600">
+                    <Fraction num={unifiedNum1} den={commonDen} /> +{' '}
+                    <Fraction num={unifiedNum2} den={commonDen} /> ={' '}
+                    {simplifiedSum.den !== commonDen && (
+                      <>
+                        <Fraction num={totalNum} den={commonDen} /> ={' '}
+                      </>
+                    )}
+                  </span>
+                )}
                 <span className="text-indigo-700 font-extrabold text-base">
                   {simplifiedSum.den === 1 ? (
                     simplifiedSum.num
@@ -276,6 +296,60 @@ export const FractionsLab: React.FC = () => {
                 )}
               </div>
             </div>
+
+            {isUnified && (
+              <div className="text-sm text-slate-700 bg-white px-4 py-3 rounded-xl border border-slate-200 space-y-1">
+                <div className="font-bold text-slate-800">
+                  통분하면 분자끼리 크기를 비교하고 나눌 수도 있어요
+                </div>
+                {/* Each "a op b" stays on one line on a narrow screen */}
+                <div>
+                  크기 비교:{' '}
+                  {den1 !== den2 && (
+                    <>
+                      <span className="whitespace-nowrap">
+                        <Fraction num={unifiedNum1} den={commonDen} /> {comparison}{' '}
+                        <Fraction num={unifiedNum2} den={commonDen} />
+                        이므로
+                      </span>{' '}
+                    </>
+                  )}
+                  <span className="whitespace-nowrap">
+                    <Fraction num={num1} den={den1} /> {comparison}{' '}
+                    <Fraction num={num2} den={den2} />
+                  </span>
+                </div>
+                <div>
+                  나눗셈:{' '}
+                  <span className="whitespace-nowrap">
+                    <Fraction num={num1} den={den1} /> ÷ <Fraction num={num2} den={den2} /> =
+                  </span>{' '}
+                  {den1 !== den2 && (
+                    <>
+                      <span className="whitespace-nowrap">
+                        <Fraction num={unifiedNum1} den={commonDen} /> ÷{' '}
+                        <Fraction num={unifiedNum2} den={commonDen} /> =
+                      </span>{' '}
+                    </>
+                  )}
+                  <span className="whitespace-nowrap">
+                    {unifiedNum1} ÷ {unifiedNum2} =
+                  </span>{' '}
+                  {quotient.den === 1 ? (
+                    quotient.num
+                  ) : (
+                    <>
+                      {quotient.den !== unifiedNum2 && (
+                        <>
+                          <Fraction num={unifiedNum1} den={unifiedNum2} /> ={' '}
+                        </>
+                      )}
+                      <Fraction num={quotient.num} den={quotient.den} />
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       ) : (
@@ -409,10 +483,18 @@ export const FractionsLab: React.FC = () => {
                 <Fraction num={productNum} den={productDen} />
               </div>
               <div className="text-xs text-slate-200">
-                노란색 겹치는 영역 {productNum}칸 / 전체 {productDen}칸 = 약분하면{' '}
-                <strong className="text-white text-sm">
-                  <Fraction num={simplifiedProduct.num} den={simplifiedProduct.den} />
-                </strong>
+                전체 {productDen}칸 중 노란색으로 겹친 칸은 {productNum}칸이에요.
+                {simplifiedProduct.den === productDen ? (
+                  ' 더 이상 약분되지 않아요.'
+                ) : (
+                  <>
+                    {' '}
+                    약분하면{' '}
+                    <strong className="text-white text-sm">
+                      <Fraction num={simplifiedProduct.num} den={simplifiedProduct.den} />
+                    </strong>
+                  </>
+                )}
               </div>
             </div>
           </div>
