@@ -2,7 +2,8 @@ import type React from 'react';
 import { useState } from 'react';
 import { sound } from '../../utils/audio';
 import { GAME_ASSETS } from '../../utils/gameAssets';
-import { gcd, getFactors, lcm } from '../../utils/mathHelpers';
+import { gcd, getFactors, josa, lcm } from '../../utils/mathHelpers';
+import { commonDivisions } from '../../utils/problemGenerators/factors';
 import { GameIcon } from '../GameIcon';
 import { LabGuide } from './LabGuide';
 
@@ -40,6 +41,8 @@ export const FactorsLab: React.FC = () => {
   const factorsA = getFactors(numA);
   const factorsB = getFactors(numB);
   const commonFactors = factorsA.filter((f) => factorsB.includes(f));
+  const { steps, divisors } = commonDivisions(numA, numB);
+  const [w, h] = selectedPair;
 
   return (
     <div className="bg-white rounded-2xl p-6 shadow-sm border border-amber-100 space-y-6">
@@ -172,16 +175,16 @@ export const FactorsLab: React.FC = () => {
               </div>
             </div>
             <div className="mt-4 text-center text-sm text-amber-200">
-              <GameIcon name="uiBulb" className="h-4 w-4" /> 이 직사각형의 두 변{' '}
-              <strong>{selectedPair[0]}</strong>, <strong>{selectedPair[1]}</strong>은(는){' '}
-              {targetNum}의 약수예요.
+              <GameIcon name="uiBulb" className="h-4 w-4" /> {targetNum} = {w} × {h}이므로 이
+              직사각형의 두 변 <strong>{w}</strong>, <strong>{josa(h, '은')}</strong> {targetNum}의
+              약수이고, {josa(targetNum, '은')} {w === h ? w : `${josa(w, '과')} ${h}`}의 배수예요.
               <br />
               만들 수 있는 모든 직사각형(
-              {pairs.map(([w, h]) => `${w}×${h}`).join(', ')})의 변을 모으면{' '}
+              {pairs.map(([pw, ph]) => `${pw}×${ph}`).join(', ')})의 변을 모으면{' '}
               <strong>
-                {targetNum}의 약수 {factors.join(', ')}
-              </strong>
-              이(가) 모두 나와요!
+                {targetNum}의 약수 {josa(factors.join(', '), '이')}
+              </strong>{' '}
+              모두 나와요!
             </div>
           </div>
         </div>
@@ -241,6 +244,8 @@ export const FactorsLab: React.FC = () => {
               <div className="text-xs text-slate-600">
                 공약수 목록: <strong className="text-amber-700">{commonFactors.join(', ')}</strong>{' '}
                 중 가장 큰 수는 <strong>{calculatedGCD}</strong>
+                <br />
+                공약수는 최대공약수 {calculatedGCD}의 약수와 같아요.
               </div>
             </div>
 
@@ -252,8 +257,36 @@ export const FactorsLab: React.FC = () => {
               <div className="text-4xl font-black text-blue-700 my-2">{calculatedLCM}</div>
               <div className="text-xs text-slate-600">
                 두 수가 처음으로 함께 만나는 배수는 <strong>{calculatedLCM}</strong>입니다!
+                <br />
+                공배수는 최소공배수 {calculatedLCM}의 배수와 같아요: {calculatedLCM},{' '}
+                {calculatedLCM * 2}, {calculatedLCM * 3}, ...
               </div>
             </div>
+          </div>
+
+          <div className="bg-slate-50 border border-slate-200 rounded-2xl p-5 text-sm text-slate-700 space-y-1">
+            <div className="font-bold text-slate-800">두 수를 공약수로 계속 나누어 구하기</div>
+            {divisors.length > 0 ? (
+              <>
+                <div>
+                  {numA}, {numB} → {steps.join(' → ')}
+                </div>
+                <div>
+                  최대공약수는 나눈 수의 곱: {divisors.join(' × ')}
+                  {divisors.length > 1 && ` = ${calculatedGCD}`}
+                </div>
+                <div>
+                  최소공배수는 나눈 수와 남은 몫의 곱:{' '}
+                  {[...divisors, numA / calculatedGCD, numB / calculatedGCD].join(' × ')} ={' '}
+                  {calculatedLCM}
+                </div>
+              </>
+            ) : (
+              <div>
+                {josa(numA, '과')} {josa(numB, '은')} 1 말고는 공약수가 없어요. 최대공약수는 1,
+                최소공배수는 {numA} × {numB} = {calculatedLCM}이에요.
+              </div>
+            )}
           </div>
         </div>
       )}

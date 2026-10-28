@@ -15,7 +15,7 @@ function pickLcmPair(max: number, maxLcm = Number.POSITIVE_INFINITY): [number, n
 }
 
 // Divide both numbers by a common prime until no common factor but 1 is left
-function commonDivisions(a: number, b: number) {
+export function commonDivisions(a: number, b: number) {
   const steps: string[] = [];
   const divisors: number[] = [];
   for (let p = 2; p <= Math.min(a, b); ) {
@@ -29,6 +29,17 @@ function commonDivisions(a: number, b: number) {
     }
   }
   return { steps, divisors };
+}
+
+// "40과 64를 공약수로 계속 나눕니다: ... 나눈 수를 모두 곱하면 2 × 2 × 2 = 8이므로 최대공약수는 8입니다."
+function gcdByDivisions(a: number, b: number): string {
+  const { steps, divisors } = commonDivisions(a, b);
+  const g = gcd(a, b);
+  const product =
+    divisors.length > 1
+      ? `나눈 수를 모두 곱하면 ${divisors.join(' × ')} = ${g}`
+      : `나눈 수가 ${g} 하나뿐`;
+  return `${josa(a, '과')} ${josa(b, '을')} 공약수로 계속 나눕니다: ${steps.join(' → ')}. ${product}이므로 최대공약수는 ${g}입니다.`;
 }
 
 export function generateFactorProblem(difficulty: Difficulty): Problem {
@@ -47,6 +58,9 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
     'nth_multiple',
     'multiples_between',
     'gcd_lcm_other',
+    'factor_multiple_relation',
+    'divisor_with_remainders',
+    'dividend_with_remainder',
   ]);
   const id = `fac_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
 
@@ -122,8 +136,14 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
   }
 
   if (type === 'lcm_word') {
-    const [a, b] = pickLcmPair(difficulty === 'easy' ? 6 : difficulty === 'medium' ? 10 : 15, 120);
+    const max = difficulty === 'easy' ? 6 : difficulty === 'medium' ? 10 : 15;
+    let [a, b] = pickLcmPair(max, 120);
+    // Hard skips tiny intervals, and the listing of departures stays at most 10 long
+    while ((difficulty === 'hard' && Math.min(a, b) < 4) || lcm(a, b) / Math.min(a, b) > 10) {
+      [a, b] = pickLcmPair(max, 120);
+    }
     const both = lcm(a, b);
+    const upTo = (k: number) => Array.from({ length: both / k }, (_, i) => k * (i + 1)).join(', ');
 
     return {
       id,
@@ -137,12 +157,12 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
       correctAnswer: both,
       explanations: [
         {
-          title: '1단계: 공배수 찾기',
-          content: `A 버스는 ${a}, ${a * 2}, ${a * 3}, ...분 후에, B 버스는 ${b}, ${b * 2}, ${b * 3}, ...분 후에 출발해요.`,
+          title: '1단계: 출발 시각을 차례로 쓰기',
+          content: `A 버스는 ${upTo(a)}, ...분 후에, B 버스는 ${upTo(b)}, ...분 후에 출발해요.`,
         },
         {
-          title: '2단계: 최소공배수 구하기',
-          content: `${josa(a, '과')} ${b}의 최소공배수는 ${both}이므로 ${both}분 후에 다시 동시에 출발합니다.`,
+          title: '2단계: 처음으로 같아지는 시각 찾기',
+          content: `두 버스의 출발 시각 중 처음으로 같은 수, 즉 ${josa(a, '과')} ${b}의 최소공배수는 ${both}이므로 ${both}분 후에 다시 동시에 출발합니다.`,
         },
       ],
     };
@@ -243,19 +263,23 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
         },
         {
           title: '2단계: 처음으로 세 자리가 되는 배수 찾기',
-          content: `${l} × ${answer / l - 1} = ${answer - l}, ${l} × ${answer / l} = ${answer} 이므로 가장 작은 세 자리 수는 ${answer}입니다.`,
+          content: `${l} × ${answer / l - 1} = ${answer - l}, ${l} × ${answer / l} = ${answer}이므로 가장 작은 세 자리 수는 ${answer}입니다.`,
         },
       ],
     };
   }
 
   if (type === 'factors_count') {
-    const num =
-      difficulty === 'easy'
-        ? randomInt(12, 30)
-        : difficulty === 'medium'
-          ? randomInt(24, 60)
-          : randomInt(40, 84);
+    // A prime has only the pair 1 × itself, which leaves nothing to find
+    let num = 1;
+    while (getFactors(num).length < 3) {
+      num =
+        difficulty === 'easy'
+          ? randomInt(12, 30)
+          : difficulty === 'medium'
+            ? randomInt(24, 60)
+            : randomInt(40, 84);
+    }
     const factors = getFactors(num);
     const pairs = factors.filter((f) => f * f <= num).map((f) => `${f} × ${num / f}`);
 
@@ -286,12 +310,13 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
   }
 
   if (type === 'gcd') {
+    // A common factor of 13 (as in 91 and 78) is too hard to spot by dividing in your head
     const g =
       difficulty === 'easy'
         ? randomInt(2, 6)
         : difficulty === 'medium'
           ? randomInt(4, 12)
-          : randomInt(6, 15);
+          : pickOne([6, 7, 8, 9, 10, 11, 12, 14, 15]);
     const maxMultiplier = difficulty === 'easy' ? 4 : difficulty === 'medium' ? 6 : 7;
     const m1 = randomInt(2, maxMultiplier);
     let m2 = randomInt(2, maxMultiplier);
@@ -346,7 +371,7 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
       subtopic: '최소공배수',
       difficulty,
       question: `두 수 ${josa(a, '과')} ${b}의 최소공배수를 구하세요.`,
-      hint: `두 수의 배수 중에서 가장 처음으로 같아지는(가장 작은) 공배수를 찾아보세요.`,
+      hint: `두 수의 배수 중에서 가장 처음으로 같아지는(가장 작은) 공배수를 찾아보세요. 두 수를 공약수로 나눈 다음, 나눈 수와 남은 몫을 모두 곱해도 돼요.`,
       answerType: 'number',
       correctAnswer: ans,
       explanations: [
@@ -356,7 +381,7 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
         },
         {
           title: '2단계: 최대공약수와 남은 몫 곱하기',
-          content: `${g} × ${m1} × ${m2} = ${ans} 입니다. 따라서 최소공배수는 ${ans}입니다.`,
+          content: `${g} × ${m1} × ${m2} = ${ans}이므로 최소공배수는 ${ans}입니다.`,
         },
       ],
     };
@@ -470,18 +495,23 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
 
   if (type === 'gcd_lcm_other') {
     const g = difficulty === 'easy' ? randomInt(2, 3) : randomInt(2, 5);
-    const [m1, m2] = pickOne([
-      [2, 3],
-      [3, 2],
-      [2, 5],
-      [5, 2],
-      [3, 4],
-      [4, 3],
-      [3, 5],
-      [5, 3],
-      [4, 5],
-      [5, 4],
-    ]);
+    const pairs =
+      difficulty === 'hard'
+        ? [
+            [3, 7],
+            [4, 7],
+            [5, 6],
+            [3, 8],
+            [5, 7],
+          ]
+        : [
+            [2, 3],
+            [2, 5],
+            [3, 4],
+            [3, 5],
+            [4, 5],
+          ];
+    const [m1, m2] = Math.random() < 0.5 ? pickOne(pairs) : [...pickOne(pairs)].reverse();
     const a = g * m1;
     const b = g * m2;
     const l = g * m1 * m2;
@@ -512,13 +542,134 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
     };
   }
 
+  if (type === 'factor_multiple_relation') {
+    // The answer is the number of factors of k, so each list mixes k with different counts
+    const a =
+      difficulty === 'easy'
+        ? randomInt(2, 4)
+        : difficulty === 'medium'
+          ? randomInt(2, 5)
+          : randomInt(3, 5);
+    const k = pickOne(
+      difficulty === 'easy'
+        ? [3, 4, 5, 6, 9]
+        : difficulty === 'medium'
+          ? [6, 8, 9, 12, 16]
+          : [8, 12, 16, 18, 20],
+    );
+    const b = a * k;
+    const factors = getFactors(b);
+    const candidates = factors.filter((f) => f % a === 0);
+
+    return {
+      id,
+      topicId: 'factors',
+      subtopic: '약수와 배수의 관계',
+      difficulty,
+      question: `어떤 수는 ${a}의 배수이면서 ${b}의 약수입니다. 어떤 수가 될 수 있는 수는 모두 몇 개인가요?`,
+      hint: `${b}의 약수를 모두 쓴 다음, 그중에서 ${a}의 배수만 골라 보세요.`,
+      answerType: 'number',
+      correctAnswer: candidates.length,
+      explanations: [
+        {
+          title: `1단계: ${b}의 약수 모두 쓰기`,
+          content: `${b}의 약수는 ${factors.join(', ')}입니다.`,
+        },
+        {
+          title: `2단계: ${a}의 배수 고르기`,
+          content: `그중에서 ${a}의 배수는 ${candidates.join(', ')}이므로 어떤 수가 될 수 있는 수는 모두 ${candidates.length}개입니다.`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'divisor_with_remainders') {
+    const g =
+      difficulty === 'easy'
+        ? randomInt(3, 6)
+        : difficulty === 'medium'
+          ? randomInt(4, 9)
+          : randomInt(6, 12);
+    const maxMultiplier = difficulty === 'easy' ? 4 : 5;
+    const m1 = randomInt(2, maxMultiplier);
+    let m2 = randomInt(2, maxMultiplier);
+    while (gcd(m1, m2) !== 1) m2 = randomInt(2, maxMultiplier);
+    // Remainders stay below the divisor; only hard uses two different ones
+    const r1 = randomInt(1, g - 1);
+    const r2 = difficulty === 'hard' ? randomInt(1, g - 1) : r1;
+    const a = g * m1 + r1;
+    const b = g * m2 + r2;
+
+    return {
+      id,
+      topicId: 'factors',
+      subtopic: '나누는 수 구하기',
+      difficulty,
+      question: `어떤 수로 ${josa(a, '을')} 나누면 ${josa(r1, '이')} 남고, ${josa(b, '을')} 나누면 ${josa(r2, '이')} 남습니다. 어떤 수 중에서 가장 큰 수는 얼마인가요?`,
+      hint: `${a}에서 나머지 ${josa(r1, '을')} 빼면 어떤 수로 나누어떨어져요. ${josa(a - r1, '과')} ${josa(b - r2, '을')} 모두 나누어떨어지게 하는 가장 큰 수를 찾아보세요.`,
+      answerType: 'number',
+      correctAnswer: g,
+      explanations: [
+        {
+          title: '1단계: 나머지를 빼서 나누어떨어지는 수 만들기',
+          content: `${a} - ${r1} = ${a - r1}, ${b} - ${r2} = ${b - r2}이므로 어떤 수는 ${josa(a - r1, '과')} ${b - r2}의 공약수입니다.`,
+        },
+        {
+          title: '2단계: 최대공약수 구하기',
+          content: gcdByDivisions(a - r1, b - r2),
+        },
+        {
+          title: '3단계: 나머지보다 큰지 확인하기',
+          content: `${josa(g, '은')} 나머지 ${Math.max(r1, r2)}보다 크므로 어떤 수 중에서 가장 큰 수는 ${g}입니다.`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'dividend_with_remainder') {
+    // Two-digit answers only, so the remainder itself (a one-digit number) is never the smallest answer
+    const max = difficulty === 'easy' ? 6 : difficulty === 'medium' ? 9 : 12;
+    let [a, b] = pickLcmPair(max, 90);
+    let r = randomInt(1, Math.min(a, b, 10) - 1);
+    while (lcm(a, b) + r < 10 || lcm(a, b) + r > 99) {
+      [a, b] = pickLcmPair(max, 90);
+      r = randomInt(1, Math.min(a, b, 10) - 1);
+    }
+    const l = lcm(a, b);
+
+    return {
+      id,
+      topicId: 'factors',
+      subtopic: '나누어지는 수 구하기',
+      difficulty,
+      question: `어떤 수를 ${josa(a, '으로')} 나누어도 ${josa(b, '으로')} 나누어도 나머지가 ${r}입니다. 어떤 수가 될 수 있는 두 자리 수 중에서 가장 작은 수는 얼마인가요?`,
+      hint: `어떤 수에서 나머지 ${josa(r, '을')} 빼면 ${josa(a, '으로')}도 ${josa(b, '으로')}도 나누어떨어져요. 그런 수는 ${josa(a, '과')} ${b}의 공배수예요.`,
+      answerType: 'number',
+      correctAnswer: l + r,
+      explanations: [
+        {
+          title: '1단계: 나머지를 뺀 수 생각하기',
+          content: `어떤 수에서 ${josa(r, '을')} 빼면 ${josa(a, '과')} ${b}의 공배수가 되므로, 어떤 수는 (${josa(a, '과')} ${b}의 공배수) + ${r}입니다.`,
+        },
+        {
+          title: '2단계: 최소공배수 구하기',
+          content: `${josa(a, '과')} ${b}의 최소공배수는 ${l}이므로 어떤 수는 ${l} + ${r} = ${l + r}, ${l * 2} + ${r} = ${l * 2 + r}, ... 입니다.`,
+        },
+        {
+          title: '3단계: 가장 작은 두 자리 수 고르기',
+          content: `이 중에서 가장 작은 두 자리 수는 ${l + r}입니다.`,
+        },
+      ],
+    };
+  }
+
   // Word Problem
   const g =
     difficulty === 'easy'
       ? randomInt(2, 6)
       : difficulty === 'medium'
         ? randomInt(4, 10)
-        : randomInt(8, 18);
+        : randomInt(6, 12);
   const m1 = randomInt(2, difficulty === 'hard' ? 7 : 4);
   let m2 = randomInt(3, difficulty === 'hard' ? 8 : 5);
   while (gcd(m1, m2) !== 1) {
@@ -543,7 +694,7 @@ export function generateFactorProblem(difficulty: Difficulty): Problem {
       },
       {
         title: '2단계: 최대공약수 계산',
-        content: `${josa(candies, '과')} ${chocolates}의 최대공약수는 ${g}입니다.`,
+        content: gcdByDivisions(candies, chocolates),
       },
       {
         title: '3단계: 결과 확인',
