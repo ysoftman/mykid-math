@@ -7,9 +7,9 @@ import { GameIcon } from '../GameIcon';
 type Solid = 'cuboid' | 'cube';
 
 const PARTS = [
-  { name: '면', count: 6, note: '평평한 부분' },
+  { name: '면', count: 6, note: '선분으로 둘러싸인 부분' },
   { name: '모서리', count: 12, note: '면과 면이 만나는 선분' },
-  { name: '꼭짓점', count: 8, note: '모서리끼리 만나는 점' },
+  { name: '꼭짓점', count: 8, note: '모서리와 모서리가 만나는 점' },
 ];
 
 export const SolidsLab: React.FC = () => {
@@ -17,6 +17,9 @@ export const SolidsLab: React.FC = () => {
   const [edges, setEdges] = useState({ a: 5, b: 3, c: 4 });
   const isCube = solid === 'cube';
   const edgeSum = isCube ? edges.a * 12 : (edges.a + edges.b + edges.c) * 4;
+  const { a, b, c } = isCube ? { a: edges.a, b: edges.a, c: edges.a } : edges;
+  const volume = a * b * c;
+  const threeFaces = a * b + b * c + a * c;
 
   const slider = (key: keyof typeof edges, label: string) => (
     <label key={key} className="block rounded-xl border border-violet-100 bg-violet-50/60 p-3">
@@ -105,7 +108,12 @@ export const SolidsLab: React.FC = () => {
             ))}
           </div>
           <p className="text-xs text-violet-900">
-            한 꼭짓점에서는 모서리 3개와 면 3개가 만나고, 마주 보는 면끼리는 평행해요.
+            한 꼭짓점에서는 모서리 3개와 면 3개가 만나요. 마주 보는 면끼리는 평행하고(3쌍), 한 면과
+            맞닿은 나머지 면 4개는 그 면과 수직이에요.
+          </p>
+          <p className="text-xs text-violet-900">
+            겨냥도는 보이는 모서리를 실선으로, 보이지 않는 모서리를 점선으로 그린 그림이에요. 모서리
+            12개 중 9개가 보이고 3개는 뒤에 숨어 있어요.
           </p>
         </div>
       </div>
@@ -130,6 +138,27 @@ export const SolidsLab: React.FC = () => {
               : `(${edges.a} + ${edges.b} + ${edges.c}) × 4 = ${edgeSum}cm`}
           </div>
           <div className="text-sm text-slate-200">모든 모서리 길이의 합</div>
+          <div className="mt-3 grid gap-2 border-t border-slate-700 pt-3 text-sm sm:grid-cols-2">
+            <div>
+              <div className="text-xs text-slate-300">
+                부피 = {isCube ? '한 모서리 × 한 모서리 × 한 모서리' : '가로 × 세로 × 높이'}
+              </div>
+              <div className="font-bold text-violet-200">
+                {a} × {b} × {c} = {volume}cm³
+              </div>
+            </div>
+            <div>
+              <div className="text-xs text-slate-300">
+                겉넓이 ={' '}
+                {isCube ? '한 면의 넓이 × 6' : '한 꼭짓점에서 만나는 세 면의 넓이의 합 × 2'}
+              </div>
+              <div className="font-bold text-violet-200">
+                {isCube
+                  ? `${a} × ${a} × 6 = ${threeFaces * 2}cm²`
+                  : `(${a * b} + ${b * c} + ${a * c}) × 2 = ${threeFaces * 2}cm²`}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -140,7 +169,7 @@ export const SolidsLab: React.FC = () => {
           <GameIcon name="soNetAlt" className="h-24 w-24" />
           <p className="flex-1 text-sm leading-relaxed text-violet-900">
             정육면체의 전개도는 정사각형 6개로 되어 있고, 모양은 모두 11가지예요. 전개도를 접으면 한
-            칸 건너뛴 면끼리 마주 보며 평행한 면이 되고, 이웃한 면은 수직으로 만나요.
+            줄에서 한 칸 건너뛴 면끼리 마주 보며 평행한 면이 되고, 이웃한 면은 수직으로 만나요.
           </p>
         </div>
       </div>

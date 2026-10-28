@@ -26,6 +26,7 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
           'net_squares',
           'equal_edges',
           'parallel',
+          'sketch',
         ]
       : difficulty === 'medium'
         ? [
@@ -35,6 +36,7 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
             'perpendicular',
             'vertex_meet',
             'parallel',
+            'sketch',
           ]
         : [
             'cuboid_edge_sum',
@@ -114,7 +116,10 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
 
   if (type === 'cuboid_edge_sum' || type === 'cuboid_height_from_sum') {
     const max = difficulty === 'easy' ? 5 : 10;
-    const [a, b, c] = [randomInt(2, max), randomInt(2, max), randomInt(2, max)];
+    const pick = () => [randomInt(2, max), randomInt(2, max), randomInt(2, max)];
+    let [a, b, c] = pick();
+    // Three equal edges would make a cube
+    while (a === b && b === c) [a, b, c] = pick();
     const sum = (a + b + c) * 4;
     if (type === 'cuboid_edge_sum') {
       return {
@@ -233,7 +238,7 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
         `${solid}에서 한 면과 수직인 면은 모두 몇 개인가요?`,
         `${solid}의 밑면과 수직으로 만나는 면은 몇 개인가요?`,
       ]),
-      hint: '그 면과 마주 보는 면은 평행해요. 이 두 면을 빼면 남은 면은 모두 그 면과 수직이에요.',
+      hint: '그 면과 마주 보는 면은 평행해요. 평행하지 않은 나머지 면은 그 면과 어떻게 만나는지 생각해 보세요.',
       correctAnswer: 4,
       explanations: [
         {
@@ -241,6 +246,34 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
           content: '면 6개 중에서 그 면 1개와 마주 보는 평행한 면 1개를 빼면 6 - 2 = 4개가 남아요.',
         },
         { title: '2단계: 수직인 면', content: '남은 4개의 면은 모두 그 면과 수직으로 만나요.' },
+      ],
+    };
+  }
+
+  if (type === 'sketch') {
+    const part = pickOne(Object.keys(PARTS) as Part[]);
+    const visible = Math.random() < 0.5;
+    // Seen from the front, a sketch shows 3 faces, 9 edges (solid lines) and 7 vertices
+    const shown = { 면: 3, 모서리: 9, 꼭짓점: 7 }[part];
+    const count = visible ? shown : PARTS[part] - shown;
+    return {
+      ...base,
+      subtopic: '직육면체의 겨냥도',
+      question: `${solid}의 겨냥도에서 ${visible ? '보이는' : '보이지 않는'} ${PART_TOPIC[part]} 몇 개인가요?`,
+      hint: '겨냥도는 보이는 모서리를 실선으로, 보이지 않는 모서리를 점선으로 그려요. 상자를 앞에서 비스듬히 본 모습을 떠올려 보세요.',
+      correctAnswer: count,
+      explanations: [
+        {
+          title: '1단계: 겨냥도에서 보이는 부분',
+          content:
+            '겨냥도에서는 면 3개, 모서리 9개, 꼭짓점 7개가 보이고, 나머지는 뒤쪽에 가려져 보이지 않아요.',
+        },
+        {
+          title: `2단계: ${part} 세기`,
+          content: visible
+            ? `보이는 ${PART_TOPIC[part]} ${count}개예요.`
+            : `${part} ${PARTS[part]}개 중에서 보이는 ${shown}개를 빼면 ${PARTS[part]} - ${shown} = ${count}개가 보이지 않아요.`,
+        },
       ],
     };
   }
