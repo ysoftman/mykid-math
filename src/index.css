@@ -41,6 +41,9 @@
       -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Pretendard", "Noto Sans KR",
       sans-serif;
     user-select: none;
+    /* Korean wraps between words, not in the middle of one; a word too long for its box still breaks */
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
 
   button,
