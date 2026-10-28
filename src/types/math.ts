@@ -35,6 +35,7 @@ export type SymmetryFigureId =
   | 'trapezoid';
 
 export type TriangleSideId = 'AB' | 'BC' | 'CA' | 'DE' | 'EF' | 'FD';
+export type TriangleVertexId = 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
 
 export type ProblemVisual =
   | {
@@ -47,6 +48,9 @@ export type ProblemVisual =
       lengths?: [number, number, number];
       firstSides: Partial<Record<TriangleSideId, string>>;
       secondSides?: Partial<Record<TriangleSideId, string>>;
+      // Angle labels such as "50°" or "?" drawn inside the corner at that vertex
+      firstAngles?: Partial<Record<TriangleVertexId, string>>;
+      secondAngles?: Partial<Record<TriangleVertexId, string>>;
     };
 
 export interface StepExplanation {
