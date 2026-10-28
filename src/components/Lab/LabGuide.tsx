@@ -12,7 +12,7 @@ export const LabGuide: React.FC = () => (
       <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-sm text-white">
         2
       </span>
-      그림을 살펴봐요
+      그림과 식을 살펴봐요
     </li>
     <li className="inline-flex items-center gap-2 rounded-full bg-indigo-50 px-3 py-2">
       <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600 text-sm text-white">
