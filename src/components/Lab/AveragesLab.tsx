@@ -2,7 +2,6 @@ import type React from 'react';
 import { useState } from 'react';
 import { sound } from '../../utils/audio';
 import { GAME_ASSETS } from '../../utils/gameAssets';
-import { simplifyFraction } from '../../utils/mathHelpers';
 import { GameIcon } from '../GameIcon';
 
 const SUBJECTS = ['국어', '수학', '영어', '과학'];
@@ -21,11 +20,17 @@ const chanceWord = (red: number) =>
           ? '~아닐 것 같다'
           : '~일 것 같다';
 
-const chanceFraction = (red: number) => {
-  if (red === 0) return '0';
-  const { num, den } = simplifyFraction(red, SECTIONS);
-  return den === 1 ? '1' : `${num}/${den}`;
-};
+// The textbook puts only 0, 1/2 and 1 into numbers; the chances between are placed on that line
+const chanceNumber = (red: number) =>
+  red === 0
+    ? '0'
+    : red === SECTIONS
+      ? '1'
+      : red === SECTIONS / 2
+        ? '1/2'
+        : red < SECTIONS / 2
+          ? '0과 1/2 사이'
+          : '1/2과 1 사이';
 
 export const AveragesLab: React.FC = () => {
   const [scores, setScores] = useState([80, 90, 70, 100]);
@@ -34,6 +39,7 @@ export const AveragesLab: React.FC = () => {
   const sum = scores.reduce((a, b) => a + b, 0);
   const mean = sum / scores.length;
   const meanText = Number.isInteger(mean) ? String(mean) : mean.toFixed(1);
+  const above = scores.filter((s) => s > mean).length;
 
   const changeScore = (index: number, delta: number) => {
     sound.playPop();
@@ -63,7 +69,7 @@ export const AveragesLab: React.FC = () => {
         <div className="flex items-start gap-3 rounded-xl border border-lime-100 bg-lime-50 p-4">
           <GameIcon name="avMean" className="h-12 w-12 shrink-0" />
           <div>
-            <h4 className="font-extrabold text-lime-950">평균 = 합계 ÷ 개수</h4>
+            <h4 className="font-extrabold text-lime-950">평균 = 자료 값의 합 ÷ 자료의 수</h4>
             <p className="mt-1 text-sm leading-relaxed text-lime-900">
               자료를 모두 더한 뒤 자료의 수로 나누면 자료를 고르게 했을 때의 값, 평균이 돼요.
             </p>
@@ -71,15 +77,16 @@ export const AveragesLab: React.FC = () => {
         </div>
 
         <div className="rounded-2xl bg-slate-900 p-4 sm:p-6">
+          {/* A legend instead of a label on the line, which would sit on a bar or its score */}
+          <p className="mb-2 flex items-center justify-end gap-2 text-xs font-bold text-amber-300">
+            <span className="w-6 border-t-2 border-dashed border-amber-300" />
+            평균 {meanText}
+          </p>
           <div className="relative flex h-48 items-end justify-around gap-2">
             <div
               className="absolute inset-x-0 border-t-2 border-dashed border-amber-300"
               style={{ bottom: `${mean * BAR_SCALE}%` }}
-            >
-              <span className="absolute right-0 -top-5 text-xs font-bold text-amber-300">
-                평균 {meanText}
-              </span>
-            </div>
+            />
             {scores.map((score, index) => (
               <div key={SUBJECTS[index]} className="flex h-full w-16 flex-col justify-end">
                 <span className="mb-1 text-center text-xs font-bold text-white">{score}</span>
@@ -116,7 +123,15 @@ export const AveragesLab: React.FC = () => {
             ))}
           </div>
           <p className="mt-4 text-center text-lg font-black text-lime-300">
-            ({scores.join(' + ')}) ÷ {scores.length} = {sum} ÷ {scores.length} = {meanText}
+            <span className="whitespace-nowrap">
+              ({scores.join(' + ')}) ÷ {scores.length}
+            </span>{' '}
+            <span className="whitespace-nowrap">
+              = {sum} ÷ {scores.length} = {meanText}
+            </span>
+          </p>
+          <p className="mt-1 text-center text-sm text-slate-300">
+            평균보다 점수가 높은 과목은 {above}과목이에요. 평균과 같은 점수는 평균보다 높지 않아요.
           </p>
         </div>
       </div>
@@ -161,7 +176,7 @@ export const AveragesLab: React.FC = () => {
             </label>
             <p className="text-sm text-slate-300">화살이 빨간색에 멈출 가능성은</p>
             <p className="text-2xl font-black text-rose-300">{chanceWord(red)}</p>
-            <p className="text-lg font-bold text-amber-300">수로 나타내면 {chanceFraction(red)}</p>
+            <p className="text-lg font-bold text-amber-300">수로 나타내면 {chanceNumber(red)}</p>
           </div>
         </div>
       </div>
@@ -169,8 +184,8 @@ export const AveragesLab: React.FC = () => {
       <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
         <GameIcon name="avDice" className="h-8 w-8 shrink-0" />
         <p>
-          <strong>기억해요:</strong> 주사위에서 짝수가 나올 가능성처럼 전체의 절반이면 반반(1/2),
-          반드시 일어나면 확실(1), 절대 일어나지 않으면 불가능(0)이에요.
+          <strong>기억해요:</strong> 주사위에서 짝수가 나올 가능성처럼 전체의 절반이면
+          '반반이다'(1/2), 반드시 일어나면 '확실하다'(1), 절대 일어나지 않으면 '불가능하다'(0)예요.
         </p>
       </div>
     </section>

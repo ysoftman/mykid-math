@@ -1,5 +1,5 @@
 import type { Difficulty, Problem } from '../../types/math';
-import { pickOne, randomInt } from '../mathHelpers';
+import { pickOne, randomInt, shuffle } from '../mathHelpers';
 import { KID_CALL } from '../profile';
 
 const DAYS = ['월요일', '화요일', '수요일', '목요일', '금요일'];
@@ -93,15 +93,179 @@ const CHANCES = [
   },
 ];
 
+// Chances that are only put into words, never as 0, 1/2 or 1
+const LIKELY_CHANCES = [
+  {
+    word: '~아닐 것 같다',
+    events: [
+      '주사위를 한 번 굴릴 때 1이 나올',
+      '빨간 구슬 1개와 파란 구슬 5개가 든 주머니에서 빨간 구슬을 꺼낼',
+      '똑같은 크기의 4칸 중 1칸이 노란색인 회전판에서 화살이 노란색에 멈출',
+      '1부터 10까지 적힌 카드 중 한 장을 뽑을 때 10이 나올',
+    ],
+  },
+  {
+    word: '~일 것 같다',
+    events: [
+      '주사위를 한 번 굴릴 때 5 이하의 수가 나올',
+      '빨간 구슬 5개와 파란 구슬 1개가 든 주머니에서 빨간 구슬을 꺼낼',
+      '똑같은 크기의 4칸 중 3칸이 노란색인 회전판에서 화살이 노란색에 멈출',
+      '1부터 10까지 적힌 카드 중 한 장을 뽑을 때 9 이하의 수가 나올',
+    ],
+  },
+];
+
+// From least to most likely
+const CHANCE_ORDER = ['불가능하다', '~아닐 것 같다', '반반이다', '~일 것 같다', '확실하다'];
+
+// "줄넘기 기록은", "수학 점수는"; measureIs is the measure with its subject particle
+const GROUP_RECORDS = [
+  { thing: '줄넘기 기록은', unit: '번', measure: '기록', measureIs: '기록이' },
+  { thing: '수학 점수는', unit: '점', measure: '점수', measureIs: '점수가' },
+  { thing: '제기차기 기록은', unit: '개', measure: '기록', measureIs: '기록이' },
+];
+
 export function generateAveragesProblem(difficulty: Difficulty): Problem {
   const id = `avg_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
   const type = pickOne(
     difficulty === 'easy'
-      ? ['mean', 'mean', 'half_chance', 'chance_fraction']
+      ? ['mean', 'total', 'above_mean', 'half_chance', 'chance_fraction', 'chance_word']
       : difficulty === 'medium'
-        ? ['mean', 'missing', 'total', 'half_chance', 'chance_fraction']
-        : ['mean', 'missing', 'raise_mean', 'chance_fraction'],
+        ? [
+            'mean',
+            'missing',
+            'total',
+            'compare_groups',
+            'above_mean',
+            'half_chance',
+            'chance_fraction',
+            'chance_word',
+          ]
+        : [
+            'mean',
+            'missing',
+            'raise_mean',
+            'compare_groups',
+            'above_mean',
+            'chance_fraction',
+            'chance_word',
+          ],
   );
+
+  if (type === 'compare_groups') {
+    // Groups of different sizes: the bigger group can have the bigger total but the smaller mean
+    const record = pickOne(GROUP_RECORDS);
+    const hard = difficulty === 'hard';
+    const sizes = shuffle(hard ? [4, 5] : [3, 4]);
+    // medium: means in tens, 10 or 20 apart; hard: means in fives, 5, 10 or 15 apart
+    const highMean = hard ? randomInt(12, 17) * 5 : randomInt(6, 8) * 10;
+    const gap = hard ? pickOne([5, 10, 15]) : pickOne([10, 20]);
+    const lowMean = highMean - gap;
+    const askGap = Math.random() < 0.5;
+    const groups = shuffle([highMean, lowMean]).map((mean, i) => ({
+      name: i === 0 ? '가' : '나',
+      size: sizes[i],
+      mean,
+      values: valuesWithMean(sizes[i], mean),
+    }));
+    const [first, second] = groups;
+    const high = first.mean === highMean ? first : second;
+    const meanStep = (g: (typeof groups)[number], step: number) => ({
+      title: `${step}단계: ${g.name} 모둠의 평균`,
+      content: `${g.values.join(' + ')} = ${g.mean * g.size}, ${g.mean * g.size} ÷ ${g.size} = ${g.mean}`,
+    });
+
+    return {
+      id,
+      topicId: 'averages',
+      subtopic: '두 모둠의 평균 비교',
+      difficulty,
+      question: `${first.name} 모둠 ${first.size}명의 ${record.thing} ${first.values.join(', ')}${record.unit}이고, ${second.name} 모둠 ${second.size}명의 ${record.thing} ${second.values.join(', ')}${record.unit}입니다. ${askGap ? `두 모둠의 평균은 몇 ${record.unit} 차이가 나나요?` : `평균이 더 높은 모둠의 평균은 몇 ${record.unit}인가요?`}`,
+      hint: `인원수가 다르면 합계가 아니라 평균으로 비교해야 해요. 모둠마다 (${record.measure}의 합) ÷ (인원수)를 구해 보세요.`,
+      answerType: 'number',
+      correctAnswer: askGap ? gap : highMean,
+      explanations: [
+        meanStep(first, 1),
+        meanStep(second, 2),
+        askGap
+          ? {
+              title: '3단계: 평균의 차 구하기',
+              content: `${highMean} - ${lowMean} = ${gap}이므로 두 모둠의 평균은 ${gap}${record.unit} 차이가 나요.`,
+            }
+          : {
+              title: '3단계: 평균 비교하기',
+              content: `${highMean} > ${lowMean}이므로 평균이 더 높은 모둠은 ${high.name} 모둠이고, 그 평균은 ${highMean}${record.unit}이에요.`,
+            },
+      ],
+    };
+  }
+
+  if (type === 'above_mean') {
+    // A value equal to the mean is not above it: 60, 80, 50, 90, 70 has mean 70 and two values above
+    const record = pickOne(GROUP_RECORDS);
+    const count = difficulty === 'easy' ? 4 : difficulty === 'medium' ? 5 : 6;
+    const mean = difficulty === 'hard' ? randomInt(9, 16) * 5 : randomInt(4, 8) * 10;
+    const values = valuesWithMean(count, mean);
+    const above = values.filter((v) => v > mean);
+    const sum = mean * count;
+
+    return {
+      id,
+      topicId: 'averages',
+      subtopic: '평균보다 높은 자료의 수',
+      difficulty,
+      question: `모둠 학생 ${count}명의 ${record.thing} ${values.join(', ')}${record.unit}입니다. ${record.measureIs} 평균보다 높은 학생은 몇 명인가요?`,
+      hint: '먼저 평균을 구한 다음, 평균과 하나씩 비교해 보세요. 평균과 같은 값은 평균보다 높은 것이 아니에요.',
+      answerType: 'number',
+      correctAnswer: above.length,
+      explanations: [
+        {
+          title: '1단계: 평균 구하기',
+          content: `${values.join(' + ')} = ${sum}, ${sum} ÷ ${count} = ${mean}`,
+        },
+        {
+          title: '2단계: 평균보다 높은 값 세기',
+          content: `${values.includes(mean) ? '평균과 같은 값은 세지 않아요. ' : ''}평균 ${mean}${record.unit}보다 높은 것은 ${above.map((v) => `${v}${record.unit}`).join(', ')}이므로 모두 ${above.length}명입니다.`,
+        },
+      ],
+    };
+  }
+
+  if (type === 'chance_word') {
+    // Three events with different chances; easy keeps to 불가능하다, 반반이다, 확실하다
+    const picked = shuffle(difficulty === 'easy' ? CHANCES : [...CHANCES, ...LIKELY_CHANCES]).slice(
+      0,
+      3,
+    );
+    const events = picked.map((c) => pickOne(c.events));
+    // hard asks half the time for the most or least likely one instead of a named word
+    const order = difficulty === 'hard' && Math.random() < 0.5 ? pickOne(['높은', '낮은']) : '';
+    const ranks = picked.map((c) => CHANCE_ORDER.indexOf(c.word));
+    const target = order
+      ? ranks.indexOf((order === '높은' ? Math.max : Math.min)(...ranks))
+      : randomInt(0, 2);
+    // One choice per line; MathText turns each "\n" into a line break
+    const list = events.map((e, i) => `${'①②③'[i]} ${e} 가능성`).join('\n');
+
+    return {
+      id,
+      topicId: 'averages',
+      subtopic: '가능성을 말로 나타내기',
+      difficulty,
+      question: order
+        ? `다음 중 일이 일어날 가능성이 가장 ${order} 것은 몇 번인가요?\n${list}`
+        : `다음 중 가능성이 '${picked[target].word}'인 것은 몇 번인가요?\n${list}`,
+      hint: `가능성은 '불가능하다', '~아닐 것 같다', '반반이다', '~일 것 같다', '확실하다'로 나타내요. 하나씩 일어날 가능성을 생각해 보세요.`,
+      answerType: 'number',
+      correctAnswer: target + 1,
+      explanations: [
+        {
+          title: '가능성을 말로 나타내기',
+          content: `${picked.map((c, i) => `${i + 1}번은 '${c.word}'`).join(', ')}이므로 ${order ? `가능성이 가장 ${order} 것은` : '답은'} ${target + 1}번이에요.`,
+        },
+      ],
+    };
+  }
 
   if (type === 'mean') {
     const count = difficulty === 'easy' ? 3 : difficulty === 'medium' ? 4 : 5;
@@ -159,7 +323,8 @@ export function generateAveragesProblem(difficulty: Difficulty): Problem {
 
   if (type === 'total') {
     const count = randomInt(3, 5);
-    const mean = randomInt(2, Math.floor(200 / count / 5)) * 5;
+    // easy keeps the mean at 30 or less; otherwise the total stays within 200
+    const mean = randomInt(2, difficulty === 'easy' ? 6 : Math.floor(200 / count / 5)) * 5;
     const total = mean * count;
 
     return {
@@ -215,7 +380,8 @@ export function generateAveragesProblem(difficulty: Difficulty): Problem {
   }
 
   if (type === 'half_chance') {
-    const total = pickOne([4, 6, 8, 10]);
+    // Not 4, whose answer 2 already appears in the hint
+    const total = pickOne([6, 8, 10]);
     const half = total / 2;
     const spinner = Math.random() < 0.5;
 
