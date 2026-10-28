@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { sound } from '../../utils/audio';
 import { GAME_ASSETS } from '../../utils/gameAssets';
 import { GameIcon } from '../GameIcon';
+import { ProblemDiagram } from '../Quiz/ProblemDiagram';
 
 type Solid = 'cuboid' | 'cube';
 
@@ -128,6 +129,15 @@ export const SolidsLab: React.FC = () => {
             ? slider('a', '한 모서리')
             : [slider('a', '가로'), slider('b', '세로'), slider('c', '높이')]}
         </div>
+        <ProblemDiagram
+          visual={{
+            kind: 'cuboid',
+            size: [a, b, c],
+            labels: isCube
+              ? { width: `${a}cm` }
+              : { width: `${a}cm`, depth: `${b}cm`, height: `${c}cm` },
+          }}
+        />
         <div className="rounded-2xl bg-slate-900 p-5 text-center text-white">
           <div className="text-xs text-slate-300">
             {isCube ? '길이가 같은 모서리 12개' : '가로·세로·높이 모서리가 4개씩'}
