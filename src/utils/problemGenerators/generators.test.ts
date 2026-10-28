@@ -598,3 +598,19 @@ test('fraction answers over 1 say how to write them and hints do not give them a
     }
   }
 });
+
+test('every solids problem draws a sketch whose edge labels match the question', () => {
+  for (const difficulty of DIFFICULTIES) {
+    for (let i = 0; i < 500; i++) {
+      const p = generateProblem('solids', difficulty);
+      expect(p.visual?.kind).toBe('cuboid');
+      if (p.visual?.kind !== 'cuboid') continue;
+      for (const label of Object.values(p.visual.labels ?? {})) {
+        if (label.endsWith('cm')) expect(p.question).toContain(label);
+      }
+      if (p.visual.highlight === 'top' || p.visual.highlight === 'bottom') {
+        expect(p.question).toContain('색칠한 면');
+      }
+    }
+  }
+});

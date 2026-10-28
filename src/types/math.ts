@@ -51,6 +51,14 @@ export type ProblemVisual =
       // Angle labels such as "50°" or "?" drawn inside the corner at that vertex
       firstAngles?: Partial<Record<TriangleVertexId, string>>;
       secondAngles?: Partial<Record<TriangleVertexId, string>>;
+    }
+  | {
+      kind: 'cuboid';
+      // 가로, 세로, 높이 drawn to scale as a sketch (겨냥도)
+      size: [number, number, number];
+      // Text such as "5cm" or "?" written next to one 가로, 세로 and 높이 edge
+      labels?: { width?: string; depth?: string; height?: string };
+      highlight?: 'top' | 'bottom' | 'vertex';
     };
 
 export interface StepExplanation {

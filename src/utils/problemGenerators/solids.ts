@@ -1,4 +1,4 @@
-import type { Difficulty, Problem } from '../../types/math';
+import type { Difficulty, Problem, ProblemVisual } from '../../types/math';
 import { josa, pickOne, randomInt } from '../mathHelpers';
 
 const PARTS = { 면: 6, 모서리: 12, 꼭짓점: 8 } as const;
@@ -49,6 +49,10 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
   );
   const solid = pickOne(['정육면체', '직육면체']);
   const base = { id, topicId: 'solids' as const, difficulty, answerType: 'number' as const };
+  const sketch: Extract<ProblemVisual, { kind: 'cuboid' }> = {
+    kind: 'cuboid',
+    size: solid === '정육면체' ? [1, 1, 1] : [5, 3, 4],
+  };
 
   if (type === 'parts_count') {
     const part = pickOne(Object.keys(PARTS) as Part[]);
@@ -61,6 +65,7 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
         `${solid}에서 ${part}의 수를 세어 보세요. 모두 몇 개인가요?`,
         `${solid} 모양 상자가 있어요. 이 상자의 ${PART_TOPIC[part]} 몇 개인가요?`,
       ]),
+      visual: sketch,
       hint: `${PART_TOPIC[part]} ${PART_MEANING[part]}이에요. 보이지 않는 뒤쪽까지 빠짐없이 세어 보세요.`,
       correctAnswer: count,
       explanations: [
@@ -83,6 +88,7 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
         `한 모서리의 길이가 ${edge}cm인 정육면체의 모든 모서리 길이의 합은 몇 cm인가요?`,
         `철사로 한 모서리가 ${edge}cm인 정육면체 모양의 뼈대를 만들려고 해요. 철사는 모두 몇 cm 필요한가요?`,
       ]),
+      visual: { kind: 'cuboid', size: [1, 1, 1], labels: { width: `${edge}cm` } },
       hint: '정육면체는 길이가 같은 모서리가 12개예요. 한 모서리의 길이에 12를 곱해요.',
       correctAnswer: sum,
       explanations: [
@@ -102,6 +108,7 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
       ...base,
       subtopic: '정육면체의 한 모서리 길이',
       question: `모든 모서리 길이의 합이 ${sum}cm인 정육면체가 있어요. 한 모서리의 길이는 몇 cm인가요?`,
+      visual: { kind: 'cuboid', size: [1, 1, 1], labels: { width: '?' } },
       hint: '정육면체의 모서리는 12개이고 길이가 모두 같으니, 합을 12로 나눠요.',
       correctAnswer: edge,
       explanations: [
@@ -126,6 +133,11 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
         ...base,
         subtopic: '직육면체의 모서리 길이의 합',
         question: `가로 ${a}cm, 세로 ${b}cm, 높이 ${c}cm인 직육면체의 모든 모서리 길이의 합은 몇 cm인가요?`,
+        visual: {
+          kind: 'cuboid',
+          size: [a, b, c],
+          labels: { width: `${a}cm`, depth: `${b}cm`, height: `${c}cm` },
+        },
         hint: '직육면체는 가로, 세로, 높이 모서리가 각각 4개씩 있어요. (가로 + 세로 + 높이) × 4',
         correctAnswer: sum,
         explanations: [
@@ -144,6 +156,11 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
       ...base,
       subtopic: '직육면체의 높이 구하기',
       question: `가로 ${a}cm, 세로 ${b}cm인 직육면체의 모든 모서리 길이의 합이 ${sum}cm예요. 높이는 몇 cm인가요?`,
+      visual: {
+        kind: 'cuboid',
+        size: [a, b, c],
+        labels: { width: `${a}cm`, depth: `${b}cm`, height: '?' },
+      },
       hint: '모든 모서리 길이의 합을 4로 나누면 가로 + 세로 + 높이가 돼요.',
       correctAnswer: c,
       explanations: [
@@ -167,6 +184,7 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
         '정육면체의 전개도를 그리려면 정사각형이 모두 몇 개 필요한가요?',
         '정육면체 전개도는 크기가 같은 정사각형 몇 개로 이루어져 있나요?',
       ]),
+      visual: { kind: 'cuboid', size: [1, 1, 1] },
       hint: '전개도는 입체도형을 펼쳐 놓은 그림이에요. 면의 수만큼 정사각형이 필요해요.',
       correctAnswer: 6,
       explanations: [
@@ -190,6 +208,11 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
         '가로, 세로, 높이가 모두 다른 직육면체에서 길이가 같은 모서리는 몇 개씩 있나요?',
         '가로, 세로, 높이가 모두 다른 직육면체의 모서리 12개를 길이가 같은 것끼리 묶으면 한 묶음에 몇 개씩인가요?',
       ]),
+      visual: {
+        kind: 'cuboid',
+        size: [5, 3, 4],
+        labels: { width: '가로', depth: '세로', height: '높이' },
+      },
       hint: '가로, 세로, 높이가 모두 다르면 모서리의 길이는 세 가지예요. 12개를 세 가지로 나눠 보세요.',
       correctAnswer: 4,
       explanations: [
@@ -212,7 +235,8 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
       subtopic: '평행한 면',
       question: askPairs
         ? `${solid}에서 서로 평행한 면은 모두 몇 쌍인가요?`
-        : `${solid}에서 한 면과 평행한 면은 몇 개인가요?`,
+        : `${solid}에서 색칠한 면과 평행한 면은 몇 개인가요?`,
+      visual: askPairs ? sketch : { ...sketch, highlight: 'top' },
       hint: '마주 보는 면끼리 평행해요. 위와 아래, 앞과 뒤, 왼쪽과 오른쪽을 생각해 보세요.',
       correctAnswer: askPairs ? 3 : 1,
       explanations: [
@@ -234,9 +258,15 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
     return {
       ...base,
       subtopic: '수직인 면',
-      question: pickOne([
-        `${solid}에서 한 면과 수직인 면은 모두 몇 개인가요?`,
-        `${solid}의 밑면과 수직으로 만나는 면은 몇 개인가요?`,
+      ...pickOne([
+        {
+          question: `${solid}에서 색칠한 면과 수직인 면은 모두 몇 개인가요?`,
+          visual: { ...sketch, highlight: 'top' as const },
+        },
+        {
+          question: `${solid}의 밑면(색칠한 면)과 수직으로 만나는 면은 몇 개인가요?`,
+          visual: { ...sketch, highlight: 'bottom' as const },
+        },
       ]),
       hint: '그 면과 마주 보는 면은 평행해요. 평행하지 않은 나머지 면은 그 면과 어떻게 만나는지 생각해 보세요.',
       correctAnswer: 4,
@@ -260,6 +290,7 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
       ...base,
       subtopic: '직육면체의 겨냥도',
       question: `${solid}의 겨냥도에서 ${visible ? '보이는' : '보이지 않는'} ${PART_TOPIC[part]} 몇 개인가요?`,
+      visual: sketch,
       hint: '겨냥도는 보이는 모서리를 실선으로, 보이지 않는 모서리를 점선으로 그려요. 상자를 앞에서 비스듬히 본 모습을 떠올려 보세요.',
       correctAnswer: count,
       explanations: [
@@ -283,7 +314,8 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
     return {
       ...base,
       subtopic: '한 꼭짓점에서 만나는 모서리와 면',
-      question: `${solid}의 한 꼭짓점에서 만나는 ${PART_TOPIC[part]} 몇 개인가요?`,
+      question: `${solid}의 한 꼭짓점(점 찍은 곳)에서 만나는 ${PART_TOPIC[part]} 몇 개인가요?`,
+      visual: { ...sketch, highlight: 'vertex' },
       hint:
         part === '면'
           ? '상자의 한 귀퉁이를 떠올려 보세요. 그 귀퉁이에 모인 면이 몇 개인지 세어요.'
@@ -316,6 +348,7 @@ export function generateSolidsProblem(difficulty: Difficulty): Problem {
         : kind === 'faces_vertices'
           ? `${solid}의 면의 수와 꼭짓점의 수를 더하면 얼마인가요?`
           : `${solid}의 모서리의 수는 면의 수보다 몇 개 더 많나요?`,
+    visual: sketch,
     hint: '면 6개, 모서리 12개, 꼭짓점 8개를 떠올려 계산해요.',
     correctAnswer: answer,
     explanations: [

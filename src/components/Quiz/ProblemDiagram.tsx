@@ -278,7 +278,105 @@ const CongruentTrianglesDiagram: React.FC<
   );
 };
 
+// Each edge is drawn at least this share of the longest so a 10 × 2 × 2 box still reads as a box
+const MIN_EDGE_RATIO = 0.4;
+// Depth recedes up and to the right at 45°, shortened to half like a textbook sketch
+const DEPTH_SLANT = 0.5 * Math.SQRT1_2;
+
+const CuboidDiagram: React.FC<Extract<ProblemVisual, { kind: 'cuboid' }>> = ({
+  size,
+  labels = {},
+  highlight,
+}) => {
+  const longest = Math.max(...size);
+  const [w, d, h] = size.map((edge) => Math.max(edge, longest * MIN_EDGE_RATIO));
+  const slant = d * DEPTH_SLANT;
+  const scale = Math.min(140 / (w + slant), 130 / (h + slant));
+  const left = (240 - (w + slant) * scale) / 2;
+  const bottom = 190 - (190 - (h + slant) * scale) / 2;
+  // f = front face, b = back face; each bottom-left, bottom-right, top-right, top-left
+  const corner = (x: number, y: number, back: boolean): Point => ({
+    x: left + (x + (back ? slant : 0)) * scale,
+    y: bottom - (y + (back ? slant : 0)) * scale,
+  });
+  const f = [corner(0, 0, false), corner(w, 0, false), corner(w, h, false), corner(0, h, false)];
+  const b = [corner(0, 0, true), corner(w, 0, true), corner(w, h, true), corner(0, h, true)];
+  const path = (points: Point[]) => points.map(({ x, y }) => `${x},${y}`).join(' ');
+  const line = (from: Point, to: Point) => ({ x1: from.x, y1: from.y, x2: to.x, y2: to.y });
+  const faces = [
+    { points: f, fill: '#ede9fe' },
+    { points: [f[3], f[2], b[2], b[3]], fill: '#f5f3ff' },
+    { points: [f[1], b[1], b[2], f[2]], fill: '#ddd6fe' },
+  ];
+  // The back-bottom-left corner is the one hidden from view, so its three edges are dashed
+  const hidden = [line(b[0], b[1]), line(b[0], b[3]), line(b[0], f[0])];
+  const visible = [
+    line(f[0], f[1]),
+    line(f[1], f[2]),
+    line(f[2], f[3]),
+    line(f[3], f[0]),
+    line(f[3], b[3]),
+    line(b[3], b[2]),
+    line(b[2], f[2]),
+    line(f[1], b[1]),
+    line(b[1], b[2]),
+  ];
+  const marked = {
+    top: [f[3], f[2], b[2], b[3]],
+    bottom: [f[0], f[1], b[1], b[0]],
+  };
+  const edgeLabels = [
+    { text: labels.width, x: (f[0].x + f[1].x) / 2, y: f[0].y + 16, anchor: 'middle' },
+    {
+      text: labels.depth,
+      x: (f[1].x + b[1].x) / 2 + 8,
+      y: (f[1].y + b[1].y) / 2 + 6,
+      anchor: 'start',
+    },
+    { text: labels.height, x: f[0].x - 8, y: (f[0].y + f[3].y) / 2, anchor: 'end' },
+  ] as const;
+
+  return (
+    <div className="mx-auto w-full max-w-xs rounded-xl border border-slate-200 bg-white p-2">
+      <svg viewBox="0 0 240 190" role="img" aria-label="입체도형의 겨냥도" className="w-full">
+        {faces.map(({ points, fill }) => (
+          <polygon key={fill} points={path(points)} fill={fill} />
+        ))}
+        {(highlight === 'top' || highlight === 'bottom') && (
+          <polygon points={path(marked[highlight])} fill="#fbbf24" fillOpacity="0.55" />
+        )}
+        {hidden.map((edge, i) => (
+          <line key={i} {...edge} stroke="#7c3aed" strokeWidth="2" strokeDasharray="5 4" />
+        ))}
+        {visible.map((edge, i) => (
+          <line key={i} {...edge} stroke="#7c3aed" strokeWidth="3" strokeLinecap="round" />
+        ))}
+        {highlight === 'vertex' && (
+          <circle cx={f[2].x} cy={f[2].y} r="7" fill="#f59e0b" stroke="white" strokeWidth="2" />
+        )}
+        {edgeLabels.map(
+          ({ text, x, y, anchor }) =>
+            text && (
+              <text
+                key={anchor}
+                x={x}
+                y={y}
+                fill={text === '?' ? '#4f46e5' : '#0f172a'}
+                fontSize={text === '?' ? 18 : 15}
+                textAnchor={anchor}
+                {...labelStyle}
+              >
+                {text}
+              </text>
+            ),
+        )}
+      </svg>
+    </div>
+  );
+};
+
 export const ProblemDiagram: React.FC<{ visual: ProblemVisual }> = ({ visual }) => {
   if (visual.kind === 'shape-set') return <ShapeSetDiagram {...visual} />;
+  if (visual.kind === 'cuboid') return <CuboidDiagram {...visual} />;
   return <CongruentTrianglesDiagram {...visual} />;
 };
