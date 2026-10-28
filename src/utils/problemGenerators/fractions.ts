@@ -332,7 +332,7 @@ export function generateFractionProblem(difficulty: Difficulty): Problem {
       topicId: 'fractions',
       subtopic: '분수의 덧셈 (통분)',
       difficulty,
-      question: `다음 분수의 덧셈을 계산하여 기약분수(더 이상 약분되지 않는 분수)로 나타내세요${OVER_ONE}:  ${num1}/${den1} + ${num2}/${den2}`,
+      question: `다음 분수의 덧셈을 계산하여 기약분수로 나타내세요${OVER_ONE}:  ${num1}/${den1} + ${num2}/${den2}`,
       hint: `분모가 다를 때는 최소공배수로 '통분'하여 분모를 똑같이 만들어준 뒤 분자끼리 더해요. 마지막에 약분도 잊지 마세요!`,
       answerType: 'fraction',
       correctAnswer: { num: simplified.num, den: simplified.den },
