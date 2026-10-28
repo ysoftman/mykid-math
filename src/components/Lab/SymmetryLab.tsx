@@ -94,8 +94,9 @@ export const SymmetryLab: React.FC = () => {
               모양과 크기가 같으면 합동이에요
             </h4>
             <p className="mt-1 text-sm leading-relaxed text-cyan-900">
-              두 도형은 방향이 달라도 옮기거나 뒤집거나 돌려서 완전히 포개지면 합동이에요. 대응하는
-              변과 각의 크기도 각각 같아요.
+              두 도형은 방향이 달라도 옮기거나 뒤집거나 돌려서 완전히 포개지면 합동이에요. 포개었을
+              때 겹치는 꼭짓점을 대응점, 겹치는 변을 대응변, 겹치는 각을 대응각이라고 해요. 대응변의
+              길이와 대응각의 크기는 서로 같아요.
             </p>
           </div>
 
@@ -183,7 +184,9 @@ export const SymmetryLab: React.FC = () => {
               선대칭은 선을 따라 접으면 포개져요
             </h4>
             <p className="mt-1 text-sm leading-relaxed text-cyan-900">
-              노란 선이 대칭축이에요. 축에서 같은 만큼 떨어진 점끼리 서로 짝이 돼요.
+              노란 선이 대칭축이에요. 대응점끼리 이은 선분은 대칭축과 수직으로 만나고, 대칭축이 그
+              선분을 똑같이 둘로 나눠요. 대칭축은 도형에 따라 여러 개일 수 있어요. 정사각형은 4개,
+              정삼각형은 3개, 정육각형은 6개예요.
             </p>
           </div>
 
@@ -237,7 +240,7 @@ export const SymmetryLab: React.FC = () => {
               {lineFolded && <GameIcon name="symSuccess" className="h-10 w-10" />}
               {lineFolded
                 ? '양쪽 도형이 포개졌어요. 이 선이 대칭축이라는 뜻이에요.'
-                : '점선은 대칭축에서 같은 거리에 있는 점을 이어요.'}
+                : '점선은 대응점끼리 이은 선분이에요. 대칭축과 수직으로 만나고, 대칭축까지의 거리가 양쪽에서 같아요.'}
             </p>
             <button
               type="button"
@@ -262,7 +265,8 @@ export const SymmetryLab: React.FC = () => {
               점대칭은 한 점을 중심으로 180° 돌려요
             </h4>
             <p className="mt-1 text-sm leading-relaxed text-cyan-900">
-              가운데 점을 기준으로 마주 보는 점을 이었을 때, 중심은 두 점의 한가운데에 있어요.
+              가운데 노란 점이 대칭의 중심이에요. 대응점끼리 이은 선분은 대칭의 중심을 지나고,
+              대칭의 중심에서 두 대응점까지의 거리는 같아요.
             </p>
           </div>
 
@@ -288,7 +292,7 @@ export const SymmetryLab: React.FC = () => {
                 ))}
               <circle cx="280" cy="150" r="7" fill="#fbbf24" />
               <circle cx="280" cy="150" r="18" fill="none" stroke="#fbbf24" strokeDasharray="3 4" />
-              <text x="280" y="28" fill="#fde68a" fontSize="14" textAnchor="middle">
+              <text x="290" y="104" fill="#fde68a" fontSize="14" textAnchor="middle">
                 대칭의 중심
               </text>
               <g transform="translate(280 150)">
@@ -317,7 +321,7 @@ export const SymmetryLab: React.FC = () => {
               {pointFolded && <GameIcon name="symSuccess" className="h-10 w-10" />}
               {pointFolded
                 ? '두 도형이 포개졌어요. 이 점을 중심으로 180° 돌렸어요.'
-                : '점선은 대칭의 중심을 지나며 서로 짝인 점을 이어요.'}
+                : '점선은 대응점끼리 이은 선분이에요. 모두 대칭의 중심을 지나고, 중심이 선분을 똑같이 둘로 나눠요.'}
             </p>
             <button
               type="button"
