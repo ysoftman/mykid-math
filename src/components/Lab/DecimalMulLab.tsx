@@ -5,7 +5,7 @@ import { GAME_ASSETS } from '../../utils/gameAssets';
 import { GameIcon } from '../GameIcon';
 import { LabGuide } from './LabGuide';
 
-const LEFT = ['0.3', '0.7', '1.2', '2.5'];
+const LEFT = ['0.3', '0.7', '1.2', '2.5', '0.25'];
 const RIGHT = ['0.2', '0.4', '0.7', '0.9'];
 const placesOf = (text: string) => text.split('.')[1]?.length ?? 0;
 const digitsOf = (text: string) => Number(text.replace('.', ''));
@@ -21,6 +21,11 @@ export const DecimalMulLab: React.FC = () => {
   const padded = String(product).padStart(places + 1, '0');
   const whole = padded.slice(0, padded.length - places);
   const fraction = padded.slice(padded.length - places);
+  // left × 10^k from its digits, so 0.25 × 0.1 shows 0.025 without float error
+  const shiftLeft = (k: number) => {
+    const p = placesOf(left) - k;
+    return String(p > 0 ? digitsOf(left) / 10 ** p : digitsOf(left) * 10 ** -p);
+  };
 
   const chips = (
     values: string[],
@@ -92,7 +97,7 @@ export const DecimalMulLab: React.FC = () => {
             </p>
           </div>
           <div className="rounded-xl bg-white/10 p-3">
-            <p className="text-xs font-bold text-orange-300">2단계 · 자리 수 더하기</p>
+            <p className="text-xs font-bold text-orange-300">2단계 · 소수점 아래 자리 수 더하기</p>
             <p className="mt-1 text-lg font-black">
               {placesOf(left)}자리 + {placesOf(right)}자리 = {places}자리
             </p>
@@ -132,11 +137,28 @@ export const DecimalMulLab: React.FC = () => {
         </p>
       </div>
 
+      <div className="rounded-xl border border-orange-100 bg-orange-50 p-4 text-sm text-orange-950">
+        <p>
+          <strong>곱의 소수점 위치:</strong> 10, 100을 곱하면 곱의 소수점이 오른쪽으로 0의 개수만큼,
+          0.1, 0.01을 곱하면 왼쪽으로 소수점 아래 자리 수만큼 옮겨져요.
+        </p>
+        <p className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-bold">
+          {[10, 100, 0.1, 0.01].map((m, i) => (
+            <span key={m} className="whitespace-nowrap">
+              {left} × {m} = {shiftLeft([1, 2, -1, -2][i])}
+            </span>
+          ))}
+        </p>
+      </div>
+
       <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
         <GameIcon name="dmCubes" className="mt-0.5 h-8 w-8 shrink-0" />
         <p>
-          <strong>기억해요:</strong> 0.3 × 0.7은 0.1이 3개와 0.1이 7개를 곱한 것이라 0.01이 21개, 즉
-          0.21이에요. 곱한 결과의 끝에 0이 남으면 지워서 써요.
+          <strong>기억해요:</strong> 0.3은 0.1이 3개, 0.7은 0.1이 7개이고{' '}
+          <span className="whitespace-nowrap">0.1 × 0.1 = 0.01이므로</span>{' '}
+          <span className="whitespace-nowrap">0.3 × 0.7은</span> 0.01이{' '}
+          <span className="whitespace-nowrap">3 × 7 = 21개,</span> 즉 0.21이에요. 곱의 소수 끝자리에
+          0이 남으면 생략해서 써요.
         </p>
       </div>
     </section>

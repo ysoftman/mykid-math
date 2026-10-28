@@ -10,6 +10,7 @@ interface Factor {
 }
 
 const PLACE_WORD = ['', '한', '두', '세'];
+const PLACE_ORDINAL = ['', '첫째', '둘째', '셋째'];
 const HUNDREDTHS = [12, 15, 24, 25, 35, 45];
 
 const factor = (digits: number, places: number): Factor => ({
@@ -17,7 +18,11 @@ const factor = (digits: number, places: number): Factor => ({
   digits,
   places,
 });
-const tenths = (min = 2, max = 9) => factor(randomInt(min, max), 1);
+const tenths = (min = 2, max = 9) => {
+  let digits = randomInt(min, max);
+  while (digits % 10 === 0) digits = randomInt(min, max);
+  return factor(digits, 1);
+};
 const hundredths = () => factor(pickOne(HUNDREDTHS), 2);
 const natural = () => factor(randomInt(2, 9), 0);
 const placesText = (f: Factor) => (f.places ? `소수 ${PLACE_WORD[f.places]} 자리` : '자연수');
@@ -49,15 +54,22 @@ function multiply(a: Factor, b: Factor) {
   return { product, places, answer, steps };
 }
 
-const WORD_PROBLEMS: ((a: string, b: string) => [string, string])[] = [
-  (a, b) => [`1m의 무게가 ${a}kg인 철근이 있습니다. 이 철근 ${b}m의 무게는 몇 kg인가요?`, 'kg'],
+// [question, unit, how to set up the expression with its particle]
+const WORD_PROBLEMS: ((a: string, b: string) => [string, string, string])[] = [
+  (a, b) => [
+    `1m의 무게가 ${a}kg인 철근이 있습니다. 이 철근 ${b}m의 무게는 몇 kg인가요?`,
+    'kg',
+    '(1m의 무게) × (철근의 길이)로',
+  ],
   (a, b) => [
     `1분에 물이 ${a}L씩 나오는 수도꼭지가 있습니다. 이 수도꼭지로 ${b}분 동안 받은 물은 모두 몇 L인가요?`,
     'L',
+    '(1분 동안 나오는 물의 양) × (물을 받은 시간)으로',
   ],
   (a, b) => [
     `한 시간에 ${a}km를 걷는 거북이가 있습니다. ${b}시간 동안 걷는 거리는 몇 km인가요?`,
     'km',
+    '(한 시간 동안 걷는 거리) × (걷는 시간)으로',
   ],
 ];
 
@@ -65,12 +77,85 @@ export function generateDecimalMulProblem(difficulty: Difficulty): Problem {
   const id = `dmul_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
   const type = pickOne(
     difficulty === 'easy'
-      ? ['nat_times_dec', 'use_nat_product']
+      ? ['nat_times_dec', 'use_nat_product', 'places_count', 'word_problem', 'point_shift']
       : difficulty === 'medium'
-        ? ['dec_times_dec', 'mixed_times_dec', 'use_nat_product', 'places_count']
-        : ['hundredths', 'mixed_times_dec', 'places_count', 'word_problem', 'square'],
+        ? [
+            'dec_times_dec',
+            'mixed_times_dec',
+            'use_nat_product',
+            'places_count',
+            'word_problem',
+            'point_shift',
+          ]
+        : [
+            'hundredths',
+            'mixed_times_dec',
+            'places_count',
+            'word_problem',
+            'square',
+            'point_shift',
+          ],
   );
   const base = { id, topicId: 'decimalMul' as const, difficulty, answerType: 'number' as const };
+
+  if (type === 'point_shift' && Math.random() < 0.5) {
+    // 곱의 소수점 위치: × 10 or × 100 moves the point right by the number of 0s.
+    // easy: 3.7 × 10; medium: 0.37 × 100 or 0.7 × 100; hard: 0.137 × 100. Products stay below 200.
+    const places = difficulty === 'easy' ? 1 : difficulty === 'medium' ? pickOne([1, 2]) : 3;
+    const zeros = difficulty === 'easy' ? 1 : pickOne([1, 2]);
+    const maxDigits = difficulty === 'easy' ? 99 : places === 1 && zeros === 2 ? 19 : 199;
+    let digits = randomInt(2, maxDigits);
+    while (digits % 10 === 0) digits = randomInt(2, maxDigits);
+    const d = factor(digits, places);
+    const answer =
+      zeros >= places ? digits * 10 ** (zeros - places) : digits / 10 ** (places - zeros);
+    return {
+      ...base,
+      subtopic: '곱의 소수점 위치',
+      question: `다음을 계산하세요:  ${d.text} × ${10 ** zeros}`,
+      hint: '10, 100을 곱하면 곱하는 수의 0의 개수만큼 곱의 소수점이 오른쪽으로 옮겨져요.',
+      correctAnswer: answer,
+      explanations: numbered([
+        {
+          title: '소수점이 옮겨지는 칸 수',
+          content: `${josa(10 ** zeros, '은')} 0이 ${zeros}개이므로 곱의 소수점이 오른쪽으로 ${zeros}칸 옮겨져요.`,
+        },
+        {
+          title: '소수점 찍기',
+          content:
+            zeros > places
+              ? `${d.text}의 소수점을 오른쪽으로 ${zeros}칸 옮기고 빈자리에 0을 채우면 ${answer}입니다.`
+              : `${d.text}의 소수점을 오른쪽으로 ${zeros}칸 옮기면 ${answer}입니다.`,
+        },
+      ]),
+    };
+  }
+
+  if (type === 'point_shift') {
+    // 곱의 소수점 위치: a natural number times 0.1, 0.01 or 0.001 moves the point left that many places
+    const places = difficulty === 'easy' ? 1 : difficulty === 'medium' ? 2 : pickOne([2, 3]);
+    let n = randomInt(2, difficulty === 'hard' ? 199 : 99);
+    while (n % 10 === 0) n = randomInt(2, difficulty === 'hard' ? 199 : 99);
+    const small = factor(1, places);
+    const [left, right] = Math.random() < 0.5 ? [n, small.text] : [small.text, n];
+    return {
+      ...base,
+      subtopic: '곱의 소수점 위치',
+      question: `다음을 계산하세요:  ${left} × ${right}`,
+      hint: '0.1, 0.01, 0.001을 곱하면 곱하는 소수의 소수점 아래 자리 수만큼 곱의 소수점이 왼쪽으로 옮겨져요.',
+      correctAnswer: n / 10 ** places,
+      explanations: numbered([
+        {
+          title: '소수점이 옮겨지는 칸 수',
+          content: `${josa(small.text, '은')} ${placesText(small)}이므로 곱의 소수점이 왼쪽으로 ${places}칸 옮겨져요.`,
+        },
+        {
+          title: '소수점 찍기',
+          content: `${n}에서 소수점을 왼쪽으로 ${places}칸 옮기면 ${decimalResultText(n, places)}`,
+        },
+      ]),
+    };
+  }
 
   if (type === 'places_count') {
     // One pair per answer (1, 2, 3 places); hard uses decimals above 1 and hundredths
@@ -96,16 +181,25 @@ export function generateDecimalMulProblem(difficulty: Difficulty): Problem {
       correctAnswer: places,
       explanations: numbered([
         steps[1],
-        { title: '계산해서 확인하기', content: `${a.text} × ${b.text} = ${answer}` },
+        {
+          title: '계산해서 확인하기',
+          content: `${a.text} × ${b.text} = ${answer}에서 소수점 아래 ${PLACE_ORDINAL[places]} 자리까지 있으므로 답은 ${places}입니다.`,
+        },
       ]),
     };
   }
 
   if (type === 'use_nat_product') {
-    const x = randomInt(2, 9);
-    const y = randomInt(2, 9);
-    const a = factor(x, 1);
-    const b = factor(y, difficulty === 'easy' ? 1 : pickOne([1, 2]));
+    // easy: 7 × 9 = 63 for 0.7 × 0.9; medium: a two-digit product such as 23 × 7 = 161 for 2.3 × 0.07
+    const easy = difficulty === 'easy';
+    let x = randomInt(2, 9);
+    let y = randomInt(2, 9);
+    while (!easy && (x < 11 || x % 10 === 0 || x * y > 200)) {
+      x = randomInt(11, 29);
+      y = randomInt(2, 9);
+    }
+    const a = factor(x, easy ? 1 : pickOne([1, 2]));
+    const b = factor(y, easy || a.places === 2 ? 1 : pickOne([1, 2]));
     const { answer, steps } = multiply(a, b);
     return {
       ...base,
@@ -118,18 +212,29 @@ export function generateDecimalMulProblem(difficulty: Difficulty): Problem {
   }
 
   if (type === 'word_problem' || type === 'square') {
-    const a = tenths();
-    const b = type === 'square' ? a : factor(pickOne([15, 25, 35, 45]), 1);
-    const { answer, steps } = multiply(a, b);
-    const [question, unit] =
+    // easy: (소수) × (자연수); medium: (소수) × (소수) with lengths above 1; hard: hundredths as in 0.25 × 1.5
+    const hundredthsWord = difficulty === 'hard' && type === 'word_problem';
+    const a = difficulty === 'easy' ? tenths() : hundredthsWord ? hundredths() : tenths(2, 19);
+    const b =
       type === 'square'
-        ? [`한 변의 길이가 ${a.text}m인 정사각형 모양 천의 넓이는 몇 m²인가요?`, 'm²']
+        ? a
+        : difficulty === 'easy'
+          ? natural()
+          : factor(pickOne(hundredthsWord ? [15, 25] : [15, 25, 35, 45]), 1);
+    const { answer, steps } = multiply(a, b);
+    const [question, unit, setup] =
+      type === 'square'
+        ? [
+            `한 변의 길이가 ${a.text}m인 정사각형 모양 천의 넓이는 몇 m²인가요?`,
+            'm²',
+            '(한 변의 길이) × (한 변의 길이)로',
+          ]
         : pickOne(WORD_PROBLEMS)(a.text, b.text);
     return {
       ...base,
       subtopic: '소수의 곱 문장제',
       question,
-      hint: `${a.text} × ${josa(b.text, '을')} 계산하면 돼요. ${calcHint(a, b)}`,
+      hint: `${setup} 식을 세워 보세요. ${calcHint(a, b)}`,
       correctAnswer: answer,
       explanations: [
         ...numbered([{ title: '식 세우기', content: `${a.text} × ${b.text}` }, ...steps]),
@@ -144,7 +249,12 @@ export function generateDecimalMulProblem(difficulty: Difficulty): Problem {
       : type === 'dec_times_dec'
         ? [tenths(), tenths(), '소수 한 자리끼리의 곱']
         : type === 'mixed_times_dec'
-          ? [tenths(11, 19), tenths(), '1보다 큰 소수의 곱']
+          ? // medium: 1.3 × 0.5; hard: both above 1, 1.3 × 1.5
+            [
+              tenths(11, 19),
+              difficulty === 'hard' ? tenths(11, 15) : tenths(),
+              '1보다 큰 소수의 곱',
+            ]
           : [hundredths(), tenths(2, 8), '소수 두 자리와 소수 한 자리의 곱'];
   const [left, right] = Math.random() < 0.5 ? [a, b] : [b, a];
   const { answer, steps } = multiply(left, right);
