@@ -1,8 +1,9 @@
 import type React from 'react';
 
-// "2와 1/3" (mixed number), "1/3", or "(5 - 3) / 15" and "(2 × 3) / (3 × 4)" (expressions)
+// "2와 1/3" (mixed number), "1/3", or "(5 - 3) / 15" and "(2 × 3) / (3 × 4)" (expressions).
+// A whole part never follows a digit or a point, so "0.53과 11/20" is a decimal and a fraction.
 const FRACTION =
-  /(\d+)[와과] (\d+)\/(\d+)|(\d+|□)\/(\d+|□)|\((\d+ [-+×] \d+)\) ?\/ ?(?:\((\d+ [-+×] \d+)\)|(\d+))/g;
+  /(?<![\d.])(\d+)[와과] (\d+)\/(\d+)|(\d+|□)\/(\d+|□)|\((\d+ [-+×] \d+)\) ?\/ ?(?:\((\d+ [-+×] \d+)\)|(\d+))/g;
 
 export const Fraction: React.FC<{ num: React.ReactNode; den: React.ReactNode }> = ({
   num,
@@ -22,12 +23,20 @@ export const Fraction: React.FC<{ num: React.ReactNode; den: React.ReactNode }> 
   </>
 );
 
-// Renders plain text with every "a/b" drawn as a stacked fraction
+// Renders plain text with every "a/b" drawn as a stacked fraction and every "\n" as a line break
 export const MathText: React.FC<{ text: string }> = ({ text }) => {
   const parts: React.ReactNode[] = [];
+  const plain = (from: number, to?: number) =>
+    text
+      .slice(from, to)
+      .split('\n')
+      .forEach((line, i) => {
+        if (i > 0) parts.push(<br key={`br${from}-${i}`} />);
+        parts.push(line);
+      });
   let last = 0;
   for (const m of text.matchAll(FRACTION)) {
-    parts.push(text.slice(last, m.index));
+    plain(last, m.index);
     parts.push(
       m[1] ? (
         <span key={m.index}>
@@ -42,6 +51,6 @@ export const MathText: React.FC<{ text: string }> = ({ text }) => {
     );
     last = m.index + m[0].length;
   }
-  parts.push(text.slice(last));
+  plain(last);
   return <>{parts}</>;
 };
